@@ -1,0 +1,42 @@
+.hj_all {
+  display: flex;
+}
+
+.hj_slider {
+  width: 15%;
+  min-height: 100%;
+  border-right: 1px solid rgb(13, 74, 137);
+  overflow: auto;
+  padding-top: 10px;
+}
+
+.hj_slider_select {
+  width: 88%;
+}
+
+.hj_slider_select_zoom_adjust {
+  width: 12%;
+}
+
+.hj_right_adjust_icon_father {
+  margin-left: 2%;
+  text-align: right;
+}
+
+.hj_right_adjust_icon {
+  background-image: url(data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMTAyNCAxMDI0IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGRhdGEtdi1lYTg5MzcyOD0iIj48cGF0aCBmaWxsPSJjdXJyZW50Q29sb3IiIGQ9Ik02MDkuNDA4IDE0OS4zNzYgMjc3Ljc2IDQ4OS42YTMyIDMyIDAgMCAwIDAgNDQuNjcybDMzMS42NDggMzQwLjM1MmEyOS4xMiAyOS4xMiAwIDAgMCA0MS43MjggMCAzMC41OTIgMzAuNTkyIDAgMCAwIDAtNDIuNzUyTDMzOS4yNjQgNTExLjkzNmwzMTEuODcyLTMxOS44NzJhMzAuNTkyIDMwLjU5MiAwIDAgMCAwLTQyLjY4OCAyOS4xMiAyOS4xMiAwIDAgMC00MS43MjggMHoiPjwvcGF0aD48L3N2Zz4=);
+  width: 23px;
+  height: 23px;
+  background-size: cover;
+  // font-weight: 700;
+  position: sticky;
+  // top: 0;
+  cursor: pointer;
+}
+
+.hj_slider_content {
+  height: 23px;
+  display: flex;
+  align-items: center;
+  justify-self: center;
+}
