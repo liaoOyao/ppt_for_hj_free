@@ -5,7 +5,8 @@
         <el-select v-model="value" class="m-2 hj_slider_select" placeholder="Select" size="large">
           <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
         </el-select>
-        <div class="hj_right_adjust_icon_father" >
+        <div class="hj_ri
+        ght_adjust_icon_father" >
           <div class="hj_right_adjust_icon"></div>
         </div>
       </div>
