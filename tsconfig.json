@@ -9,7 +9,7 @@
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "suppressImplicitAnyIndexErrors":true, //在TypeScript中使用索引访问对象，但没有明确指定索引的类型时，TypeScript会抛出一个错误。如果你设置了这个选项，TypeScript就会忽略这种错误
+    "suppressImplicitAnyIndexErrors": true, //在TypeScript中使用索引访问对象，但没有明确指定索引的类型时，TypeScript会抛出一个错误。如果你设置了这个选项，TypeScript就会忽略这种错误
     "sourceMap": true,
     "baseUrl": ".",
     "types": [

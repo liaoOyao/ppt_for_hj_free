@@ -116,13 +116,11 @@ export default defineComponent({
   height: calc(100% - 40px);
   display: flex;
 }
-
 .layout-content-left {
   width: 160px;
   height: 100%;
   flex-shrink: 0;
 }
-
 .layout-content-center {
   width: calc(100% - 160px - 260px);
 
@@ -130,7 +128,6 @@ export default defineComponent({
     height: 40px;
   }
 }
-
 .layout-content-right {
   width: 260px;
   height: 100%;

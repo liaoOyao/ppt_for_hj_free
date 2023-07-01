@@ -17,11 +17,17 @@
     "core-js": "^3.6.5",
     "crypto-js": "^4.0.0",
     "dexie": "^3.0.3",
+<<<<<<< HEAD
     "element-plus": "^2.3.7",
     "file-saver": "^2.0.5",
     "hfmath": "0.0.2",
     "html-to-image": "^1.9.0",
     "less": "^3.13.1",
+=======
+    "file-saver": "^2.0.5",
+    "hfmath": "0.0.2",
+    "html-to-image": "^1.9.0",
+>>>>>>> 2fa6721e5b5419815b16099074323d57d41413b5
     "lodash": "^4.17.20",
     "mitt": "^3.0.0",
     "nanoid": "^3.3.3",
@@ -77,6 +83,10 @@
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^7.1.0",
     "husky": "^7.0.2",
+<<<<<<< HEAD
+=======
+    "less": "^4.1.1",
+>>>>>>> 2fa6721e5b5419815b16099074323d57d41413b5
     "less-loader": "^7.1.0",
     "sass": "^1.32.13",
     "sass-loader": "^8.0.2",
