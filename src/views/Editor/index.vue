@@ -5,8 +5,7 @@
         <el-select v-model="value" class="m-2 hj_slider_select" placeholder="Select" size="large">
           <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
         </el-select>
-        <div class="hj_ri
-        ght_adjust_icon_father" >
+        <div class="hj_right_adjust_icon_father">
           <div class="hj_right_adjust_icon"></div>
         </div>
       </div>
@@ -31,7 +30,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue'
+import { defineComponent, ref, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useMainStore } from '@/store'
 import useGlobalHotkey from '@/hooks/useGlobalHotkey'
@@ -45,6 +44,7 @@ import Toolbar from './Toolbar/index.vue'
 import Remark from './Remark/index.vue'
 import ExportDialog from './ExportDialog/index.vue'
 import '../../assets/styles/hj_style.scss'
+import useExport from '@/hooks/useExport'
 
 export default defineComponent({
   name: 'editor',
@@ -90,21 +90,32 @@ export default defineComponent({
         label: 'Option5',
       },
     ]
+    const ppt_data = [{'id':'ygsaCHGK0I','elements':[{'type':'text','id':'q6vnO4-ZOn','left':72.19760572139303,'top':27.839319029850742,'width':181.3847429519071,'height':80,'content':'<p style=\'\'>汉捷咨询管理有限公司</p>','rotate':0,'defaultFontName':'Microsoft Yahei','defaultColor':'#333','outline':{'width':2,'color':'#000','style':'solid'}}],'background':{'type':'solid','color':'#fff'}},{'id':'6zWUVwfKm7','elements':[{'type':'text','id':'o7twfyvKvt','left':72.19760572139303,'top':27.839319029850742,'width':181.3847429519071,'height':80,'content':'<p style=\'\'>汉捷咨询管理有限公司</p>','rotate':0,'defaultFontName':'Microsoft Yahei','defaultColor':'#333','outline':{'width':2,'color':'#000','style':'solid'}}],'background':{'type':'solid','color':'#fff'}},{'id':'jt_byN3tvQ','elements':[{'type':'text','id':'A4wSlLCrDi','left':72.19760572139303,'top':27.839319029850742,'width':181.3847429519071,'height':80,'content':'<p style=\'\'>汉捷咨询管理有限公司</p>','rotate':0,'defaultFontName':'Microsoft Yahei','defaultColor':'#333','outline':{'width':2,'color':'#000','style':'solid'}}],'background':{'type':'solid','color':'#fff'}}]
+    // [{ 'id':'ygsaCHGK0I','elements':[{'type':'text','id':'q6vnO4-ZOn','left':72.19760572139303,'top':27.839319029850742,'width':181.3847429519071,'height':80,'content':'<p style=\'\'>汉捷咨询管理有限公司</p>','rotate':0,'defaultFontName':'Microsoft Yahei','defaultColor':'#333','outline':{'width':2,'color':'#000','style':'solid'}}],'background':{'type':'solid','color':'#fff'}},{'id':'6zWUVwfKm7','elements':[{'type':'text','id':'o7twfyvKvt','left':72.19760572139303,'top':27.839319029850742,'width':181.3847429519071,'height':80,'content':'<p style=\'\'>汉捷咨询管理有限公司</p>','rotate':0,'defaultFontName':'Microsoft Yahei','defaultColor':'#333','outline':{'width':2,'color':'#000','style':'solid'}}],'background':{'type':'solid','color':'#fff'}},{'id':'jt_byN3tvQ','elements':[{'type':'text','id':'A4wSlLCrDi','left':72.19760572139303,'top':27.839319029850742,'width':181.3847429519071,'height':80,'content':'<p style=\'\'>汉捷咨询管理有限公司</p>','rotate':0,'defaultFontName':'Microsoft Yahei','defaultColor':'#333','outline':{'width':2,'color':'#000','style':'solid'}}],'background':{'type':'solid','color':'#fff'}}]
+    const { importSpecificData } = useExport()
+    onMounted(() => {
+      alert('加载导入的数据中')
+      // importSpecificData([])
+    })
+
     return {
       remarkHeight,
       dialogForExport,
       closeExportDialog,
       value,
       options,
+      importSpecificData,
+      ppt_data,
     }
 
   },
+
 })
 </script>
 
 <style lang="scss" scoped>
 .pptist-editor {
-  width: 80%;
+  width: 85%;
   height: 100%;
 }
 
@@ -116,11 +127,13 @@ export default defineComponent({
   height: calc(100% - 40px);
   display: flex;
 }
+
 .layout-content-left {
   width: 160px;
   height: 100%;
   flex-shrink: 0;
 }
+
 .layout-content-center {
   width: calc(100% - 160px - 260px);
 
@@ -128,6 +141,7 @@ export default defineComponent({
     height: 40px;
   }
 }
+
 .layout-content-right {
   width: 260px;
   height: 100%;

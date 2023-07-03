@@ -28,11 +28,12 @@ module.exports = {
       'avoidEscape': true,
       'allowTemplateLiterals': true,
     }],
-    'key-spacing': ['error', {
-      'beforeColon': false,
-      'afterColon': true,
-      'mode': 'strict',
-    }],
+    "key-spacing": "off",
+    // 'key-spacing': ['warn', {
+    //   'beforeColon': false,
+    //   'afterColon': true,
+    //   'mode': 'strict',
+    // }],
     'no-empty': 'error',
     'no-else-return': 'error',
     'no-multi-spaces': 'error',
@@ -41,10 +42,11 @@ module.exports = {
     'spaced-comment': ['error', 'always'],
     'arrow-spacing': 'error',
     'no-duplicate-imports': 'error',
-    'comma-spacing': ['error', {
-      'before': false,
-      'after': true,
-    }],
+    "comma-spacing": "off",
+    // 'comma-spacing': ['error', {
+    //   'before': false,
+    //   'after': true,
+    // }],
     'default-case': 'error',
     'consistent-this': ['error', '_this'],
     'max-depth': ['error', 6],
