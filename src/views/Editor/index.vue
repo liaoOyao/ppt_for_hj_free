@@ -282,8 +282,8 @@ export default defineComponent({
 
     const getSpfdData = () => {
       spfd_array.value = [
-        { pk: 100, name: "spfd1" },
-        { pk: 2000, name: "spfd2" },
+        { pk: 100, name: "SPFD1" },
+        { pk: 2000, name: "SPFD2" },
       ]
     }
 
