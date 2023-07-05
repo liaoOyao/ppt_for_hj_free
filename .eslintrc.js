@@ -24,10 +24,11 @@ module.exports = {
     'indent': ['error', 2, { 
       'SwitchCase': 1,
     }],
-    'quotes': ['error', 'single', {
-      'avoidEscape': true,
-      'allowTemplateLiterals': true,
-    }],
+    'quotes': "off",
+    // 'quotes': ['error', 'single', {
+    //   'avoidEscape': true,
+    //   'allowTemplateLiterals': true,
+    // }],
     "key-spacing": "off",
     // 'key-spacing': ['warn', {
     //   'beforeColon': false,
@@ -36,9 +37,11 @@ module.exports = {
     // }],
     'no-empty': 'error',
     'no-else-return': 'error',
-    'no-multi-spaces': 'error',
+    'no-multi-spaces': 'warn',
+    // 'no-multi-spaces': 'error',
     'require-await': 'error',
-    'brace-style': ['error', 'stroustrup'],
+    'brace-style':'off',
+    // 'brace-style': ['error', 'stroustrup'],
     'spaced-comment': ['error', 'always'],
     'arrow-spacing': 'error',
     'no-duplicate-imports': 'error',

@@ -2,16 +2,150 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  position: relative;
 }
 
-.hj_all {
+// 公共 字体
+.common_hj_font_style {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.42857143;
+  color: #333;
+  background-color: #fff;
+}
+
+// 公共一行
+.hj_ppt_inline {
+  display: inline-block;
+}
+
+// 不是第一个
+.hj_ppt_inline:not(:first-child) {
+  margin-left: 20px;
+}
+
+.hj_ppt_a {
+  color: #337ab7;
+  text-decoration: none;
+  background-color: transparent; //透明
+  font-size: 1em;
+  border-bottom: 1px solid transparent;
+  display: inline-block;
+}
+
+
+
+// 快速年份的小字
+.fast_year_font {
+  font-size: 1em;
+}
+
+.fast_year_style {
+  height: 58px;
+  line-height: 58px;
   display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hj_ppt_font {
+  color: #23527c;
+}
+
+.higet_ppt_pointer {
+  cursor: pointer;
+}
+
+
+.higet_ppt_pointer:hover,
+:focus {
+  cursor: pointer;
+  color: #23527c;
+  text-decoration: underline;
+}
+
+.hj_final_all {
+  padding: 0 15px;
   width: 100%;
   height: 100%;
   position: relative;
   margin: 0;
-  padding: 0;
   box-sizing: border-box;
+}
+
+.hj_margin-left-class {
+  margin-left: 20px;
+}
+
+// 下拉框部分的头部部分
+.hj_head_ppt {
+  height: 145px;
+}
+
+.hj_head_ppt_filter_div_name {
+  font-weight: 700;
+}
+
+.hj_head_ppt_filter_div {
+  height: 58px;
+  display: flex;
+  align-items: center;
+}
+
+.hj_head_ppt_filter_div_select {
+  width: 218px;
+  height: 38px;
+}
+
+.hj_head_ppt_title_div {
+  height: 67px;
+  padding-top: 30px;
+}
+
+.hj_head_ppt_title_div_hr {
+  background: #ccc;
+  border: none;
+  height: 1px;
+  width: 100%;
+  // margin: 0 20px 20px 20px;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.title_style {
+  font-family: inherit;
+  font-weight: 500;
+  line-height: 1.1;
+  color: inherit;
+}
+
+.hj_font_size {
+  font-size: 18px;
+}
+
+.hj_font_size_little {
+  font-size: 14px;
+}
+
+// .title_big {
+
+// }
+
+.title_small {
+  padding: 10px 0;
+}
+
+// 下拉框部分的下面部分
+.hj_all_ppt {
+  display: flex;
+  width: 100%;
+  height: calc(100% - 145px);
+  // position: relative;
+  // margin: 0;
+  // padding: 0;
+  // box-sizing: border-box;
 }
 
 .hj_slider {
@@ -32,8 +166,10 @@
 }
 
 .hj_right_adjust_icon_father {
-  margin-left: 2%;
+  margin-left: 88%;
   text-align: right;
+  width: 23px;
+  line-height: 23px;
 }
 
 .hj_right_adjust_icon {
@@ -52,4 +188,54 @@
   display: flex;
   align-items: center;
   justify-self: center;
+}
+
+.hj_slider_bottom_line {
+  height: 2px;
+  width: 90%;
+  background-color: black;
+  margin: 20px 0;
+}
+
+.higet_ppt_span_bold {
+  font-weight: 700;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  // font-size: 14px;
+  line-height: 1.42857;
+  color: rgb(51, 51, 51);
+  background-color: rgb(255, 255, 255);
+}
+
+.hj_sidebar_categroy_ppt_this {
+  background-color: #eee;
+}
+
+.hj_sidebar_ppt_item {
+  vertical-align: middle;
+  margin-top: 5px;
+  display: flex;
+  align-items: center;
+}
+
+.hj_sidebar_icon {
+  width: 5px;
+  min-width: 5px;
+  height: 10px;
+  background-color: #05588a;
+  display: inline-block;
+  margin: auto 5px auto 0;
+}
+
+.hj_siderbar_ppt_height {
+  height: 20px;
+}
+
+.hj_siderbar_ppt_font {
+  // line-height: 24px;
+  font: 14px;
+  font-family: Helvetica Neue, Helvetica, PingFang SC, Tahoma, Arial, sans-serif;
+}
+
+.hj_sidebar_category_ppt {
+  max-height: 235px;
 }
