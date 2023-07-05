@@ -5,16 +5,17 @@
         <!-- array_top: {{ array_top }} -->
         <div class="hj_ppt_inline ">
           <span class="hj_head_ppt_filter_div_name common_hj_font_style">功能领域:&nbsp;</span>
-          <el-select v-if="array_top.indexOf('spfd') !== -1" v-model="value_year" placeholder="请选择spfd">
-            <el-option v-for="item in spfd_array" :key="item.value" :label="item.label" :value="item.value">
+          <el-select v-if="array_top.indexOf('spfd') !== -1" v-model="value_spfd" placeholder="请选择spfd"
+            @change="(value: any) => handleBuplOrSpfdChange(value, 'spfd')">
+            <el-option v-for="item in spfd_array" :key="item.pk" :label="item.name" :value="item.pk">
             </el-option>
           </el-select>
-
         </div>
-        <div class="hj_ppt_inline " v-if="array_top.indexOf('pl') !== -1">
+        <div class="hj_ppt_inline " v-if="array_top.indexOf('bupl') !== -1">
           <span class="hj_head_ppt_filter_div_name common_hj_font_style">BUPL:&nbsp;</span>
-          <el-select v-model="value_year" placeholder="请选择pl">
-            <el-option v-for="item in bupl_array" :key="item.value" :label="item.label" :value="item.value">
+          <el-select v-model="value_bupl" placeholder="请选择pl"
+            @change="(value: any) => handleBuplOrSpfdChange(value, 'bupl')">
+            <el-option v-for="item in bupl_array" :key="item.pk" :label="item.name" :value="item.pk">
             </el-option>
           </el-select>
         </div>
@@ -35,7 +36,7 @@
       <div class="hj_head_ppt_title_div">
         <h4 class="text-center hj_font_size title_style title_big">{{ title }}</h4>
         <h5 class="text-center title_style hj_font_size_little title_small"> 部门:<span id="title_department"
-            style="margin-right: 20px;">汉捷公司</span> 年份:<span id="">{{ value_year }}</span></h5>
+            style="margin-right: 20px;">{{ select_pk_name }}</span> 年份:<span id="">{{ value_year }}</span></h5>
         <hr class="hj_head_ppt_title_div_hr">
       </div>
     </div>
@@ -51,7 +52,7 @@
           <div class="hj_sidebar_ppt_item " :data-table_pk="company_array[0].pk" data-form_type="c">
             <div class="hj_sidebar_ppt_icon"></div>
             <a class="higet_ppt_pointer hj_siderbar_ppt_height hj_ppt_font "
-              @click="hj_ppt_sidebar_select(company_array[0].pk ? company_array[0].pk : null, 'c')"
+              @click="hj_ppt_sidebar_select(company_array[0].pk ? company_array[0].pk : null, company_array[0].department_name ? company_array[0].department_name : null, 'c')"
               :class="{ 'hj_sidebar_categroy_ppt_this': company_array[0].pk == selectedPk }">
               {{ company_array[0].department_name }}
             </a>
@@ -62,10 +63,10 @@
         <div v-if="bupl_array.length > 0" class="hj_sidebar_category_ppt">
           <span class="higet_ppt_span_bold " style="font-size: 1.1em;">BUPL</span>
           <div v-for="(item, index) in bupl_array" class="hj_sidebar_ppt_item " :key="index" :data-table_pk="item.pk"
-            data-form_type="pl">
+            data-form_type="bupl">
             <div class="hj_sidebar_ppt_icon"></div>
             <a class="higet_ppt_pointer hj_siderbar_ppt_height hj_ppt_font "
-              @click="hj_ppt_sidebar_select(item.pk ? item.pk : null, 'pl')">
+              @click="hj_ppt_sidebar_select(item.pk ? item.pk : null, item.name ? item.name : null, 'bupl')">
               {{ item.name }}
             </a>
           </div>
@@ -79,7 +80,7 @@
             data-form_type="spfd">
             <div class="hj_sidebar_ppt_icon"></div>
             <a class="higet_ppt_pointer hj_siderbar_ppt_height hj_ppt_font "
-              @click="hj_ppt_sidebar_select(item.pk ? item.pk : null, 'spfd')"
+              @click="hj_ppt_sidebar_select(item.pk ? item.pk : null, item.name ? item.name : null, 'spfd')"
               :class="{ 'hj_sidebar_categroy_ppt_this': item.pk == selectedPk }">
               {{ item.name }}
             </a>
@@ -178,6 +179,9 @@ export default defineComponent({
           } else {
             ElMessage.error('头部至少要有一个下拉列表')
           }
+          if (array_top.value.indexOf('year') !== -1) {
+            getYearData()
+          }
         }
         //  获取左侧的下拉列表
         if (params.has('array_left')) {
@@ -223,37 +227,12 @@ export default defineComponent({
     const bupl_array = ref<any[]>([]) // bupl 
     const spfd_array = ref<any[]>([]) // spfd功能领域
     const year_array = ref<any[]>([]) // 年份
-
-    value_year
-    value_year
+    const select_pk_name = ref('') // 标题中pk_name
     const title = ref('')
     // const my_funture_years = ref([])
 
 
     const current_year = new Date().getFullYear()
-
-    const options = [
-      {
-        value: 'Option1',
-        label: 'Option1',
-      },
-      {
-        value: 'Option2',
-        label: 'Option2',
-      },
-      {
-        value: 'Option3',
-        label: 'Option3',
-      },
-      {
-        value: 'Option4',
-        label: 'Option4',
-      },
-      {
-        value: 'Option5',
-        label: 'Option5',
-      },
-    ]
 
 
     //  3年
@@ -270,8 +249,8 @@ export default defineComponent({
     // 获取几个维度的数据
     const getBuplData = () => {
       bupl_array.value = [
-        { pk: 300, name: "bupl1" },
-        { pk: 400, name: "bupl2" },
+        { pk: 300, name: "BUPL1" },
+        { pk: 400, name: "BUPL2" },
       ]
     }
 
@@ -338,35 +317,52 @@ export default defineComponent({
     // 切换选择的维度
     // 选中的样式
     // 取消  之前选中的样式
-    const hj_ppt_sidebar_select = (pk: any, name: string) => {
+    const hj_ppt_sidebar_select = (pk: any, pk_name: string, name: string) => {
       if (pk && name) {
         selectedPk = pk
         const elements = document.querySelectorAll('.hj_sidebar_ppt_item') // 获取元素
         elements.forEach((element) => {
           const formType = element.getAttribute('data-form_type')
+          const data_table_pk = element.getAttribute('data-table_pk')
           console.log(formType)
-          if (formType !== name) {
-            // 移除这个元素下的a标签的 hj_sidebar_categroy_ppt_this样式类
-            const el_a = element.querySelector('a') 
-            if (el_a) {
-              el_a.classList.remove('hj_sidebar_categroy_ppt_this')
-            }
+          debugger
+          if (formType !== name || pk.toString() !== data_table_pk) {
+            element.classList.remove('hj_sidebar_categroy_ppt_this')
           } else {
-            const data_table_pk = element.getAttribute('data-table_pk')
-            console.log(data_table_pk)
-            if (data_table_pk === pk) {
-              // 给这个元素下的a标签 增加样式类名为 hj_sidebar_categroy_ppt_this
-              const el_a = element.querySelector('a')
-              if (el_a) {
-                el_a.classList.add('hj_sidebar_categroy_ppt_this')
-              }
+            element.classList.add('hj_sidebar_categroy_ppt_this')
+            //  根据formType 是buplu 还是spfd 去选择后面的代码提供的el-select  ，然后再根据 pk和name 选择下拉框值
+            if (formType === 'bupl') {
+              value_bupl.value = pk
+              value_spfd.value = null
+            } else if (formType === 'spfd') {
+              value_spfd.value = pk
+              value_bupl.value = null
             }
+            // 更新标题中的部门
+            select_pk_name.value = pk_name
           }
         })
       } else {
         ElMessage.error('缺少对应pk值或formType，请联系管理员')
       }
     }
+
+    // bupl选中状态
+    const handleBuplOrSpfdChange = (val: any, name: string) => {
+      debugger
+      let selectedOption = null
+      if (name === 'spfd') {
+        selectedOption = spfd_array.value.find(item => item.pk === val)
+      }
+      else if (name === 'bupl') {
+        selectedOption = bupl_array.value.find(item => item.pk === val)
+      }
+      hj_ppt_sidebar_select(val, selectedOption ? selectedOption.name ? selectedOption.name : null : null, name)
+    }
+    // // spfd选中状态
+    // const handleSpfdChange = (val: any, name: string) => {
+    //   // hj_ppt_sidebar_select(val,label, name)
+    // }
     // 导入数据
     const pptData = [{ 'id': 'ygsaCHGK0I', 'elements': [{ 'type': 'text', 'id': 'q6vnO4-ZOn', 'left': 72.19760572139303, 'top': 27.839319029850742, 'width': 181.3847429519071, 'height': 80, 'content': '<p style=\'\'>汉捷咨询管理有限公司</p>', 'rotate': 0, 'defaultFontName': 'Microsoft Yahei', 'defaultColor': '#333', 'outline': { 'width': 2, 'color': '#000', 'style': 'solid' } }], 'background': { 'type': 'solid', 'color': '#fff' } }, { 'id': '6zWUVwfKm7', 'elements': [{ 'type': 'text', 'id': 'o7twfyvKvt', 'left': 72.19760572139303, 'top': 27.839319029850742, 'width': 181.3847429519071, 'height': 80, 'content': '<p style=\'\'>汉捷咨询管理有限公司</p>', 'rotate': 0, 'defaultFontName': 'Microsoft Yahei', 'defaultColor': '#333', 'outline': { 'width': 2, 'color': '#000', 'style': 'solid' } }], 'background': { 'type': 'solid', 'color': '#fff' } }, { 'id': 'jt_byN3tvQ', 'elements': [{ 'type': 'text', 'id': 'A4wSlLCrDi', 'left': 72.19760572139303, 'top': 27.839319029850742, 'width': 181.3847429519071, 'height': 80, 'content': '<p style=\'\'>汉捷咨询管理有限公司</p>', 'rotate': 0, 'defaultFontName': 'Microsoft Yahei', 'defaultColor': '#333', 'outline': { 'width': 2, 'color': '#000', 'style': 'solid' } }], 'background': { 'type': 'solid', 'color': '#fff' } }]
     // [{ 'id':'ygsaCHGK0I','elements':[{'type':'text','id':'q6vnO4-ZOn','left':72.19760572139303,'top':27.839319029850742,'width':181.3847429519071,'height':80,'content':'<p style=\'\'>汉捷咨询管理有限公司</p>','rotate':0,'defaultFontName':'Microsoft Yahei','defaultColor':'#333','outline':{'width':2,'color':'#000','style':'solid'}}],'background':{'type':'solid','color':'#fff'}},{'id':'6zWUVwfKm7','elements':[{'type':'text','id':'o7twfyvKvt','left':72.19760572139303,'top':27.839319029850742,'width':181.3847429519071,'height':80,'content':'<p style=\'\'>汉捷咨询管理有限公司</p>','rotate':0,'defaultFontName':'Microsoft Yahei','defaultColor':'#333','outline':{'width':2,'color':'#000','style':'solid'}}],'background':{'type':'solid','color':'#fff'}},{'id':'jt_byN3tvQ','elements':[{'type':'text','id':'A4wSlLCrDi','left':72.19760572139303,'top':27.839319029850742,'width':181.3847429519071,'height':80,'content':'<p style=\'\'>汉捷咨询管理有限公司</p>','rotate':0,'defaultFontName':'Microsoft Yahei','defaultColor':'#333','outline':{'width':2,'color':'#000','style':'solid'}}],'background':{'type':'solid','color':'#fff'}}]
@@ -383,7 +379,6 @@ export default defineComponent({
       dialogForExport,
       closeExportDialog,
       value,
-      options,
       importSpecificData,
       pptData,
       handleUrlAndSleect,
@@ -402,6 +397,8 @@ export default defineComponent({
       year_array,
       hj_ppt_sidebar_select,
       selectedPk,
+      handleBuplOrSpfdChange,
+      select_pk_name,
     }
 
   },
