@@ -35,7 +35,7 @@
           @mousedown="$event => handleClickSlideThumbnail($event, index)"
           v-contextmenu="contextmenusThumbnailItem"
         >
-          <div class="label" :class="{ 'offset-left': index >= 99 }">{{ fillDigit(index + 1, 2) }}</div>
+          <div class="hj_pp_label" :class="{ 'offset-left': index >= 99 }">{{ fillDigit(index + 1, 2) }}</div>
           <ThumbnailSlide class="thumbnail" :slide="element" :size="120" :visible="index < slidesLoadLimit" />
         </div>
       </template>
@@ -316,25 +316,25 @@ export default defineComponent({
   align-items: center;
   padding: 5px 0;
 
-  .thumbnail {
+  .hj_pp_thumbnail {
     outline: 1px solid rgba($color: $themeColor, $alpha: .15);
   }
 
   &.active {
-    .label {
+    .hj_pp_label {
       color: $themeColor;
     }
-    .thumbnail {
+    .hj_pp_thumbnail {
       outline-color: $themeColor;
     }
   }
   &.selected {
-    .thumbnail {
+    .hj_pp_thumbnail {
       outline-color: $themeColor;
     }
   }
 }
-.label {
+.hj_pp_label {
   font-size: 12px;
   color: #999;
   width: 20px;

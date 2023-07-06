@@ -52,8 +52,7 @@
           <div class="hj_sidebar_ppt_item " :data-table_pk="company_array[0].pk" data-form_type="c">
             <div class="hj_sidebar_ppt_icon"></div>
             <a class="higet_ppt_pointer hj_siderbar_ppt_height hj_ppt_font "
-              @click="hj_ppt_sidebar_select(company_array[0].pk ? company_array[0].pk : null, company_array[0].department_name ? company_array[0].department_name : null, 'c')"
-              :class="{ 'hj_sidebar_categroy_ppt_this': company_array[0].pk == selectedPk }">
+              @click="hj_ppt_sidebar_select(company_array[0].pk ? company_array[0].pk : null, company_array[0].department_name ? company_array[0].department_name : null, 'c')">
               {{ company_array[0].department_name }}
             </a>
           </div>
@@ -80,8 +79,7 @@
             data-form_type="spfd">
             <div class="hj_sidebar_ppt_icon"></div>
             <a class="higet_ppt_pointer hj_siderbar_ppt_height hj_ppt_font "
-              @click="hj_ppt_sidebar_select(item.pk ? item.pk : null, item.name ? item.name : null, 'spfd')"
-              :class="{ 'hj_sidebar_categroy_ppt_this': item.pk == selectedPk }">
+              @click="hj_ppt_sidebar_select(item.pk ? item.pk : null, item.name ? item.name : null, 'spfd')">
               {{ item.name }}
             </a>
           </div>
@@ -339,6 +337,7 @@ export default defineComponent({
             }
             // 更新标题中的部门
             select_pk_name.value = pk_name
+
           }
         })
       } else {
@@ -358,6 +357,7 @@ export default defineComponent({
       }
       hj_ppt_sidebar_select(val, selectedOption ? selectedOption.name ? selectedOption.name : null : null, name)
     }
+
     // // spfd选中状态
     // const handleSpfdChange = (val: any, name: string) => {
     //   // hj_ppt_sidebar_select(val,label, name)
