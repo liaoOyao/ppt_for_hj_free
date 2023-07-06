@@ -36,7 +36,7 @@
           v-contextmenu="contextmenusThumbnailItem"
         >
           <div class="hj_pp_label" :class="{ 'offset-left': index >= 99 }">{{ fillDigit(index + 1, 2) }}</div>
-          <ThumbnailSlide class="thumbnail" :slide="element" :size="120" :visible="index < slidesLoadLimit" />
+          <ThumbnailSlide class="hj_pp_thumbnail" :slide="element" :size="120" :visible="index < slidesLoadLimit" />
         </div>
       </template>
     </Draggable>
@@ -324,7 +324,7 @@ export default defineComponent({
     .hj_pp_label {
       color: $themeColor;
     }
-    .hj_pp_thumbnail {
+    .thumbnail {
       outline-color: $themeColor;
     }
   }
