@@ -78,7 +78,7 @@
 
 // 下拉框部分的头部部分
 .hj_head_ppt {
-  height: 145px;
+  height: 125px;
 }
 
 .hj_head_ppt_filter_div_name {
@@ -98,7 +98,7 @@
 
 .hj_head_ppt_title_div {
   height: 67px;
-  padding-top: 30px;
+  padding-top: 10px;
 }
 
 .hj_head_ppt_title_div_hr {
@@ -140,7 +140,7 @@
 .hj_all_ppt {
   display: flex;
   width: 100%;
-  height: calc(100% - 145px);
+  height: calc(100% - 125px);
   // position: relative;
   // margin: 0;
   // padding: 0;
@@ -189,11 +189,17 @@
   justify-self: center;
 }
 
+// .hj_slider_bottom_line {
+//   height: 2px;
+//   width: 90%;
+//   background-color: black;
+//   margin: 20px 0;
+// }
 .hj_slider_bottom_line {
-  height: 2px;
-  width: 90%;
-  background-color: black;
-  margin: 20px 0;
+  margin: 15px 0;
+  width: 50%;
+  height: 1px;
+  background-color: #0d4a89;
 }
 
 .higet_ppt_span_bold {
