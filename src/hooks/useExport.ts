@@ -62,12 +62,13 @@ export default () => {
   }
 
   // 导入pptist文件
-  const importSpecificFile = (files: File[], cover = false) => {
+  const importSpecificFile = (files: File[], cover = true) => {
     const file = files[0]
-
+    debugger
     const reader = new FileReader()
     reader.addEventListener('load', () => {
       try {
+        debugger
         const slides = JSON.parse(decrypt(reader.result as string))
         if (cover) slidesStore.setSlides(slides)
         else addSlidesFromData(slides)
@@ -80,7 +81,10 @@ export default () => {
   }
   // 导入pptist文件,通过传入数组数据
   const importSpecificData = (slides: Slide[], cover = true) => {
+    console.log(slides,"slides")
+    debugger
     try {
+      debugger
       if (cover) slidesStore.setSlides(slides)
       else addSlidesFromData(slides)
     } catch {
