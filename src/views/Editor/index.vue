@@ -7,7 +7,8 @@
           <span class="hj_head_ppt_filter_div_name common_hj_font_style">部门:&nbsp;</span>
           <el-select filterable v-model="value_dep" placeholder="请选择部门"
             @change="(value: any) => handleDimessionChange(value, 'd')">
-            <el-option v-for="item in dep_array" :key="item.pk" :label="item.name||item.text?item.text:null" :value="item.pk">
+            <el-option v-for="item in dep_array" :key="item.pk" :label="item.name || item.text ? item.text : null"
+              :value="item.pk">
             </el-option>
           </el-select>
         </div>
@@ -365,7 +366,7 @@ export default defineComponent({
     const selectYear = (year: number) => {
       console.log(`You selected ${year}`)
       value_year.value = year
-      // 这里你可以添加你的逻辑
+      handleDimessionChange(value, 'year')
     }
 
     // 获取几个维度的数据
@@ -446,69 +447,79 @@ export default defineComponent({
       debugger
       open_loading()
       // name  是type
-      if (pk && name) {
-        const elements = document.querySelectorAll('.hj_sidebar_ppt_item') // 获取元素
-        elements.forEach((element) => {
-          const formType = element.getAttribute('data-form_type')
-          const data_table_pk = element.getAttribute('data-table_pk')
-          console.log(formType)
-          if (formType !== name || pk.toString() !== data_table_pk) {
-            element.classList.remove('hj_sidebar_categroy_ppt_this')
-          }
-          else {
-            //找到要选中的对象了
-            element.classList.add('hj_sidebar_categroy_ppt_this')
-            //  根据formType 是buplu 还是spfd 去选择后面的代码提供的el-select  ，然后再根据 pk和name 选择下拉框值
-            let dimension_obj = {}
-            if (formType === 'bupl') {
-              value_bupl.value = pk
-              value_spfd.value = null
-              value_dep.value = null
-              value_c.value = null
-              dimension_obj = {
-                'bupl_id': value_bupl.value,
-                'spfd_id': 0,
-                'd_id': 0,
+      let dimension_obj = {}
+      if (name !== 'year') {
+        if (pk && name) {
+          const elements = document.querySelectorAll('.hj_sidebar_ppt_item') // 获取元素
+          elements.forEach((element) => {
+            const formType = element.getAttribute('data-form_type')
+            const data_table_pk = element.getAttribute('data-table_pk')
+            console.log(formType)
+            if (formType !== name || pk.toString() !== data_table_pk) {
+              element.classList.remove('hj_sidebar_categroy_ppt_this')
+            }
+            else {
+              //找到要选中的对象了
+              element.classList.add('hj_sidebar_categroy_ppt_this')
+              //  根据formType 是buplu 还是spfd 去选择后面的代码提供的el-select  ，然后再根据 pk和name 选择下拉框值
+              if (formType === 'bupl') {
+                value_bupl.value = pk
+                value_spfd.value = null
+                value_dep.value = null
+                value_c.value = null
+                dimension_obj = {
+                  'bupl_id': value_bupl.value,
+                  'spfd_id': 0,
+                  'd_id': 0,
+                }
+              } else if (formType === 'spfd') {
+                value_spfd.value = pk
+                value_bupl.value = null
+                value_dep.value = null
+                value_c.value = null
+                dimension_obj = {
+                  'spfd_id': value_spfd.value,
+                  'bupl_id': 0,
+                  'd_id': 0,
+                }
+              } else if (formType === 'd') {
+                value_dep.value = pk
+                value_spfd.value = null
+                value_bupl.value = null
+                value_c.value = null
+                dimension_obj = {
+                  'd_id': value_dep.value,
+                  'bupl_id': 0,
+                  'spfd_id': 0,
+                }
+              } else if (formType === 'c') {
+                value_c.value = pk
+                value_dep.value = null
+                value_spfd.value = null
+                value_bupl.value = null
+                dimension_obj = {
+                  'bupl_id': 0,
+                  'spfd_id': 0,
+                  'd_id': 0,
+                }
               }
-            } else if (formType === 'spfd') {
-              value_spfd.value = pk
-              value_bupl.value = null
-              value_dep.value = null
-              value_c.value = null
-              dimension_obj = {
-                'spfd_id': value_spfd.value,
-                'bupl_id': 0,
-                'd_id': 0,
-              }
-            } else if (formType === 'd') {
-              value_dep.value = pk
-              value_spfd.value = null
-              value_bupl.value = null
-              value_c.value = null
-              dimension_obj = {
-                'd_id': value_dep.value,
-                'bupl_id': 0,
-                'spfd_id': 0,
-              }
-            } else if (formType === 'c') {
-              value_c.value = pk
-              value_dep.value = null
-              value_spfd.value = null
-              value_bupl.value = null
-              dimension_obj = {
-                'bupl_id': 0,
-                'spfd_id': 0,
-                'd_id': 0,
-              }
+
+              get_hz_ppt_by_dimension_and_year(dimension_obj, value_year.value)
+              // 更新标题中的部门
+              select_pk_name.value = pk_name
             }
 
-            get_hz_ppt_by_dimension_and_year(dimension_obj, value_year.value)
-            // 更新标题中的部门
-            select_pk_name.value = pk_name
-          }
-
-        })
+          })
+        }
+      } else {
+        dimension_obj = {
+          'bupl_id': value_bupl.value || 0,
+          'spfd_id': value_spfd.value || 0,
+          'd_id': value_dep.value || 0,
+        }
+        get_hz_ppt_by_dimension_and_year(dimension_obj, value_year.value)
       }
+
       close_loading()
     }
 

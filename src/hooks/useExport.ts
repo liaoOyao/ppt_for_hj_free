@@ -81,6 +81,7 @@ export default () => {
   }
   // 导入pptist文件,通过传入数组数据
   const importSpecificData = (slides: Slide[], cover = true) => {
+    slidesStore.updateSlideIndex(0) //默认索引
     console.log(slides,"slides")
     debugger
     try {
