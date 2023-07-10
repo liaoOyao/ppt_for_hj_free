@@ -46,7 +46,7 @@ class Ajax {
 }
 
 export default new Ajax({
-  baseURL: 'http://192.168.0.102:8080/', // 这里填写你的api地址
+  baseURL: 'http://192.168.1.175:8080/', // 这里填写你的api地址
   timeout: 10000, // 请求超时时间
   withCredentials: true, // 允许携带cookie
 })
