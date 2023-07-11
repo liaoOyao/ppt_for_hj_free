@@ -38,6 +38,7 @@ export default () => {
     cutSlide,
     copyAndPasteSlide,
     selectAllSlide,
+    
   } = useSlideHandler()
 
   const { combineElements, uncombineElements } = useCombineElement()
@@ -51,6 +52,13 @@ export default () => {
   const { enterScreening, enterScreeningFromStart } = useScreening()
   const { scaleCanvas, resetCanvas } = useScaleCanvas()
 
+  const saveHis = () => {
+    alert("保存历史")
+    // 返回当前页面的json 数据 
+  }
+  const viewHis = () => {
+    alert("查看历史")
+  }
   const copy = () => {
     if (activeElementIdList.value.length) copyElement()
     else if (thumbnailsFocus.value) copySlide()
@@ -127,14 +135,14 @@ export default () => {
   const keydownListener = (e: KeyboardEvent) => {
     const { ctrlKey, shiftKey, altKey, metaKey } = e
     const ctrlOrMetaKeyActive = ctrlKey || metaKey
-    
+
     const key = e.key.toUpperCase()
 
     if (ctrlOrMetaKeyActive && !ctrlKeyState.value) keyboardStore.setCtrlKeyState(true)
     if (shiftKey && !shiftKeyState.value) keyboardStore.setShiftKeyState(true)
     if (!disableHotkeys.value && key === KEYS.SPACE) keyboardStore.setSpaceKeyState(true)
 
-    
+
     if (ctrlOrMetaKeyActive && key === KEYS.P) {
       e.preventDefault()
       mainStore.setDialogForExport('pdf')
@@ -151,9 +159,18 @@ export default () => {
       enterScreeningFromStart()
       return
     }
-    
-    if (!editorAreaFocus.value && !thumbnailsFocus.value) return      
 
+    if (!editorAreaFocus.value && !thumbnailsFocus.value) return
+    if (ctrlOrMetaKeyActive && key === KEYS.S) {
+      if (disableHotkeys.value) return
+      e.preventDefault()
+      saveHis()
+    }
+    if (ctrlOrMetaKeyActive && key === KEYS.H) {
+      if (disableHotkeys.value) return
+      e.preventDefault()
+      viewHis()
+    }
     if (ctrlOrMetaKeyActive && key === KEYS.C) {
       if (disableHotkeys.value) return
       e.preventDefault()
@@ -270,7 +287,7 @@ export default () => {
       tabActiveElement()
     }
   }
-  
+
   const keyupListener = () => {
     if (ctrlKeyState.value) keyboardStore.setCtrlKeyState(false)
     if (shiftKeyState.value) keyboardStore.setShiftKeyState(false)

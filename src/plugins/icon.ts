@@ -101,6 +101,9 @@ import {
   IndentLeft,
   IndentRight,
   VerticalSpacingBetweenItems,
+  History,
+  SaveOne,
+  Save
 } from '@icon-park/vue-next'
 
 const icons = {
@@ -203,6 +206,9 @@ const icons = {
   IndentLeft,
   IndentRight,
   VerticalSpacingBetweenItems,
+  History,
+  SaveOne,
+  Save,
 }
 
 export default {
@@ -212,3 +218,5 @@ export default {
     }
   }
 }
+// <save theme="outline" size="18" fill="#333"/>
+// <save-one theme="outline" size="18" fill="#333"/>
