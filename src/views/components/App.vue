@@ -1,27 +1,23 @@
 <template>
-  <Screen v-if="screening" />
-  <Editor v-else-if="isPC" />
+  <Screen v-if="true" />
   <Mobile v-else />
-  <!-- <Screen v-if="whichone===1" />
-  <Editor v-else-if="whichone ===2" />
-  <Mobile v-else /> -->
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted } from 'vue'
+import { computed, defineComponent, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useScreenStore, useMainStore, useSnapshotStore } from '@/store'
 import { LOCALSTORAGE_KEY_DISCARDED_DB } from '@/configs/storage'
-import { isPC } from './utils/common'
+import { isPC } from '@/utils/common'
 
-import Editor from './views/Editor/index.vue'
-import Screen from './views/Screen/index.vue'
-import Mobile from './views/Mobile.vue'
+// import Editor from '@/views/Editor/index.vue'
+import Screen from '@/views/Screen/indexHisView.vue'
+
+import Mobile from '@/views/MobileHisView.vue'
 
 export default defineComponent({
   name: 'app',
   components: {
-    Editor,
     Screen,
     Mobile,
   },
@@ -41,6 +37,8 @@ export default defineComponent({
       // prefentconext()
     })
 
+
+
     // 应用注销时向 localStorage 中记录下本次 indexedDB 的数据库ID，用于之后清除数据库
     window.addEventListener('unload', () => {
       const discardedDB = localStorage.getItem(LOCALSTORAGE_KEY_DISCARDED_DB)
@@ -54,12 +52,13 @@ export default defineComponent({
     const prefentconext = () => {
       document.oncontextmenu = e => e.preventDefault()
     }
-    // const whichone =  1
+    // 创建一个计算属性
+    // const isPCComputed = computed(() => isPC())
     return {
       screening,
       isPC: isPC(),
-      // whichone,
     }
+
   },
 })
 </script>
@@ -69,5 +68,14 @@ export default defineComponent({
   height: 100%;
   width: 100%;
   position: relative;
+}
+
+// 矫正下拉框的层级
+.el-message {
+  z-index: 2147483647 !important;
+}
+
+.el-alert {
+  z-index: 99999 !important;
 }
 </style>

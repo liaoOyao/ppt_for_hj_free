@@ -88,14 +88,15 @@
       <HotkeyDoc />
     </Drawer>
     <!-- 保存历史功能的对话框 -->
+    <!-- :before-close="(formRef: any, done: any) => handleBeforeClose(formRef, done)" :close-on-click-modal="false" -->
 
     <el-dialog v-model="historyDrawerVisible" title="保存当前版本" width="30%" draggable align-center
-      :before-close="(formRef: any, done: any) => handleBeforeClose(formRef, done)" :close-on-click-modal="false"
-      :destroy-on-close="true">
-      <el-form ref="formRef" :model="verisonNameValidateForm" label-width="100px" class="demo-ruleForm">
+      :before-close="handleBeforeClose" :close-on-click-modal="false" :destroy-on-close="true">
+      <el-form ref="formRef" :model="verisonNameValidateForm" label-width="100px" class="demo-ruleForm"
+        style="margin-top: 25px;">
         <el-form-item label="版本名称" prop="verison_name" :rules="[
-          { required: true, message: '请输入版本名称' },
-          { type: 'string', message: '最大长度256', max: 256 },
+          { required: true, message: '请输入版本名称', key: 1, },
+          { type: 'string', message: '最大长度256', max: 256, key: 2 },
         ]">
           <el-input v-model="verisonNameValidateForm.verison_name" placeholder="请输入版本名称" clearable />
         </el-form-item>
@@ -117,26 +118,36 @@
       :destroy-on-close="true">
       <div class="viewHisAll">
         <div class="viewHisHeader">
-          <div class="titleLine">标题行</div>
-          <div class="versionInfoLine">版本信息行</div>
+          <div class="titleLine">BUPL3年战略目标（历史版本）（管理软件 2022）</div>
         </div>
         <div class="viewHisContent">
           <div class="PptLeft">
-            <div class="pptSiderBar" v-for="(item, index) in version_list">
-              <div class="saveHis">
-                保存当前版本
-              </div>
-              <div v-if="index !== 0" :data-id="item.id" :data-version="item.name">
+            <div class="ppt_save_current_version" @click="openHistory(1)">
+              保存当前版本
+            </div>
+            <hr class="ppt_view_his_hr" />
+            <div class="pptSiderBar" v-for="(item, index) in version_list" :key="index">
+              <div v-if="index !== 0" :data-id="item.id" :data-version="item.name"
+                class="hiwin_ppt_snapshot_models_sidebar_row">
                 <!-- 有默认选中样式 -->
-                
+                <div class="viewSiderBarIcon"></div>
+                <!-- <Delete-mode theme="outline" size="14" fill="#ee0c0c" strokeLinejoin="bevel"/> -->
+                <IconDeleteMode class="ppt_delete_icon"></IconDeleteMode>
+                <a class="higet_pointer hiwin_ppt_snapshot_models_sidebar_row" >加载模板产生2023-07-01 15:05</a>
               </div>
               <div v-else>
-
+                <a></a>
               </div>
             </div>
           </div>
           <div class="PptRight">
-            <div id="app" class="viewHistPPt"></div>
+            <div class="versionInfoLine">版本：<span class="span_ppt_version">加载模板产生2023-07-01 15:05</span>
+              <div class="ppt_crateor_info">创建人：<span class="span_ppt_creator"
+                  style="margin-right: 20px;">胡红卫</span>创建时间：<span class="span_created_time">2023-07-01 14:59</span></div>
+            </div>
+            <div class="viewHistPPt">
+              <APP />
+            </div>
             <div class="pptNull" v-if="pptNULLVisable"><span class="higet_color_red">(没有可查看数据或暂无权限查看)</span></div>
           </div>
         </div>
@@ -155,22 +166,28 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, reactive } from 'vue'
+import { defineComponent, ref, reactive, ComponentOptions } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useMainStore } from '@/store'
 import useScreening from '@/hooks/useScreening'
 import useSlideHandler from '@/hooks/useSlideHandler'
 import useHistorySnapshot from '@/hooks/useHistorySnapshot'
 import useExport from '@/hooks/useExport'
-import saveHistory from '../../Editor/histtoryDialog/SaveHistory.vue'
-import viewHistory from '../../Editor/histtoryDialog/ViewHistory.vue'
+// import saveHistory from '../../Editor/histtoryDialog/SaveHistory.vue'
+// import viewHistory from '../../Editor/histtoryDialog/ViewHistory.vue'
+import APP from '@/views/components/App.vue'
+// import APP from '@/App.vue'
+
 import HotkeyDoc from './HotkeyDoc.vue'
 import type { FormInstance } from 'element-plus'
 import { fa } from 'element-plus/es/locale'
+
 export default defineComponent({
   name: 'editor-header',
   components: {
     HotkeyDoc,
+    APP,
+    // Editor
     // saveHistory,
     // viewHistory
   },
@@ -230,15 +247,19 @@ export default defineComponent({
         }
       })
     }
-
+    // 保存历史版本
+    const save_his_version = () => {
+      alert('保存版本')
+    }
     const resetForm = (formEl: FormInstance | undefined) => {
       if (!formEl) return
       formEl.resetFields()
       historyDrawerVisible.value = false
     }
-    const handleBeforeClose = function (formEl: FormInstance | undefined, done: any) {
-      if (!formEl) return
-      formEl.resetFields()
+    const handleBeforeClose = function (done: any) {
+      debugger
+      // if (!formEl) return
+      // formEl.resetFields()
       done()
       historyDrawerVisible.value = false
     }
@@ -282,6 +303,7 @@ export default defineComponent({
       handleBeforeCloseViewHis,
       pptNULLVisable,
       version_list,
+      save_his_version,
     }
   },
 })
@@ -295,6 +317,7 @@ export default defineComponent({
   display: flex;
   justify-content: space-between;
   padding: 0 10px;
+  position: relative;
 }
 
 .left,
@@ -324,7 +347,67 @@ export default defineComponent({
 }
 
 .viewHisAll {
-  height: 78vh;
-  overflow-y: auto;
+  height: 100%;
+  width: 100%;
+  // overflow-y: auto;
+  position: relative;
+}
+</style>
+
+<style lang="scss" >
+.el-dialog {
+  // --el-dialog-width: 50%;
+  // --el-dialog-margin-top: 15vh;
+  // --el-dialog-bg-color: var(--el-bg-color);
+  // --el-dialog-box-shadow: var(--el-box-shadow);
+  // --el-dialog-title-font-size: var(--el-font-size-large);
+  // --el-dialog-content-font-size: 14px;
+  // --el-dialog-font-line-height: var(--el-font-line-height-primary);
+  // --el-dialog-padding-primary: 20px;
+  // --el-dialog-border-radius: var(--el-border-radius-small);
+  // position: relative;
+  // margin: var(--el-dialog-margin-top,15vh) auto 50px;
+  // background: var(--el-dialog-bg-color);
+  // border-radius: var(--el-dialog-border-radius);
+  // box-shadow: var(--el-dialog-box-shadow);
+  // box-sizing: border-box;
+  // width: var(--el-dialog-width,50%);
+  --el-dialog-padding-primary: 15px;
+}
+
+.el-dialog__body {
+  padding: 0 var(--el-dialog-padding-primary);
+}
+
+//  矫正一下样式不对的问题
+.slide-content[data-v-2ee3d44c] {
+  background-color: #fff;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 100% !important;
+  height: 100% !important;
+  // position: relative;
+}
+
+.el-message {
+  z-index: 2147483647 !important;
+}
+
+.el-alert {
+  z-index: 99999 !important;
+}
+
+.screen-slide {
+  // width: 100vh !important;
+  // height: calc(100% - 20px) !important;
+  width: 100% !important;
+  height: 100% !important;
+  position: relative !important;
 }
 </style>

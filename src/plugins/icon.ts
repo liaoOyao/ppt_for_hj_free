@@ -103,7 +103,8 @@ import {
   VerticalSpacingBetweenItems,
   History,
   SaveOne,
-  Save
+  Save,
+  DeleteMode,
 } from '@icon-park/vue-next'
 
 const icons = {
@@ -209,6 +210,7 @@ const icons = {
   History,
   SaveOne,
   Save,
+  DeleteMode,
 }
 
 export default {
