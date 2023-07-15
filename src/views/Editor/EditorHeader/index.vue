@@ -118,7 +118,7 @@
       :destroy-on-close="true">
       <div class="viewHisAll">
         <div class="viewHisHeader">
-          <div class="titleLine">BUPL3年战略目标（历史版本）（管理软件 2022）</div>
+          <div class="titleLine">历史版本</div>
         </div>
         <div class="viewHisContent">
           <div class="PptLeft">
@@ -128,22 +128,23 @@
             <hr class="ppt_view_his_hr" />
             <div class="pptSiderBar" v-for="(item, index) in version_list" :key="index">
               <div v-if="index !== 0" :data-id="item.id" :data-version="item.name"
-                class="hiwin_ppt_snapshot_models_sidebar_row">
+                class="hiwin_ppt_snapshot_models_sidebar_row"
+                :class="{ 'hiwin_ppt_snapshot_models_sidebar_row_select': index === 1 }">
                 <!-- 有默认选中样式 -->
                 <div class="viewSiderBarIcon"></div>
                 <!-- <Delete-mode theme="outline" size="14" fill="#ee0c0c" strokeLinejoin="bevel"/> -->
-                <IconDeleteMode class="ppt_delete_icon"></IconDeleteMode>
-                <a class="higet_pointer hiwin_ppt_snapshot_models_sidebar_row" >加载模板产生2023-07-01 15:05</a>
-              </div>
-              <div v-else>
-                <a></a>
+                <!-- <IconDeleteMode class="ppt_delete_icon" @click=""></IconDeleteMode> -->
+                <IconDeleteMode class="ppt_delete_icon" @click="openDialog(item.name)" />
+                <a class="higet_pointer hiwin_ppt_snapshot_models_sidebar_row_a"
+                  @click="hj_ppt_sidebar_his_view_select(item.id ? item.id : null, item.name || null)">{{ item.name }}</a>
               </div>
             </div>
           </div>
           <div class="PptRight">
-            <div class="versionInfoLine">版本：<span class="span_ppt_version">加载模板产生2023-07-01 15:05</span>
-              <div class="ppt_crateor_info">创建人：<span class="span_ppt_creator"
-                  style="margin-right: 20px;">胡红卫</span>创建时间：<span class="span_created_time">2023-07-01 14:59</span></div>
+            <div class="versionInfoLine">版本：<span class="span_ppt_version">{{ version_info.version_name }}</span>
+              <div class="ppt_crateor_info">创建人：<span class="span_ppt_creator" style="margin-right: 20px;">{{
+                version_info.ppt_creator }}</span>创建时间：<span class="span_created_time">{{
+    version_info.created_time }}</span></div>
             </div>
             <div class="viewHistPPt">
               <APP />
@@ -154,11 +155,11 @@
 
       </div>
       <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="historyDrawerViewHisVisible = false">取消</el-button>
-          <el-button type="primary" @click="historyDrawerViewHisVisible = false">
+        <span class="dialog-footer ">
+          <el-button @click="historyDrawerViewHisVisible = false" class="hzppt_view_close">关闭</el-button>
+          <!-- <el-button type="primary" @click="historyDrawerViewHisVisible = false">
             确定
-          </el-button>
+          </el-button> -->
         </span>
       </template>
     </el-dialog>
@@ -179,8 +180,10 @@ import APP from '@/views/components/App.vue'
 // import APP from '@/App.vue'
 
 import HotkeyDoc from './HotkeyDoc.vue'
-import type { FormInstance } from 'element-plus'
+import { ElLoading, FormInstance, ElMessageBox, ElMessage } from 'element-plus'
+
 import { fa } from 'element-plus/es/locale'
+import { method } from 'lodash'
 
 export default defineComponent({
   name: 'editor-header',
@@ -269,13 +272,119 @@ export default defineComponent({
       done()
       historyDrawerViewHisVisible.value = false
     }
+
+    const loading = ref<any>(null)
+    const hj_ppt_sidebar_his_view_select = (pk: any, pk_name: string) => {
+      debugger
+      open_loading()
+      // name  是type
+      if (pk && pk_name) {
+        const elements = document.querySelectorAll('.hiwin_ppt_snapshot_models_sidebar_row') // 获取元素
+        elements.forEach((element) => {
+          const data_id = element.getAttribute('data-id')
+          const data_version = element.getAttribute('data-version')
+          if (pk_name !== data_version || pk.toString() !== data_id) {
+            element.classList.remove('hiwin_ppt_snapshot_models_sidebar_row_select')
+          }
+          else {
+            //找到要选中的对象了
+            element.classList.add('hiwin_ppt_snapshot_models_sidebar_row_select')
+            // get_hz_ppt_by_dimension_and_year(dimension_obj, value_year.value)
+            // 更新标题
+            const selectedOption = version_list.value.find(item => item.id === pk)
+            if (selectedOption) {
+              version_info.value.created_time = selectedOption.created_time
+              version_info.value.ppt_creator = selectedOption.creator
+              version_info.value.version_name = selectedOption.name
+            }
+          }
+
+        })
+      }
+      close_loading()
+    }
+    const open_loading = () => {
+      loading.value = ElLoading.service({
+        lock: false,
+        text: '加载中',
+        background: 'rgba(0, 0, 0, 0.6)',
+        // target: '.pptist-editor'  // 这里添加你的div的class或者id
+        // target: '#hj_all_ppt_id',  // 这里添加你的div的class或者id
+      })
+    }
+    const close_loading = () => {
+      if (loading.value) {
+        console.log('loading.value exists')
+        if (typeof loading.value.close === 'function') {
+          console.log('loading.value.close is a function')
+          setTimeout(() => {
+            loading.value.close()
+          }, 1000)
+        } else {
+          console.log('loading.value.close is not a function')
+        }
+      } else {
+
+        console.log('loading.value does not exist')
+      }
+    }
     const pptNULLVisable = ref(false)
+    // 版本信息模块
     const version_list = ref<any>([])
-    version_list.value = [
-      { id: 1, name: '版本1' },
-      { id: 2, name: '版本2' },
-      { id: 3, name: '版本3' },
-    ]
+    for (let i = 4; i <= 50; i++) {
+      version_list.value.push({
+        id: i,
+        name: `版本${i}`,
+        creator: '李小明',
+        created_time: '2023-07-01 14:59'
+      })
+    }
+    // version_list.value = [
+    //   { id: 1, name: '版本1', 'creator': '李小明', 'created_time': '2023-07-01 14:59' },
+    //   { id: 2, name: '版本2', 'creator': '李小明', 'created_time': '2023-07-01 14:59' },
+    //   { id: 3, name: '版本3', 'creator': '李小明', 'created_time': '2023-07-01 14:59' },
+
+    // ]
+    const dialogVisible = ref(false)
+    const version_info = ref({
+      'version_name': null,
+      'ppt_creator': null,
+      'created_time': null
+    })
+    const openDialog = function (name: any) {
+      if (name) {
+        ElMessageBox.confirm(
+          '确定删除版本”' + name + '”吗？',
+          '信息',
+          {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning',
+          }
+        )
+          .then(() => {
+            ElMessage({
+              type: 'success',
+              message: '模拟删除成功！',
+            })
+          })
+          .catch(() => {
+            ElMessage({
+              type: 'info',
+              message: '模拟删除取消！',
+            })
+          })
+      } else {
+        ElMessage({
+          type: 'info',
+          message: '没有获取到当前版本，请刷新重试！',
+        })
+      }
+    }
+    // const deleteItem = function () {
+    //   // Add your delete logic here
+    //   // dialogVisible.value = false
+    // }
     return {
       redo,
       undo,
@@ -304,6 +413,11 @@ export default defineComponent({
       pptNULLVisable,
       version_list,
       save_his_version,
+      hj_ppt_sidebar_his_view_select,
+      version_info,
+      dialogVisible,
+      openDialog,
+      // deleteItem,
     }
   },
 })
@@ -409,5 +523,13 @@ export default defineComponent({
   width: 100% !important;
   height: 100% !important;
   position: relative !important;
+}
+
+// .el-button {
+//   margin-top: 11px;
+// }
+
+.hzppt_view_close {
+  margin-top: 11px;
 }
 </style>

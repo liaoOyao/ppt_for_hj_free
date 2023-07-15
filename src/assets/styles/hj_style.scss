@@ -149,10 +149,11 @@
 
 .hj_slider {
   box-sizing: border-box;
-  // width: 8.3333333333%;
-  width: 1/12;
+  width: 8.3333333333%;
+  // width: 1/12;
   min-height: 200px;
-  border-right: 1px solid rgb(13, 74, 137);
+  // border-right: 1px solid rgb(13, 74, 137);
+  border-right: 1px solid #ccc;
   overflow: auto;
   padding-top: 10px;
 }
@@ -221,6 +222,14 @@
   margin-top: 5px;
   display: flex;
   align-items: center;
+  line-height: 20px;
+  width: calc(100% - 2px);
+}
+
+.hj_sidebar_ppt_item a {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 20px;
 }
 
 .hj_sidebar_icon {
@@ -358,12 +367,30 @@
   vertical-align: middle;
   display: flex;
   align-items: center;
-  background-color: rgb(238, 238, 238);
+  justify-content: start;
   color: #337ab7;
+  height: 20px;
+  line-height: 20px;
 }
 
 .hiwin_ppt_snapshot_models_sidebar_row:hover {
-  color: #337ab7;
+  color: #337ab7 !important;
+  text-decoration: underline;
+}
+
+.hiwin_ppt_snapshot_models_sidebar_row_select {
+  background-color: rgb(238, 238, 238);
+}
+
+.hiwin_ppt_snapshot_models_sidebar_row_a {
+  color: #337ab7 !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hiwin_ppt_snapshot_models_sidebar_row a :hover {
+  color: #23527c;
   text-decoration: underline;
 }
 
@@ -385,7 +412,14 @@
   height: calc(100vh - 202px);
   overflow-y: auto;
   min-height: 200px;
-  width: calc(11.666667% - 2px);
+  // width: 1/12;
+  width: 8.3333333333%;
+  // border-right: 1px solid rgb(13, 74, 137);
+  // border-right: 1px solid #f2f2f2;
+  border-right: 1px solid #eee;
+
+  // width: 8.333333%;
+  // width: calc(11.666667% - 2px);
 }
 
 // .PptRight {
@@ -394,7 +428,8 @@
 // }
 
 .PptRight {
-  width: 88%;
+  width: 91.6666666667%;
+  // width: 88%;
   // height: 100%;
   height: calc(100vh - 202px);
 }
@@ -405,6 +440,7 @@
 // }
 
 .viewHistPPt {
+  margin-top: 11px;
   height: calc(100% - 20px);
   position: relative;
   width: 100%;

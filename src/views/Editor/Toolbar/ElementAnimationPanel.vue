@@ -183,7 +183,7 @@ export default defineComponent({
 
     // 当前页面的动画列表
     const animationSequence = computed(() => {
-      const animationSequence = []
+      const animationSequence: any[] = []
       for (let i = 0; i < formatedAnimations.value.length; i++) {
         const item = formatedAnimations.value[i]
         for (let j = 0; j < item.animations.length; j++) {

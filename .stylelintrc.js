@@ -35,5 +35,7 @@ module.exports = {
     'selector-pseudo-element-colon-notation': 'double',
     'selector-pseudo-element-no-unknown': null,
     'selector-list-comma-newline-after': null,
+    'selector-combinator-space-after':null,
+    'selector-combinator-space-before':null,
   },
 }

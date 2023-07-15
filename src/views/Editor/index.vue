@@ -264,14 +264,17 @@ export default defineComponent({
           // 年份
           if (params.has('year')) {
             const temp = params.get('year')
+            getYearData(dim_data.year_list)
             if (temp) {
-              getYearData(dim_data.year_list)
               year_id.value = temp
               value_year.value = Number(dim_data.cur_year)
               current_year = Number(dim_data.cur_year)
             }
-          } else {
-            ElMessage.error('缺少年份信息')
+          } else { // 没有传年份
+            getYearData(dim_data.year_list)
+            year_id.value = new Date().getFullYear().toString()
+            value_year.value = Number(new Date().getFullYear() )
+            current_year = Number(value_year.value)
           }
 
           if (params.has('show_c')) {
@@ -424,7 +427,6 @@ export default defineComponent({
       // 根据传入的pk、pk_name (用来渲染标题中的部门的)  设置默认选中
       if (pk && type) {
         const elements = document.querySelectorAll('.hj_sidebar_ppt_item') // 获取元素
-        debugger
         elements.forEach((element) => {
           debugger
           const formType = element.getAttribute('data-form_type')
@@ -437,6 +439,13 @@ export default defineComponent({
             select_pk_name.value = pk_name
           }
         })
+        // 导入数据
+        const dimension_obj = {
+          'bupl_id': value_bupl.value || 0,
+          'spfd_id': value_spfd.value || 0,
+          'd_id': value_dep.value || 0,
+        }
+        get_hz_ppt_by_dimension_and_year(dimension_obj, value_year.value)
       } else {
         ElMessage.error('没有设置默认选中对象')
       }
@@ -526,7 +535,7 @@ export default defineComponent({
 
     // 顶部维度改变
     const handleDimessionChange = (val: any, name: string) => {
-      let selectedOption = null  // 主要用来获取pk_name
+      let selectedOption: any = null  // 主要用来获取pk_name
       if (name === 'spfd') {
         selectedOption = spfd_array.value.find(item => item.pk === val)
       }
@@ -543,7 +552,9 @@ export default defineComponent({
       else if (name === 'c') {
         selectedOption = dep_array.value.find(item => item.pk === val)
       }
-      hj_ppt_sidebar_select(val, selectedOption ? selectedOption.name ? selectedOption.name : null : null, name)
+      if (selectedOption) {
+        hj_ppt_sidebar_select(val, selectedOption ? selectedOption.name ? selectedOption.name : null : null, name)
+      }
     }
 
     // 获取doc 数据,并且获取 维度列表的信息
@@ -637,7 +648,9 @@ export default defineComponent({
       }
     }
 
-    handleUrlAndSleect('/primary_data/hz_ppt?bupl_id=0&spfd_id=0&d_id=0&year=2023&grid_key=ppt&show_c=1&title=ppt页面')
+    // handleUrlAndSleect('/primary_data/hz_ppt?bupl_id=0&spfd_id=0&d_id=0&year=2023&grid_key=ppt&show_c=1&title=ppt页面')
+    handleUrlAndSleect('/primary_data/hz_ppt?bupl_id=0&spfd_id=0&d_id=0&grid_key=ppt&show_c=1&title=ppt页面')
+
     // 导入数据
 
     const pptData = [{ 'id': 'ygsaCHGK0I', 'elements': [{ 'type': 'text', 'id': 'q6vnO4-ZOn', 'left': 72.19760572139303, 'top': 27.839319029850742, 'width': 181.3847429519071, 'height': 80, 'content': '<p style=\'\'>汉捷咨询管理有限公司</p>', 'rotate': 0, 'defaultFontName': 'Microsoft Yahei', 'defaultColor': '#333', 'outline': { 'width': 2, 'color': '#000', 'style': 'solid' } }], 'background': { 'type': 'solid', 'color': '#fff' } }, { 'id': '6zWUVwfKm7', 'elements': [{ 'type': 'text', 'id': 'o7twfyvKvt', 'left': 72.19760572139303, 'top': 27.839319029850742, 'width': 181.3847429519071, 'height': 80, 'content': '<p style=\'\'>汉捷咨询管理有限公司</p>', 'rotate': 0, 'defaultFontName': 'Microsoft Yahei', 'defaultColor': '#333', 'outline': { 'width': 2, 'color': '#000', 'style': 'solid' } }], 'background': { 'type': 'solid', 'color': '#fff' } }, { 'id': 'jt_byN3tvQ', 'elements': [{ 'type': 'text', 'id': 'A4wSlLCrDi', 'left': 72.19760572139303, 'top': 27.839319029850742, 'width': 181.3847429519071, 'height': 80, 'content': '<p style=\'\'>汉捷咨询管理有限公司</p>', 'rotate': 0, 'defaultFontName': 'Microsoft Yahei', 'defaultColor': '#333', 'outline': { 'width': 2, 'color': '#000', 'style': 'solid' } }], 'background': { 'type': 'solid', 'color': '#fff' } }]

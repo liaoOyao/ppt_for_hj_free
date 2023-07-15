@@ -108,7 +108,7 @@ const gradient = (startColor: string, endColor: string, step: number) => {
   const rStep = (_endColor.r - _startColor.r) / step
   const gStep = (_endColor.g - _startColor.g) / step
   const bStep = (_endColor.b - _startColor.b) / step
-  const gradientColorArr = []
+  const gradientColorArr:any[] = []
 
   for (let i = 0; i < step; i++) {
     const gradientColor = tinycolor({
@@ -122,7 +122,7 @@ const gradient = (startColor: string, endColor: string, step: number) => {
 }
 
 const getPresetColors = () => {
-  const presetColors = []
+  const presetColors: any[] = []
   for (const color of presetColorConfig) {
     presetColors.push(gradient(color[1], color[0], 5))
   }

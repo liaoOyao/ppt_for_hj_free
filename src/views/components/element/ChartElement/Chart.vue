@@ -1,26 +1,14 @@
 <template>
-  <div 
-    class="chart"
-    :style="{ flexDirection: legend === 'top' ? 'column-reverse' : 'column' }"
-  >
-    <div 
-      class="chart-content"
-      ref="chartRef"
-      :style="{
-        width: width + 'px',
-        height: chartHeight + 'px',
-        transform: `scale(${1 / slideScale})`,
-      }"
-    ></div>
+  <div class="chart" :style="{ flexDirection: legend === 'top' ? 'column-reverse' : 'column' }">
+    <div class="chart-content" ref="chartRef" :style="{
+      width: width + 'px',
+      height: chartHeight + 'px',
+      transform: `scale(${1 / slideScale})`,
+    }"></div>
     <div class="legends" :style="{ transform: `scale(${1 / slideScale})` }" v-if="legend">
-      <div 
-        class="legend" 
-        v-for="(legend, index) in legends" 
-        :key="index"
-        :style="{ color: gridColor }"
-      >
+      <div class="legend" v-for="(legend, index) in legends" :key="index" :style="{ color: gridColor }">
         <div class="block" :style="{ backgroundColor: themeColors[index] }"></div>
-        {{legend}}
+        {{ legend }}
       </div>
     </div>
   </div>
@@ -90,13 +78,15 @@ export default defineComponent({
 
     const getDataAndOptions = () => {
       const propsOptopns = props.options || {}
-      const options = {
-        ...propsOptopns,
-        width: props.width * slideScale.value,
-        height: chartHeight.value * slideScale.value,
+      if (typeof propsOptopns === 'object' && propsOptopns !== null) {
+        const options = {
+          ...propsOptopns,
+          width: props.width * slideScale.value,
+          height: chartHeight.value * slideScale.value,
+        }
+        const data = props.type === 'pie' ? { ...props.data, series: props.data.series[0] } : props.data
+        return { data, options }
       }
-      const data = props.type === 'pie' ? { ...props.data, series: props.data.series[0] } : props.data
-      return { data, options }
     }
 
     const renderChart = () => {
@@ -201,18 +191,23 @@ export default defineComponent({
     .ct-series-#{nth($ct-series-names, $i)} .ct-line {
       stroke: $color;
     }
+
     .ct-series-#{nth($ct-series-names, $i)} .ct-point {
       stroke: $color;
     }
+
     .ct-series-#{nth($ct-series-names, $i)} .ct-area {
       fill: $color;
     }
+
     .ct-series-#{nth($ct-series-names, $i)} .ct-bar {
       stroke: $color;
     }
+
     .ct-series-#{nth($ct-series-names, $i)} .ct-slice-pie {
       fill: $color;
     }
+
     .ct-series-#{nth($ct-series-names, $i)} .ct-slice-donut {
       stroke: $color;
     }
@@ -223,6 +218,7 @@ export default defineComponent({
   .ct-grid {
     stroke: var(--grid-color);
   }
+
   .ct-label {
     fill: var(--grid-color);
     color: var(--grid-color);
@@ -236,11 +232,12 @@ export default defineComponent({
   align-items: center;
   font-size: 14px;
 }
+
 .legend {
   display: flex;
   align-items: center;
 
-  & + .legend {
+  &+.legend {
     margin-left: 10px;
   }
 

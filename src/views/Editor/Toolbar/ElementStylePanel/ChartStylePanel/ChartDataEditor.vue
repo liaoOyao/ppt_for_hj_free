@@ -170,7 +170,7 @@ export default defineComponent({
       }
 
       for (let colIndex = 1; colIndex < col; colIndex++) {
-        const seriesItem = []
+        const seriesItem: any[] = []
         for (let rowIndex = 1; rowIndex < row; rowIndex++) {
           const valueInputRef = document.querySelector(`#cell-${rowIndex}-${colIndex}`) as HTMLInputElement
           let value = 0

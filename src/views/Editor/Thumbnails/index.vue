@@ -136,8 +136,8 @@ export default defineComponent({
           minIndex = index
         }
 
-        const newSelectedSlidesIndex = []
-        for (let i = minIndex; i <= maxIndex; i++) newSelectedSlidesIndex.push(i)
+        const newSelectedSlidesIndex:any[] = []
+        for (let i = minIndex; i <= maxIndex; i++) newSelectedSlidesIndex.push( i)
         mainStore.updateSelectedSlidesIndex(newSelectedSlidesIndex)
         changSlideIndex(index)
       }

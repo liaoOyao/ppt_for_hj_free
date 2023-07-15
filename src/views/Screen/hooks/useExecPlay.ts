@@ -105,7 +105,7 @@ export default () => {
   // }, 1000, { leading: true, trailing: false })
 
   const throttleMassage = throttle(function (msg) {
-    const level = '99999' // 这里可以根据需要设置层级
+    const level = '' // 这里可以根据需要设置提示
     const messageWithLevel = `${level}: ${msg}`
     message.success(messageWithLevel)
   }, 1000, { leading: true, trailing: false })
