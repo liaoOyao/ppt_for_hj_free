@@ -348,7 +348,7 @@ export default defineComponent({
 
     // bupl选中状态
     const handleBuplOrSpfdChange = (val: any, name: string) => {
-      debugger
+      // debugger
       let selectedOption = null
       if (name === 'spfd') {
         selectedOption = spfd_array.value.find(item => item.pk === val)
@@ -370,7 +370,7 @@ export default defineComponent({
       // alert('加载导入的数据中')
       // importSpecificData([])
       // handleUrlAndSleect('/primary_data/company_strategy_action_pl?pl_id=01&year=2023&array_top='['year:1','spfd:1','pl:1']')
-      handleUrlAndSleect('/primary_data/company_strategy_action_pl?pl_id=01&year=2023&title=年度人才计划&array_top=' + encodeURIComponent(JSON.stringify(['year', 'spfd', 'bupl'])) + '&array_left=' + encodeURIComponent(JSON.stringify(['company', 'spfd', 'bupl'])))
+      handleUrlAndSleect('/company_strategy_action_pl?pl_id=01&year=2023&title=年度人才计划&array_top=' + encodeURIComponent(JSON.stringify(['year', 'spfd', 'bupl'])) + '&array_left=' + encodeURIComponent(JSON.stringify(['company', 'spfd', 'bupl'])))
     })
 
     return {

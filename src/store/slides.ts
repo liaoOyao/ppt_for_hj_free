@@ -115,7 +115,7 @@ export const useSlidesStore = defineStore('slides', {
     },
   
     setSlides(slides: Slide[]) {
-      debugger
+      // debugger
       this.slides = slides
     },
   

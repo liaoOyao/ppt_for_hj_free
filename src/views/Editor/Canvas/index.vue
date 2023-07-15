@@ -169,7 +169,7 @@ export default defineComponent({
 
     const elementList = ref<PPTElement[]>([])
     const setLocalElementList = () => {
-      debugger
+      // debugger
       console.log(currentSlide,"currentSlide")
       console.log(currentSlide.value,'currentSlide.value')
       console.log(currentSlide.value.elements,'currentSlide.value.elements')

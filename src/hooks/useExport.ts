@@ -64,11 +64,11 @@ export default () => {
   // 导入pptist文件
   const importSpecificFile = (files: File[], cover = true) => {
     const file = files[0]
-    debugger
+    // debugger
     const reader = new FileReader()
     reader.addEventListener('load', () => {
       try {
-        debugger
+        // debugger
         const slides = JSON.parse(decrypt(reader.result as string))
         if (cover) slidesStore.setSlides(slides)
         else addSlidesFromData(slides)
@@ -83,9 +83,9 @@ export default () => {
   const importSpecificData = (slides: Slide[], cover = true) => {
     slidesStore.updateSlideIndex(0) //默认索引
     console.log(slides,"slides")
-    debugger
+    // debugger
     try {
-      debugger
+      // debugger
       if (cover) slidesStore.setSlides(slides)
       else addSlidesFromData(slides)
     } catch {

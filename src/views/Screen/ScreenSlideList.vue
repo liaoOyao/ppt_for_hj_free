@@ -88,7 +88,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .screen-slide-list {
-  background: #1d1d1d;
+  // background: #1d1d1d;
   position: relative;
   width: 100%;
   height: 100%;
@@ -155,5 +155,7 @@ export default defineComponent({
   display: flex;
   justify-content: center;
   align-items: center;
+  height: 100% !important;
+  height: 100%!important;
 }
 </style>

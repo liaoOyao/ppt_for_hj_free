@@ -13,11 +13,11 @@ class Ajax {
   private handleRequest(config: AxiosRequestConfig): InternalAxiosRequestConfig {
     // 在这里可以添加一些请求前的处理，例如添加token到header      
     // 添加授权令牌
-    debugger
+    // debugger
     if (config.headers) {
-      config.headers['Cookie'] = 'sessionid=52q1lw28tf8aztw5lohj42vj34amioi5; csrftoken=N4P5c8ytqVy1GbAcfQGkW9rW5zqgVo5efxbjxYsi6UsImITblLqzBdkBtRalSsk9'
-      config.headers['Referer'] = 'http://localhost:8081/'
-      config.headers['Origin'] = 'http://localhost:8081/'
+      // config.headers['Cookie'] = 'sessionid=52q1lw28tf8aztw5lohj42vj34amioi5; csrftoken=N4P5c8ytqVy1GbAcfQGkW9rW5zqgVo5efxbjxYsi6UsImITblLqzBdkBtRalSsk9'
+      // config.headers['Referer'] = 'http://localhost:8081/'
+      // config.headers['Origin'] = 'http://localhost:8081/'
     }
     return config as InternalAxiosRequestConfig
   }
@@ -44,9 +44,12 @@ class Ajax {
 
   // 可以按需添加其他http方法，例如put, delete等
 }
-
+// 获取当前网址的baseURL
+const currentURL = window.location.href
+const baseURL = currentURL.substring(0, currentURL.lastIndexOf('/') + 1)
 export default new Ajax({
-  baseURL: 'http://192.168.1.175:8080/', // 这里填写你的api地址
+  // baseURL: 'http://192.168.1.175:8080/', // 这里填写你的api地址
+  baseURL:baseURL, // 这里填写你的api地址
   timeout: 10000, // 请求超时时间
   withCredentials: true, // 允许携带cookie
 })

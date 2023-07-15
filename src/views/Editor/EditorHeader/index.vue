@@ -260,7 +260,7 @@ export default defineComponent({
       historyDrawerVisible.value = false
     }
     const handleBeforeClose = function (done: any) {
-      debugger
+      // debugger
       // if (!formEl) return
       // formEl.resetFields()
       done()
@@ -275,7 +275,7 @@ export default defineComponent({
 
     const loading = ref<any>(null)
     const hj_ppt_sidebar_his_view_select = (pk: any, pk_name: string) => {
-      debugger
+      // debugger
       open_loading()
       // name  是type
       if (pk && pk_name) {
