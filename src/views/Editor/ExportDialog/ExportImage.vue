@@ -68,7 +68,7 @@
 
     <div class="btns">
       <Button class="btn export" type="primary" @click="expImage()">导出图片</Button>
-      <Button class="btn close" @click="close()">关闭</Button>
+      <Button class="btn close ppt_his_close_btn" @click="close()">关闭</Button>
     </div>
 
     <FullscreenSpin :loading="exporting" tip="正在导出..." />

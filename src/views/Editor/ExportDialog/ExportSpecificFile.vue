@@ -29,7 +29,7 @@
     </div>
     <div class="btns">
       <Button class="btn export" type="primary" @click="exportSpecificFile(selectedSlides)">导出 .pptist 文件</Button>
-      <Button class="btn close" @click="close()">关闭</Button>
+      <Button class="btn close ppt_his_close_btn" @click="close()">关闭</Button>
     </div>
   </div>
 </template>

@@ -32,7 +32,7 @@
     </div>
     <div class="btns">
       <Button class="btn export" type="primary" @click="exportPPTX(selectedSlides, masterOverwrite)">导出 PPTX</Button>
-      <Button class="btn close" @click="close()">关闭</Button>
+      <Button class="btn close ppt_his_close_btn" @click="close()">关闭</Button>
     </div>
 
     <FullscreenSpin :loading="exporting" tip="正在导出..." />

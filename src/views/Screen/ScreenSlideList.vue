@@ -155,7 +155,7 @@ export default defineComponent({
   display: flex;
   justify-content: center;
   align-items: center;
+  width: 100% !important;
   height: 100% !important;
-  height: 100%!important;
 }
 </style>

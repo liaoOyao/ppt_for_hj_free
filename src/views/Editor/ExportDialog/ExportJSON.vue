@@ -6,7 +6,7 @@
 
     <div class="btns">
       <Button class="btn export" type="primary" @click="exportJSON()">导出 JSON</Button>
-      <Button class="btn close" @click="close()">关闭</Button>
+      <Button class="btn close ppt_his_close_btn" @click="close()">关闭</Button>
     </div>
   </div>
 </template>

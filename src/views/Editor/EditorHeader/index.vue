@@ -127,16 +127,16 @@
             </div>
             <hr class="ppt_view_his_hr" />
             <div class="pptSiderBar" v-for="(item, index) in version_list" :key="index">
-              <div v-if="index !== 0" :data-id="item.id" :data-version="item.name"
-                class="hiwin_ppt_snapshot_models_sidebar_row"
-                :class="{ 'hiwin_ppt_snapshot_models_sidebar_row_select': index === 1 }">
+              <div :data-id="item.id" :data-version="item.name" class="hiwin_ppt_snapshot_models_sidebar_row"
+                :class="{ 'hiwin_ppt_snapshot_models_sidebar_row_select': index === 0 }">
                 <!-- 有默认选中样式 -->
                 <div class="viewSiderBarIcon"></div>
                 <!-- <Delete-mode theme="outline" size="14" fill="#ee0c0c" strokeLinejoin="bevel"/> -->
                 <!-- <IconDeleteMode class="ppt_delete_icon" @click=""></IconDeleteMode> -->
                 <IconDeleteMode class="ppt_delete_icon" @click="openDialog(item.name)" />
                 <a class="higet_pointer hiwin_ppt_snapshot_models_sidebar_row_a"
-                  @click="hj_ppt_sidebar_his_view_select(item.id ? item.id : null, item.name || null)">{{ item.name }}</a>
+                  @click="hj_ppt_sidebar_his_view_select(item.id ? item.id : null, item.name || null, false)">{{ item.name
+                  }}</a>
               </div>
             </div>
           </div>
@@ -167,7 +167,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, reactive, ComponentOptions } from 'vue'
+import { defineComponent, ref, reactive, ComponentOptions, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useMainStore } from '@/store'
 import useScreening from '@/hooks/useScreening'
@@ -216,7 +216,9 @@ export default defineComponent({
     const hotkeyDrawerVisible = ref(false)
     const historyDrawerVisible = ref(false)
     const historyDrawerViewHisVisible = ref(false)
+    const loading = ref(null)
 
+    
 
     const goIssues = () => {
       window.open('https://github.com/pipipi-pikachu/PPTist/issues')
@@ -227,7 +229,14 @@ export default defineComponent({
         historyDrawerVisible.value = true
       } else if (index === 2) {
         // 查看历史
+        // 打开主页时页面已经渲染好，只是没显示，点击查看历史时渲染样式和数据
         historyDrawerViewHisVisible.value = true
+        hj_ppt_sidebar_his_view_select(4, '版本4', false)
+        console.log(version_list)
+        // setTimeout(() => {
+        //   hj_ppt_sidebar_his_view_select(4, '版本4', false)
+        //   console.log(version_list)
+        // }, 500)
       }
     }
     // 保存历史版本模块
@@ -273,33 +282,44 @@ export default defineComponent({
       historyDrawerViewHisVisible.value = false
     }
 
-    const loading = ref<any>(null)
-    const hj_ppt_sidebar_his_view_select = (pk: any, pk_name: string) => {
+    const hj_ppt_sidebar_his_view_select = (pk: any, pk_name: string, is_first_default: false) => {
       // debugger
       open_loading()
       // name  是type
       if (pk && pk_name) {
-        const elements = document.querySelectorAll('.hiwin_ppt_snapshot_models_sidebar_row') // 获取元素
-        elements.forEach((element) => {
-          const data_id = element.getAttribute('data-id')
-          const data_version = element.getAttribute('data-version')
-          if (pk_name !== data_version || pk.toString() !== data_id) {
-            element.classList.remove('hiwin_ppt_snapshot_models_sidebar_row_select')
-          }
-          else {
-            //找到要选中的对象了
-            element.classList.add('hiwin_ppt_snapshot_models_sidebar_row_select')
-            // get_hz_ppt_by_dimension_and_year(dimension_obj, value_year.value)
-            // 更新标题
-            const selectedOption = version_list.value.find(item => item.id === pk)
-            if (selectedOption) {
-              version_info.value.created_time = selectedOption.created_time
-              version_info.value.ppt_creator = selectedOption.creator
-              version_info.value.version_name = selectedOption.name
+        debugger
+        const observer = new MutationObserver((mutationsList, observer) => {
+          for (const mutation of mutationsList) {
+            if (mutation.type === 'childList') {
+              const elements = document.querySelectorAll('.hiwin_ppt_snapshot_models_sidebar_row') // 获取元素
+              elements.forEach((element) => {
+                const data_id = element.getAttribute('data-id')
+                const data_version = element.getAttribute('data-version')
+                if (pk_name !== data_version || pk.toString() !== data_id) {
+                  debugger
+                  element.classList.remove('hiwin_ppt_snapshot_models_sidebar_row_select')
+                } else {
+                  debugger
+                  //找到要选中的对象了
+                  element.classList.add('hiwin_ppt_snapshot_models_sidebar_row_select')
+                  // get_hz_ppt_by_dimension_and_year(dimension_obj, value_year.value)
+                  // 更新标题
+                  const selectedOption = version_list.value.find((item: { id: any }) => item.id === pk)
+                  if (selectedOption) {
+                    version_info.value.created_time = selectedOption.created_time
+                    version_info.value.ppt_creator = selectedOption.creator
+                    version_info.value.version_name = selectedOption.name
+                  }
+                  if (is_first_default) {
+                    console.log('第一次选中')
+                  }
+                }
+              })
+              observer.disconnect()  //观察器断开连接
             }
           }
-
         })
+        observer.observe(document.body, { childList: true, subtree: true })
       }
       close_loading()
     }
@@ -339,6 +359,7 @@ export default defineComponent({
         created_time: '2023-07-01 14:59'
       })
     }
+
     // version_list.value = [
     //   { id: 1, name: '版本1', 'creator': '李小明', 'created_time': '2023-07-01 14:59' },
     //   { id: 2, name: '版本2', 'creator': '李小明', 'created_time': '2023-07-01 14:59' },
@@ -385,6 +406,10 @@ export default defineComponent({
     //   // Add your delete logic here
     //   // dialogVisible.value = false
     // }
+    // onMounted(() => {
+    //   // hj_ppt_sidebar_his_view_select()
+    // })
+
     return {
       redo,
       undo,
