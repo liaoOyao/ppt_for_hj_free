@@ -31,9 +31,9 @@ export default defineComponent({
     const { databaseId } = storeToRefs(mainStore)
     const { screening } = storeToRefs(useScreenStore())
 
-    if (process.env.NODE_ENV === 'production') {
-      window.onbeforeunload = () => false
-    }
+    // if (process.env.NODE_ENV === 'production') {
+    //   window.onbeforeunload = () => false
+    // }
 
     onMounted(() => {
       snapshotStore.initSnapshotDatabase()

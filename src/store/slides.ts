@@ -27,8 +27,8 @@ export interface SlidesState {
   slides: Slide[];
   slideIndex: number;
   viewportRatio: number;
+  isChanged: boolean;
 }
-
 export const useSlidesStore = defineStore('slides', {
   state: (): SlidesState => ({
     theme: theme, // 主题样式
@@ -36,13 +36,15 @@ export const useSlidesStore = defineStore('slides', {
     slides: slides, // 幻灯片页面数据
     slideIndex: 0, // 当前页面索引
     viewportRatio: 0.5625, // 可是区域比例，默认16:9
+    isChanged: false, //当前数据是否改变，点击首页保存后设置为false
   }),
+
 
   getters: {
     currentSlide(state) {
       return state.slides[state.slideIndex]
     },
-  
+
     currentSlideAnimations(state) {
       const currentSlide = state.slides[state.slideIndex]
       if (!currentSlide?.animations) return []
@@ -83,7 +85,7 @@ export const useSlidesStore = defineStore('slides', {
       }
       return formatedAnimations
     },
-  
+
     layouts(state) {
       const {
         themeColor,
@@ -91,69 +93,79 @@ export const useSlidesStore = defineStore('slides', {
         fontName,
         backgroundColor,
       } = state.theme
-  
+
       const subColor = tinycolor(fontColor).isDark() ? 'rgba(230, 230, 230, 0.5)' : 'rgba(180, 180, 180, 0.5)'
-  
+
       const layoutsString = JSON.stringify(layouts)
         .replaceAll('{{themeColor}}', themeColor)
         .replaceAll('{{fontColor}}', fontColor)
         .replaceAll('{{fontName}}', fontName)
         .replaceAll('{{backgroundColor}}', backgroundColor)
         .replaceAll('{{subColor}}', subColor)
-      
+
       return JSON.parse(layoutsString)
     },
   },
 
   actions: {
     setTheme(themeProps: Partial<SlideTheme>) {
+      this.isChanged = true
+      // this.$patch({ theme: { ...this.theme, ...themeProps } })
       this.theme = { ...this.theme, ...themeProps }
     },
-  
+
     setViewportRatio(viewportRatio: number) {
+      this.$patch({ viewportRatio: viewportRatio })
       this.viewportRatio = viewportRatio
     },
-  
+
     setSlides(slides: Slide[]) {
-      // debugger
+      this.isChanged = true
+      this.$patch({ slides: slides })
       this.slides = slides
     },
-  
+
     addSlide(slide: Slide | Slide[]) {
+      this.isChanged = true
       const slides = Array.isArray(slide) ? slide : [slide]
       const addIndex = this.slideIndex + 1
       this.slides.splice(addIndex, 0, ...slides)
       this.slideIndex = addIndex
     },
-  
+
     updateSlide(props: Partial<Slide>) {
-      debugger
+      this.isChanged = true
       const slideIndex = this.slideIndex
       this.slides[slideIndex] = { ...this.slides[slideIndex], ...props }
+      // this.$patch({ slides[slideIndex]:  { ...this.slides[slideIndex], ...props } })
+      // this.updated('updateSlide', [slideIndex, slideIndex], this.slides[slideIndex])
     },
-  
+
     deleteSlide(slideId: string | string[]) {
+      this.isChanged = true
       const slidesId = Array.isArray(slideId) ? slideId : [slideId]
-  
+
       const deleteSlidesIndex = []
       for (let i = 0; i < slidesId.length; i++) {
         const index = this.slides.findIndex(item => item.id === slidesId[i])
         deleteSlidesIndex.push(index)
       }
       let newIndex = Math.min(...deleteSlidesIndex)
-  
+
       const maxIndex = this.slides.length - slidesId.length - 1
       if (newIndex > maxIndex) newIndex = maxIndex
-  
+
       this.slideIndex = newIndex
       this.slides = this.slides.filter(item => !slidesId.includes(item.id))
     },
-  
+
     updateSlideIndex(index: number) {
+      this.isChanged = true
       this.slideIndex = index
     },
-  
+
     addElement(element: PPTElement | PPTElement[]) {
+      this.isChanged = true
       const elements = Array.isArray(element) ? element : [element]
       const currentSlideEls = this.slides[this.slideIndex].elements
       const newEls = [...currentSlideEls, ...elements]
@@ -161,16 +173,18 @@ export const useSlidesStore = defineStore('slides', {
     },
 
     deleteElement(elementId: string | string[]) {
+      this.isChanged = true
       const elementIdList = Array.isArray(elementId) ? elementId : [elementId]
       const currentSlideEls = this.slides[this.slideIndex].elements
       const newEls = currentSlideEls.filter(item => !elementIdList.includes(item.id))
       this.slides[this.slideIndex].elements = newEls
     },
-  
+
     updateElement(data: UpdateElementData) {
+      this.isChanged = true
       const { id, props } = data
       const elIdList = typeof id === 'string' ? [id] : id
-  
+
       const slideIndex = this.slideIndex
       const slide = this.slides[slideIndex]
       const elements = slide.elements.map(el => {
@@ -178,11 +192,12 @@ export const useSlidesStore = defineStore('slides', {
       })
       this.slides[slideIndex].elements = (elements as PPTElement[])
     },
-  
+
     removeElementProps(data: RemoveElementPropData) {
+      this.isChanged = true
       const { id, propName } = data
       const propsNames = typeof propName === 'string' ? [propName] : propName
-  
+
       const slideIndex = this.slideIndex
       const slide = this.slides[slideIndex]
       const elements = slide.elements.map(el => {
@@ -190,5 +205,16 @@ export const useSlidesStore = defineStore('slides', {
       })
       this.slides[slideIndex].elements = (elements as PPTElement[])
     },
+
+    setIschanged(is_change:boolean) {
+      this.isChanged = is_change
+    }
+    // updated(type: string,range:any, data: any) {
+    //   // type是改变类型，
+    //   console.log(type,'type',range,'range',data,'data')
+
+    //   return { 'type': type, 'range':range,'data': data }
+    // }
   },
+
 })

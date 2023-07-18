@@ -1,7 +1,7 @@
 // https://eslint.org/docs/rules/
 
 // const isProduction = process.env.NODE_ENV === 'production'
-const isProduction = process.env.NODE_ENV === 'dev'
+const isProduction = process.env.NODE_ENV === 'production'
 
 
 module.exports = {
@@ -20,10 +20,12 @@ module.exports = {
   rules: {
     'curly': ['error', 'multi-line'],
     'eqeqeq': ['error', 'always'],
+    // 'eqeqeq': ['error', 'always'],
     'semi': ['error', 'never'],
-    'indent': ['error', 2, { 
-      'SwitchCase': 1,
-    }],
+    'indent':'off',
+    // 'indent': ['error', 2, { 
+    //   'SwitchCase': 1,
+    // }],
     'quotes': "off",
     // 'quotes': ['error', 'single', {
     //   'avoidEscape': true,
@@ -37,7 +39,9 @@ module.exports = {
     // }],
     // 'no-empty': 'error',
     'no-empty': 'off',
+    "@typescript-eslint/no-empty-function": "off",
     'no-else-return': 'error',
+    'no-else-return': 'off',
     'no-multi-spaces': 'warn',
     // 'no-multi-spaces': 'error',
     'require-await': 'error',
@@ -55,7 +59,8 @@ module.exports = {
     'default-case': 'error',
     'consistent-this': ['error', '_this'],
     'max-depth': ['error', 6],
-    'max-lines': ['error', 800],
+    // 'max-lines': ['error', 800],
+    'max-lines': 'off',
     'no-multi-str': 'error',
     'space-infix-ops': 'error',
     'space-before-blocks': ['error', 'always'],

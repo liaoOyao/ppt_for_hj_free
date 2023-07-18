@@ -105,9 +105,9 @@ export default () => {
   // }, 1000, { leading: true, trailing: false })
 
   const throttleMassage = throttle(function (msg) {
-    const level = '' // 这里可以根据需要设置提示
-    const messageWithLevel = `${level}: ${msg}`
-    message.success(messageWithLevel)
+    // const level = '' // 这里可以根据需要设置提示
+    // const messageWithLevel = `${level}: ${msg}`
+    message.success(msg)
   }, 1000, { leading: true, trailing: false })
 
   // 向上/向下播放

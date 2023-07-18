@@ -3,6 +3,7 @@ import { storeToRefs } from 'pinia'
 import { useMainStore, useSlidesStore, useKeyboardStore } from '@/store'
 import { ElementOrderCommands } from '@/types/edit'
 import { KEYS } from '@/configs/hotkey'
+import { message } from 'ant-design-vue'
 
 import useSlideHandler from './useSlideHandler'
 import useLockElement from './useLockElement'
@@ -52,13 +53,7 @@ export default () => {
   const { enterScreening, enterScreeningFromStart } = useScreening()
   const { scaleCanvas, resetCanvas } = useScaleCanvas()
 
-  const saveHis = () => {
-    alert("保存历史")
-    // 返回当前页面的json 数据 
-  }
-  const viewHis = () => {
-    alert("查看历史")
-  }
+
   const copy = () => {
     if (activeElementIdList.value.length) copyElement()
     else if (thumbnailsFocus.value) copySlide()
@@ -161,16 +156,6 @@ export default () => {
     }
 
     if (!editorAreaFocus.value && !thumbnailsFocus.value) return
-    if (ctrlOrMetaKeyActive && key === KEYS.S) {
-      if (disableHotkeys.value) return
-      e.preventDefault()
-      saveHis()
-    }
-    if (ctrlOrMetaKeyActive && key === KEYS.H) {
-      if (disableHotkeys.value) return
-      e.preventDefault()
-      viewHis()
-    }
     if (ctrlOrMetaKeyActive && key === KEYS.C) {
       if (disableHotkeys.value) return
       e.preventDefault()

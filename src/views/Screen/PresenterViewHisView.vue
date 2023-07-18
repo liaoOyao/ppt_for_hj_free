@@ -71,7 +71,10 @@ import useSlideSize from './hooks/useSlideSize'
 import useFullscreen from './hooks/useFullscreen'
 
 import ThumbnailSlide from '@/views/components/ThumbnailSlide/index.vue'
-import ScreenSlideList from './ScreenSlideList.vue'
+// import ScreenSlideList from './ScreenSlideList.vue'
+// import ScreenSlideList from '@/Editor/Screen/ScreenSlideListViewHis.vue'
+import ScreenSlideList from './ScreenSlideListViewHis.vue'
+
 import WritingBoardTool from './WritingBoardTool.vue'
 
 export default defineComponent({
@@ -171,7 +174,7 @@ export default defineComponent({
           handler: () => writingBoardToolVisible.value = true,
         },
         {
-          text: '激光笔/打开/取消',
+          text: ( laserPen.value ? '关闭' : '打开') + '激光笔' ,
           handler: () => laserPen.value = !laserPen.value,
         },
         // {
@@ -237,6 +240,7 @@ export default defineComponent({
   width: 100%;
   height: 100%;
   display: flex;
+  overflow: auto;
 }
 
 .toolbar {
@@ -290,7 +294,7 @@ export default defineComponent({
     justify-content: center;
     align-items: center;
     line-height: 22px;
-    margin-top: -29px;
+    margin-top: -20px;
   }
 
   .hj_ppt_export_icon:hover {
@@ -471,4 +475,7 @@ export default defineComponent({
 .export-dialog .content {
   z-index: 99999 !important;
 } */
+.ant-message {
+  z-index: 9999 !important;
+}
 </style>

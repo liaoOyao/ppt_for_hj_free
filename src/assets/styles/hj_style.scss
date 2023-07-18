@@ -70,6 +70,7 @@
   position: relative;
   margin: 0;
   box-sizing: border-box;
+  font: 14px Helvetica Neue, Helvetica, PingFang SC, Tahoma, Arial, sans-serif;
 }
 
 .hj_margin-left-class {
@@ -78,7 +79,7 @@
 
 // 下拉框部分的头部部分
 .hj_head_ppt {
-  height: 125px;
+  height: 89.6px;
 }
 
 .hj_head_ppt_filter_div_name {
@@ -97,8 +98,8 @@
 }
 
 .hj_head_ppt_title_div {
-  height: 67px;
-  padding-top: 10px;
+  height: 31.6px;
+  // padding-top: 10px;
 }
 
 .hj_head_ppt_title_div_hr {
@@ -128,19 +129,22 @@
   font-size: 14px;
 }
 
-// .title_big {
+.title_big {
+  // padding: 0 0 10px 0;
+  margin-bottom: 10px;
+}
 
+// .title_small {
+//   padding: 10px 0;
 // }
 
-.title_small {
-  padding: 10px 0;
-}
+
 
 // 下拉框部分的下面部分
 .hj_all_ppt {
   display: flex;
   width: 100%;
-  height: calc(100% - 125px);
+  height: calc(100% - 89.4px);
   // position: relative;
   // margin: 0;
   // padding: 0;
@@ -150,12 +154,11 @@
 .hj_slider {
   box-sizing: border-box;
   width: 8.3333333333%;
-  // width: 1/12;
   min-height: 200px;
-  // border-right: 1px solid rgb(13, 74, 137);
   border-right: 1px solid #ccc;
-  overflow: auto;
+  overflow-y: auto;
   padding-top: 10px;
+  overflow-x: hidden;
 }
 
 .hj_slider_select {
@@ -166,9 +169,16 @@
   width: 12%;
 }
 
+// .hj_right_adjust_icon_father {
+//   margin-left: 88%;
+//   text-align: right;
+//   width: 23px;
+//   line-height: 23px;
+// }
+
 .hj_right_adjust_icon_father {
-  margin-left: 88%;
-  text-align: right;
+  margin-left: calc(100% - 30px);
+  text-align: center;
   width: 23px;
   line-height: 23px;
 }
@@ -227,6 +237,7 @@
 }
 
 .hj_sidebar_ppt_item a {
+  overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   line-height: 20px;
@@ -480,6 +491,11 @@
   cursor: pointer;
 }
 
+// .ppt_his_close_btn {
+
+//   border: 1px solid #d9d9d9;
+// }
+
 .ppt_his_close_btn {
-  border: 1px solid #d9d9d9;
+  border: 1px solid #333 !important;
 }

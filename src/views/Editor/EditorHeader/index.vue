@@ -59,6 +59,11 @@
     </div>
 
     <div class="right">
+      <Tooltip :mouseLeaveDelay="0" title="保存数据">
+        <div class="menu-item" @click="handleSaveData()">
+          <IconSave size="18" fill="#666"></IconSave>
+        </div>
+      </Tooltip>
       <Tooltip :mouseLeaveDelay="0" title="保存当前版本">
         <div class="menu-item" @click="openHistory(1)">
           <IconSaveOne size="18" fill="#666"></IconSaveOne>
@@ -79,9 +84,9 @@
           <IconPpt size="19" fill="#666" style="margin-top: 1px;" />
         </div>
       </Tooltip>
-      <!-- <a href="https://github.com/pipipi-pikachu/PPTist" target="_blank">
+      <a href="https://github.com/pipipi-pikachu/PPTist" target="_blank">
         <div class="menu-item"><IconGithub size="18" fill="#666" /></div>
-      </a> -->
+      </a>
     </div>
 
     <Drawer width="320" placement="right" :visible="hotkeyDrawerVisible" @close="hotkeyDrawerVisible = false">
@@ -167,7 +172,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, reactive, ComponentOptions, onMounted } from 'vue'
+import { defineComponent, ref, reactive, ComponentOptions, onMounted, SetupContext, onUnmounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useMainStore } from '@/store'
 import useScreening from '@/hooks/useScreening'
@@ -181,10 +186,8 @@ import APP from '@/views/components/App.vue'
 
 import HotkeyDoc from './HotkeyDoc.vue'
 import { ElLoading, FormInstance, ElMessageBox, ElMessage } from 'element-plus'
-
-import { fa } from 'element-plus/es/locale'
-import { method } from 'lodash'
-
+// import { fa } from 'element-plus/es/locale'
+// import { method } from 'lodash'
 export default defineComponent({
   name: 'editor-header',
   components: {
@@ -194,7 +197,8 @@ export default defineComponent({
     // saveHistory,
     // viewHistory
   },
-  setup() {
+  // setup(context: SetupContext) {
+  setup(_: unknown, context: SetupContext) {
     const mainStore = useMainStore()
     const { showGridLines, showRuler } = storeToRefs(mainStore)
 
@@ -218,7 +222,7 @@ export default defineComponent({
     const historyDrawerViewHisVisible = ref(false)
     const loading = ref(null)
 
-    
+
 
     const goIssues = () => {
       window.open('https://github.com/pipipi-pikachu/PPTist/issues')
@@ -406,9 +410,12 @@ export default defineComponent({
     //   // Add your delete logic here
     //   // dialogVisible.value = false
     // }
-    // onMounted(() => {
-    //   // hj_ppt_sidebar_his_view_select()
-    // })
+    // 调用父亲的保存方法
+    const handleSaveData = () => {
+      // const data = '需要保存的数据';
+      // this.$emit('save-data', data);
+      context.emit('save_data')
+    }
 
     return {
       redo,
@@ -442,6 +449,7 @@ export default defineComponent({
       version_info,
       dialogVisible,
       openDialog,
+      handleSaveData,
       // deleteItem,
     }
   },
