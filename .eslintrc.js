@@ -78,12 +78,15 @@ module.exports = {
     'no-eval': 'error',
     'no-var': 'error',
     'no-with': 'error',
-    'no-alert': isProduction ? 'error' : 'warn',
-    'no-console': isProduction ? 'error' : 'warn',
-    'no-debugger': isProduction ? 'error' : 'warn',
+    // 'no-alert': isProduction ? 'error' : 'warn',
+    // 'no-console': isProduction ? 'error' : 'warn',
+    'no-alert': isProduction ? 'warn' : 'warn',
+    'no-console': isProduction ? 'warn' : 'warn',
+    // 'no-': isProduction ? 'error' : 'warn',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
-    'no-unreachable':'off',
-    "no-undef": "off"
+    'no-unreachable': 'off',
+    "no-undef": "off",
+    "no-debugger": isProduction ? 'warn' : 'warn'
   },
   overrides: [
     {

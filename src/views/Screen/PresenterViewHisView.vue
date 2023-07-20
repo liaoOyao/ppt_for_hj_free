@@ -67,7 +67,8 @@ import { parseText2Paragraphs } from '@/utils/textParser'
 import useScreening from '@/hooks/useScreening'
 import useLoadSlides from '@/hooks/useLoadSlides'
 import useExecPlay from './hooks/useExecPlay'
-import useSlideSize from './hooks/useSlideSize'
+// import useSlideSize from './hooks/useSlideSize'
+import useSlideSizeHisView from './hooks/useSlideSizeHisView'
 import useFullscreen from './hooks/useFullscreen'
 
 import ThumbnailSlide from '@/views/components/ThumbnailSlide/index.vue'
@@ -111,7 +112,7 @@ export default defineComponent({
       animationIndex,
     } = useExecPlay()
 
-    const { slideWidth, slideHeight } = useSlideSize(slideListWrapRef)
+    const { slideWidth, slideHeight } = useSlideSizeHisView(slideListWrapRef)
     const { exitScreening } = useScreening()
     const { slidesLoadLimit } = useLoadSlides()
     const { fullscreenState, manualExitFullscreen } = useFullscreen()

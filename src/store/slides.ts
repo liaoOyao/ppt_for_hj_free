@@ -28,6 +28,7 @@ export interface SlidesState {
   slideIndex: number;
   viewportRatio: number;
   isChanged: boolean;
+  isFirst: -1;
 }
 export const useSlidesStore = defineStore('slides', {
   state: (): SlidesState => ({
@@ -37,6 +38,7 @@ export const useSlidesStore = defineStore('slides', {
     slideIndex: 0, // 当前页面索引
     viewportRatio: 0.5625, // 可是区域比例，默认16:9
     isChanged: false, //当前数据是否改变，点击首页保存后设置为false
+    isFirst: -1, //是否为第一次加载 -1 为首次加载  1 为多次加载
   }),
 
 
@@ -108,8 +110,20 @@ export const useSlidesStore = defineStore('slides', {
   },
 
   actions: {
+    handle_is_first() {
+        if (this.isFirst === -1) {
+          this.isFirst = 0
+        }
+        else if (this.isFirst === 0) { //第一次加载而非改变时会被设置为0
+          this.isFirst = 1
+        }
+        else if (this.isFirst === 1) { //数据改变
+          this.isFirst = 1
+          this.isChanged = true
+        }
+    },
     setTheme(themeProps: Partial<SlideTheme>) {
-      this.isChanged = true
+
       // this.$patch({ theme: { ...this.theme, ...themeProps } })
       this.theme = { ...this.theme, ...themeProps }
     },
@@ -206,8 +220,9 @@ export const useSlidesStore = defineStore('slides', {
       this.slides[slideIndex].elements = (elements as PPTElement[])
     },
 
-    setIschanged(is_change:boolean) {
+    setIschanged(is_change: boolean) {
       this.isChanged = is_change
+      this.isFirst = -1
     }
     // updated(type: string,range:any, data: any) {
     //   // type是改变类型，

@@ -324,7 +324,7 @@ export default defineComponent({
           const formType = element.getAttribute('data-form_type')
           const data_table_pk = element.getAttribute('data-table_pk')
           console.log(formType)
-          debugger
+          
           if (formType !== name || pk.toString() !== data_table_pk) {
             element.classList.remove('hj_sidebar_categroy_ppt_this')
           } else {
@@ -348,7 +348,7 @@ export default defineComponent({
 
     // bupl选中状态
     const handleBuplOrSpfdChange = (val: any, name: string) => {
-      // debugger
+      // 
       let selectedOption = null
       if (name === 'spfd') {
         selectedOption = spfd_array.value.find(item => item.pk === val)

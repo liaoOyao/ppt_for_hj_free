@@ -105,6 +105,9 @@ import {
   SaveOne,
   Save,
   DeleteMode,
+  Export,
+  DownloadOne,
+ FileEditing,
 } from '@icon-park/vue-next'
 
 const icons = {
@@ -211,6 +214,9 @@ const icons = {
   SaveOne,
   Save,
   DeleteMode,
+  Export,
+  DownloadOne,
+  FileEditing,
 }
 
 export default {

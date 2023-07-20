@@ -56,6 +56,16 @@
           </Menu>
         </template>
       </Dropdown>
+      <Tooltip :mouseLeaveDelay="0" title="加载模版">
+        <div class="menu-item" @click="openHistory(2)">
+          <IconDownloadOne size="18" fill="#666"></IconDownloadOne><span class="text">加载</span>
+        </div>
+      </Tooltip>
+      <Tooltip :mouseLeaveDelay="0" title="编辑模版">
+        <div class="menu-item" @click="openHistory(2)">
+          <IconFileEditing size="18" fill="#666"></IconFileEditing><span class="text">编辑</span>
+        </div>
+      </Tooltip>
     </div>
 
     <div class="right">
@@ -77,6 +87,9 @@
       <Tooltip :mouseLeaveDelay="0" title="导出">
         <div class="menu-item" @click="setDialogForExport('pptx')">
           <IconShare size="18" fill="#666" />
+          <!-- <IconExport size="18" fill="#666" /> -->
+
+
         </div>
       </Tooltip>
       <Tooltip :mouseLeaveDelay="0" title="幻灯片放映">
@@ -84,9 +97,9 @@
           <IconPpt size="19" fill="#666" style="margin-top: 1px;" />
         </div>
       </Tooltip>
-      <a href="https://github.com/pipipi-pikachu/PPTist" target="_blank">
+      <!-- <a href="https://github.com/pipipi-pikachu/PPTist" target="_blank">
         <div class="menu-item"><IconGithub size="18" fill="#666" /></div>
-      </a>
+      </a> -->
     </div>
 
     <Drawer width="320" placement="right" :visible="hotkeyDrawerVisible" @close="hotkeyDrawerVisible = false">
@@ -123,29 +136,36 @@
       :destroy-on-close="true">
       <div class="viewHisAll">
         <div class="viewHisHeader">
-          <div class="titleLine">历史版本</div>
+          <div class="titleLine">{{ his_title }}</div>
         </div>
         <div class="viewHisContent">
           <div class="PptLeft">
             <div class="ppt_save_current_version" @click="openHistory(1)">
-              保存当前版本
+              保存当前版本 <br>
+            </div>
+            <div class="font_common_ppt">
+              (根据当前数据新增历史版本)
             </div>
             <hr class="ppt_view_his_hr" />
-            <div class="pptSiderBar" v-for="(item, index) in version_list" :key="index">
-              <div :data-id="item.id" :data-version="item.name" class="hiwin_ppt_snapshot_models_sidebar_row"
-                :class="{ 'hiwin_ppt_snapshot_models_sidebar_row_select': index === 0 }">
-                <!-- 有默认选中样式 -->
-                <div class="viewSiderBarIcon"></div>
-                <!-- <Delete-mode theme="outline" size="14" fill="#ee0c0c" strokeLinejoin="bevel"/> -->
-                <!-- <IconDeleteMode class="ppt_delete_icon" @click=""></IconDeleteMode> -->
-                <IconDeleteMode class="ppt_delete_icon" @click="openDialog(item.name)" />
-                <a class="higet_pointer hiwin_ppt_snapshot_models_sidebar_row_a"
-                  @click="hj_ppt_sidebar_his_view_select(item.id ? item.id : null, item.name || null, false)">{{ item.name
-                  }}</a>
+            <div v-if="!pptNULLVisable">
+              <div class="pptSiderBar" v-for="(item, index) in version_list" :key="index">
+                <div :data-id="item.id" :data-version="item.name" class="hiwin_ppt_snapshot_models_sidebar_row"
+                  :class="{ 'hiwin_ppt_snapshot_models_sidebar_row_select': index === 0 }">
+                  <!-- 有默认选中样式 -->
+                  <div class="viewSiderBarIcon"></div>
+                  <!-- <Delete-mode theme="outline" size="14" fill="#ee0c0c" strokeLinejoin="bevel"/> -->
+                  <!-- <IconDeleteMode class="ppt_delete_icon" @click=""></IconDeleteMode> -->
+                  <IconDeleteMode class="ppt_delete_icon" @click="openDialog(item)" />
+                  <a class="higet_pointer hiwin_ppt_snapshot_models_sidebar_row_a"
+                    @click="hj_ppt_sidebar_his_view_select(item.id ? item.id : null, item.name || null, false)">{{
+                      item.name
+                    }}</a>
+                </div>
               </div>
             </div>
+            <div class="pptHisListNull" v-else><span class="font_common_ppt">暂无历史版本</span></div>
           </div>
-          <div class="PptRight">
+          <div class="PptRight" v-if="!pptNULLVisable">
             <div class="versionInfoLine">版本：<span class="span_ppt_version">{{ version_info.version_name }}</span>
               <div class="ppt_crateor_info">创建人：<span class="span_ppt_creator" style="margin-right: 20px;">{{
                 version_info.ppt_creator }}</span>创建时间：<span class="span_created_time">{{
@@ -154,8 +174,8 @@
             <div class="viewHistPPt">
               <APP />
             </div>
-            <div class="pptNull" v-if="pptNULLVisable"><span class="higet_color_red">(没有可查看数据或暂无权限查看)</span></div>
           </div>
+          <div class="pptNull" v-if="pptNULLVisable"><span class="higet_color_red">(没有可查看数据或暂无权限查看)</span></div>
         </div>
 
       </div>
@@ -169,12 +189,13 @@
       </template>
     </el-dialog>
   </div>
+  <!-- {{ dimension_obj_for_index }} -->
 </template>
 
 <script lang="ts">
 import { defineComponent, ref, reactive, ComponentOptions, onMounted, SetupContext, onUnmounted } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useMainStore } from '@/store'
+import { useMainStore, useSlidesStore } from '@/store'
 import useScreening from '@/hooks/useScreening'
 import useSlideHandler from '@/hooks/useSlideHandler'
 import useHistorySnapshot from '@/hooks/useHistorySnapshot'
@@ -186,6 +207,12 @@ import APP from '@/views/components/App.vue'
 
 import HotkeyDoc from './HotkeyDoc.vue'
 import { ElLoading, FormInstance, ElMessageBox, ElMessage } from 'element-plus'
+import http from '@/utils/http'
+
+// import { fa } from 'element-plus/es/locale'
+import pako from '@/utils/pako/pako.min.js'
+import { arrayBufferToBase64, base64ToArrayBuffer } from '@/utils/handle_data'
+import { IntermediateMode, Message } from '@icon-park/vue-next'
 // import { fa } from 'element-plus/es/locale'
 // import { method } from 'lodash'
 export default defineComponent({
@@ -194,11 +221,17 @@ export default defineComponent({
     HotkeyDoc,
     APP,
     // Editor
-    // saveHistory,
-    // viewHistory
+  },
+  // props:['dimension_obj_for_index'],
+  props: {
+    dimension_obj_for_index: {
+      type: Object, // 或者其他你期望的类型
+      required: true, // 如果这个prop是必需的，否则可以省略
+    }
   },
   // setup(context: SetupContext) {
-  setup(_: unknown, context: SetupContext) {
+  // setup(_: unknown, props: { dimension_obj_for_index: Object },context: SetupContext) {
+  setup(props: { dimension_obj_for_index: any }, context: SetupContext) {
     const mainStore = useMainStore()
     const { showGridLines, showRuler } = storeToRefs(mainStore)
 
@@ -224,23 +257,79 @@ export default defineComponent({
 
 
 
+
     const goIssues = () => {
       window.open('https://github.com/pipipi-pikachu/PPTist/issues')
     }
+    const slidesStore = useSlidesStore()  // slider 仓库
+    let current_version_obj = null
     const openHistory = (index: number) => {
       if (index === 1) {
-        // 保存历史
+        // 打开保存历史弹窗
         historyDrawerVisible.value = true
       } else if (index === 2) {
         // 查看历史
         // 打开主页时页面已经渲染好，只是没显示，点击查看历史时渲染样式和数据
         historyDrawerViewHisVisible.value = true
-        hj_ppt_sidebar_his_view_select(4, '版本4', false)
-        console.log(version_list)
-        // setTimeout(() => {
-        //   hj_ppt_sidebar_his_view_select(4, '版本4', false)
-        //   console.log(version_list)
-        // }, 500)
+        // 设置标题
+        const my_dimession = props.dimension_obj_for_index
+
+
+        if (!my_dimession) {
+          ElMessage.error('首页的维度对象没有获取到，请刷新重试！')
+          return
+        }
+        his_title.value = (my_dimession.title ? my_dimession.title : '无') + ' 历史版本  ' + '(' + (my_dimession.select_pk_name ? my_dimession.select_pk_name : '空维度') + ' ' + (my_dimession.year ? my_dimession.year : '无年份') + ')'
+        // his_title.value = (my_dimession.title ? my_dimession.title : '无') + ('&npsb;&npsb;历史版本' + '&npsb;&npsb;') + ('(' ) + (my_dimession.select_pk_name ? my_dimession.select_pk_name : '空维度')+ &nbsp; + (my_dimession.year ? my_dimession.year : '无年份') + ')')
+        //获取历史版本
+        get_ppt_history_list()
+      }
+    }
+    const { importSpecificData } = useExport()
+    const import_my_data = (current_version_obj_temp: any) => {
+      const base64_data = current_version_obj_temp.doc
+      const arrayBuffer = base64ToArrayBuffer(base64_data)
+      // 使用pako进行解压
+      const decompressedData = pako.inflate(arrayBuffer, { to: 'string' })
+      // 将解压后的数据转换回JSON对象
+      const data = JSON.parse(decompressedData)
+      importSpecificData(data)
+    }
+    const his_title = ref<string>('')
+    const get_ppt_history_list = async () => {
+      // const get_ppt_history_list = () => {
+      // 获取ppt历史记录
+      pptNULLVisable.value = true
+      const data = { "status": 200, "msg": "ok", "data": { "version_list": [{ "id": 66, "name": "123-8", "create_time": "2023-07-20 10:09:28", "hiwin_creator": "李海" }, { "id": 64, "name": "123-7", "create_time": "2023-07-20 10:09:24", "hiwin_creator": "李海" }, { "id": 62, "name": "123-6", "create_time": "2023-07-20 10:09:19", "hiwin_creator": "李海" }, { "id": 60, "name": "123-5", "create_time": "2023-07-20 10:09:15", "hiwin_creator": "李海" }, { "id": 58, "name": "123-4", "create_time": "2023-07-20 10:09:11", "hiwin_creator": "李海" }, { "id": 56, "name": "123-3", "create_time": "2023-07-20 10:09:07", "hiwin_creator": "李海" }, { "id": 54, "name": "123-2", "create_time": "2023-07-20 10:09:03", "hiwin_creator": "李海" }, { "id": 52, "name": "123-1", "create_time": "2023-07-20 10:08:58", "hiwin_creator": "李海" }, { "id": 51, "name": "123", "create_time": "2023-07-20 10:07:47", "hiwin_creator": "李海" }, { "id": 50, "name": "123", "create_time": "2023-07-20 10:07:45", "hiwin_creator": "李海" }], "current_version_obj": { "id": 66, "name": "123-8", "doc": "H4sIAAAAAAAAA9VWW2sbRxT+K8v0wS+rzVz3VtfQugRTatd20oTG+GEtjawl693t7tiSG/xSAiENeTOlD4GGYKhfStungFvIr5GU/ouekfbmRKpsggsdzWh2z5yZPd+5zs4jFHaQj5TMVSuPwo5sEWQiGckDGasc+TuPkDpOJbDkvQBmc8rP23vbgxTeItlVyMcmUkmKfIrhqR92VA/5gtsm6slwvwcMzKaWMNFRKPufJQM4VnPC2DVRGmhutG5g+H0JA8gw6389HsBHumEUActHYs/b64gJYSA724EKE+R3gyiXJkrSoB2qY5DFckyUJSpQIDU+MWcDSJKHa1n3PQC1+ExDqcSn+EaF70Zheg/5KjuUs2VXcqBK0cNO7KwPKtGZEIXwtrCoqPXvihoAEdxiHrb1ehTGcq2kW9RE7SRWYG04ejldWc5VlsT7MKdBbOTqOJKfLHWBo5WH30nfMAih6WBpZfTH09Hz15ubd5dvac4VmIqNt9IV1EBhoo7sBoeRug2HbAQHGs562M6SPOkq45sAREQVz2oSJZnWFmMMzcHv5Org3uYM/FSwuQoQ9ns45+CjXMMbvjgfX7wZ/XU6PrsY/fhkfP5meHE6Pj2v0N4ASG2YEuTtOH2Q8xqkTUqQzDVRroIMqDvY1E4oY9ixI7g3eUuTcBq5CHajXQ27+FzlgRPUOiISiHhUKYyeAPde0H64nyWH+sw6dArG6qjupKETLf27CYTOSSBNG6ZqI/76iwoe4aUNCXcreRxCagM6jiU85izy39Ki+mOtIAr3Y99ow6LMPl5a6NvcLUw/+vVsePZ49PrP4Q8vRy+f/P3qp//cyw+21462NioNUQz4caOx0h+4Z7mcCq/oNr9aACxQ1GwFVbHRVNDw6W/v6OiGY8NZ3fq8365jgzILew0NOHWoWKzZ+OzIYZAcXXC8qn9gHPF5RQd7/W/v9yvBW9Sx7MZniQ7tieScUcthDZGc6nCChW1Rz646a2R5qLKNFegLqxbFxqrBsdGCYU86wQWVFGQypU9rWlHciFty0IJDP5NqpVgo6FPqtDxeuSbWZfA6WWl2SmJXudMc3enJ1UZOcpkliFv3MkM5AiKx9jdWmcbGwmpuaGQveLu8tNgypaqb94nyhnF9Hc7xyPW0f+TUdwlKyCXfom51sSOWi0XdnP8D6su3wjmJ9v7WV3c/ra+yDHPLww6veml2z7UIbqChdbwT53LYNTTA8YfWp4l3+0ZRcv8lObt4ci97/PPb31+9/eX78YtnddG6odoFKkiyzh1QMuwR1w3U3X8AWckOV34MAAA=", "create_time": "2023-07-20 10:09:28", "hiwin_creator": "李海" } } }
+      // const data = { "status": 200, "msg": "ok", "data": { "version_list": [{ "id": 66, "name": "123-8", "create_time": "2023-07-20T10:09:28.707", "hiwin_creator": "李海" }, { "id": 64, "name": "123-7", "create_time": "2023-07-20T10:09:24.027", "hiwin_creator": "李海" }, { "id": 62, "name": "123-6", "create_time": "2023-07-20T10:09:19.153", "hiwin_creator": "李海" }, { "id": 60, "name": "123-5", "create_time": "2023-07-20T10:09:15.276", "hiwin_creator": "李海" }, { "id": 58, "name": "123-4", "create_time": "2023-07-20T10:09:11.971", "hiwin_creator": "李海" }, { "id": 56, "name": "123-3", "create_time": "2023-07-20T10:09:07.667", "hiwin_creator": "李海" }, { "id": 54, "name": "123-2", "create_time": "2023-07-20T10:09:03.031", "hiwin_creator": "李海" }, { "id": 52, "name": "123-1", "create_time": "2023-07-20T10:08:58.225", "hiwin_creator": "李海" }, { "id": 51, "name": "123", "create_time": "2023-07-20T10:07:47.011", "hiwin_creator": "李海" }, { "id": 50, "name": "123", "create_time": "2023-07-20T10:07:45.346", "hiwin_creator": "李海" }], "current_version_obj": { "id": 66, "name": "123-8", "doc": "H4sIAAAAAAAAA9VWW2sbRxT+K8v0wS+rzVz3VtfQugRTatd20oTG+GEtjawl693t7tiSG/xSAiENeTOlD4GGYKhfStungFvIr5GU/ouekfbmRKpsggsdzWh2z5yZPd+5zs4jFHaQj5TMVSuPwo5sEWQiGckDGasc+TuPkDpOJbDkvQBmc8rP23vbgxTeItlVyMcmUkmKfIrhqR92VA/5gtsm6slwvwcMzKaWMNFRKPufJQM4VnPC2DVRGmhutG5g+H0JA8gw6389HsBHumEUActHYs/b64gJYSA724EKE+R3gyiXJkrSoB2qY5DFckyUJSpQIDU+MWcDSJKHa1n3PQC1+ExDqcSn+EaF70Zheg/5KjuUs2VXcqBK0cNO7KwPKtGZEIXwtrCoqPXvihoAEdxiHrb1ehTGcq2kW9RE7SRWYG04ejldWc5VlsT7MKdBbOTqOJKfLHWBo5WH30nfMAih6WBpZfTH09Hz15ubd5dvac4VmIqNt9IV1EBhoo7sBoeRug2HbAQHGs562M6SPOkq45sAREQVz2oSJZnWFmMMzcHv5Org3uYM/FSwuQoQ9ns45+CjXMMbvjgfX7wZ/XU6PrsY/fhkfP5meHE6Pj2v0N4ASG2YEuTtOH2Q8xqkTUqQzDVRroIMqDvY1E4oY9ixI7g3eUuTcBq5CHajXQ27+FzlgRPUOiISiHhUKYyeAPde0H64nyWH+sw6dArG6qjupKETLf27CYTOSSBNG6ZqI/76iwoe4aUNCXcreRxCagM6jiU85izy39Ki+mOtIAr3Y99ow6LMPl5a6NvcLUw/+vVsePZ49PrP4Q8vRy+f/P3qp//cyw+21462NioNUQz4caOx0h+4Z7mcCq/oNr9aACxQ1GwFVbHRVNDw6W/v6OiGY8NZ3fq8365jgzILew0NOHWoWKzZ+OzIYZAcXXC8qn9gHPF5RQd7/W/v9yvBW9Sx7MZniQ7tieScUcthDZGc6nCChW1Rz646a2R5qLKNFegLqxbFxqrBsdGCYU86wQWVFGQypU9rWlHciFty0IJDP5NqpVgo6FPqtDxeuSbWZfA6WWl2SmJXudMc3enJ1UZOcpkliFv3MkM5AiKx9jdWmcbGwmpuaGQveLu8tNgypaqb94nyhnF9Hc7xyPW0f+TUdwlKyCXfom51sSOWi0XdnP8D6su3wjmJ9v7WV3c/ra+yDHPLww6veml2z7UIbqChdbwT53LYNTTA8YfWp4l3+0ZRcv8lObt4ci97/PPb31+9/eX78YtnddG6odoFKkiyzh1QMuwR1w3U3X8AWckOV34MAAA=", "create_time": "2023-07-20T10:09:28.707", "hiwin_creator": "李海" } } }
+      try {
+        const localDimensionObj = reactive({
+          ...props.dimension_obj_for_index
+        })
+        console.log(props.dimension_obj_for_index, 'localDimensionObj')
+        localDimensionObj.bupl_id = localDimensionObj.bupl_id || 0
+        localDimensionObj.spfd_id = localDimensionObj.spfd_id || 0
+        localDimensionObj.d_id = localDimensionObj.d_id || 0
+        console.log(localDimensionObj, 'localDimensionObj')
+        const data = await http.get('/hz_ppt', { method_: "get_ppt_history_list", ...localDimensionObj })
+        if (data && data.status === 200) {
+          pptNULLVisable.value = false
+          version_list.value = data.data.version_list
+          debugger
+          current_version_obj = data.data.current_version_obj
+          // 导入当前页面的数据
+          import_my_data(current_version_obj)
+          // 默认选中样式和填充值
+          hj_ppt_sidebar_his_view_select(current_version_obj.id, current_version_obj.name, true)
+        } else if (data && data.status === 404) {
+          // 空
+          // show_ppt.value =false
+          pptNULLVisable.value = true
+        } else {
+          ElMessage.error(data ? data.msg ? data.msg : '获取失败请刷新重试' : '获取失败请刷新重试')
+        }
+      } catch (e) {
+        ElMessage.error('获取失败请刷新重试')
       }
     }
     // 保存历史版本模块
@@ -252,11 +341,40 @@ export default defineComponent({
 
     const submitForm = (formEl: FormInstance | undefined) => {
       if (!formEl) return
-      formEl.validate((valid) => {
+      formEl.validate(async (valid) => {
         if (valid) {
           // console.log('submit!')
-          formEl.resetFields()
-          historyDrawerVisible.value = false
+          // 保存当前版数据
+          const { slides, theme } = storeToRefs(slidesStore)
+          console.log(theme)
+
+          // 获取数据 
+          const data_ppt = pako.gzip(JSON.stringify(slides.value ? slides.value : null))
+          // data_ppt转换为Base64编码时，String.fromCharCode.apply函数调用栈溢出了,因为data太大了，因此将unit8array 分块处理
+          const base64_data = arrayBufferToBase64(data_ppt)
+          try {
+            const localDimensionObj = reactive({
+              ...props.dimension_obj_for_index
+            })
+            console.log(props.dimension_obj_for_index, 'localDimensionObj')
+            localDimensionObj.bupl_id = localDimensionObj.bupl_id || 0
+            localDimensionObj.spfd_id = localDimensionObj.spfd_id || 0
+            localDimensionObj.d_id = localDimensionObj.d_id || 0
+            console.log(localDimensionObj, 'localDimensionObj')
+            const data = await http.post('/hz_ppt', { method_: "save_ppt_history", ...localDimensionObj, version: verisonNameValidateForm.verison_name, doc: base64_data })
+            if (data && data.status === 200) {
+              if (data.version_list) {
+                ElMessage.success('保存成功！')
+                formEl.resetFields()
+                historyDrawerVisible.value = false
+              }
+            }
+            else {
+              ElMessage.error(data.msg ? data.msg : '保存失败请刷新重试！')
+            }
+          } catch (e) {
+            ElMessage.error('保存失败请刷新重试！')
+          }
         } else {
           // console.log('error submit!')
           return false
@@ -273,7 +391,7 @@ export default defineComponent({
       historyDrawerVisible.value = false
     }
     const handleBeforeClose = function (done: any) {
-      // debugger
+      // 
       // if (!formEl) return
       // formEl.resetFields()
       done()
@@ -286,21 +404,19 @@ export default defineComponent({
       historyDrawerViewHisVisible.value = false
     }
 
-    const hj_ppt_sidebar_his_view_select = (pk: any, pk_name: string, is_first_default: false) => {
-      // debugger
+    const hj_ppt_sidebar_his_view_select = (pk: any, pk_name: string, is_first_default: boolean) => {
       open_loading()
       // name  是type
       if (pk && pk_name) {
-        debugger
         const observer = new MutationObserver((mutationsList, observer) => {
           for (const mutation of mutationsList) {
             if (mutation.type === 'childList') {
               const elements = document.querySelectorAll('.hiwin_ppt_snapshot_models_sidebar_row') // 获取元素
-              elements.forEach((element) => {
+              elements.forEach(async (element) => {
                 const data_id = element.getAttribute('data-id')
                 const data_version = element.getAttribute('data-version')
                 if (pk_name !== data_version || pk.toString() !== data_id) {
-                  debugger
+
                   element.classList.remove('hiwin_ppt_snapshot_models_sidebar_row_select')
                 } else {
                   debugger
@@ -310,12 +426,18 @@ export default defineComponent({
                   // 更新标题
                   const selectedOption = version_list.value.find((item: { id: any }) => item.id === pk)
                   if (selectedOption) {
-                    version_info.value.created_time = selectedOption.created_time
-                    version_info.value.ppt_creator = selectedOption.creator
+                    version_info.value.created_time = selectedOption.create_time
+                    version_info.value.ppt_creator = selectedOption.hiwin_creator
                     version_info.value.version_name = selectedOption.name
                   }
-                  if (is_first_default) {
-                    console.log('第一次选中')
+                  if (!is_first_default) {
+                    const data = await http.get('/hz_ppt', { method_: "get_one_ppt_history_by_id", id: pk })
+                    if (data && data.status === 200) {
+                      import_my_data(data.current_version_obj_temp)
+                    }
+                    else {
+                      ElMessage.error(data ? data.msg ? data.msg : '获取失败请刷新重试' : '获取失败请刷新重试')
+                    }
                   }
                 }
               })
@@ -355,14 +477,14 @@ export default defineComponent({
     const pptNULLVisable = ref(false)
     // 版本信息模块
     const version_list = ref<any>([])
-    for (let i = 4; i <= 50; i++) {
-      version_list.value.push({
-        id: i,
-        name: `版本${i}`,
-        creator: '李小明',
-        created_time: '2023-07-01 14:59'
-      })
-    }
+    // for (let i = 4; i <= 50; i++) {
+    //   version_list.value.push({
+    //     id: i,
+    //     name: `版本${i}`,
+    //     creator: '李小明',
+    //     created_time: '2023-07-01 14:59'
+    //   })
+    // }
 
     // version_list.value = [
     //   { id: 1, name: '版本1', 'creator': '李小明', 'created_time': '2023-07-01 14:59' },
@@ -370,14 +492,15 @@ export default defineComponent({
     //   { id: 3, name: '版本3', 'creator': '李小明', 'created_time': '2023-07-01 14:59' },
 
     // ]
+
     const dialogVisible = ref(false)
     const version_info = ref({
       'version_name': null,
       'ppt_creator': null,
       'created_time': null
     })
-    const openDialog = function (name: any) {
-      if (name) {
+    const openDialog = function (item: any) {
+      if (item.name) {
         ElMessageBox.confirm(
           '确定删除版本”' + name + '”吗？',
           '信息',
@@ -387,16 +510,24 @@ export default defineComponent({
             type: 'warning',
           }
         )
-          .then(() => {
-            ElMessage({
-              type: 'success',
-              message: '模拟删除成功！',
-            })
+          .then(async () => {
+            const data = await http.post('/hz_ppt', { method_: "delete_ppt_version_by_id", id: item.id })
+            if (data && data.sttaus === 200) {
+              ElMessage({
+                type: 'success',
+                message: '删除成功！',
+              })
+            } else {
+              ElMessage({
+                type: 'error',
+                message: data ? data.msg ? data.msg : '删除失败请刷新重试' : '删除失败请刷新重试',
+              })
+            }
           })
-          .catch(() => {
+          .catch((e) => {
             ElMessage({
-              type: 'info',
-              message: '模拟删除取消！',
+              type: 'error',
+              message: '删除失败请刷新重试',
             })
           })
       } else {
@@ -416,7 +547,20 @@ export default defineComponent({
       // this.$emit('save-data', data);
       context.emit('save_data')
     }
-
+    // const hanldeDefaultSelect = () => {
+    //   // 直接选中当前对象
+    //   // 选中第一个
+    //   debugger
+    //   hj_ppt_sidebar_his_view_select(current_version_obj ? current_version_obj.id : null, current_version_obj ? current_version_obj.name : null, true)
+    // }
+    onMounted(() => {
+      // 最后处理默认选中
+      // hanldeDefaultSelect()
+      // nextTick(() => {
+      //   // 在DOM更新完成后执行操作
+      //   // ref.select1.$el.style.width = '212px'
+      //   select2.value.$el.style.width = '120px'
+    })
     return {
       redo,
       undo,
@@ -450,6 +594,7 @@ export default defineComponent({
       dialogVisible,
       openDialog,
       handleSaveData,
+      his_title,
       // deleteItem,
     }
   },

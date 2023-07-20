@@ -13,7 +13,7 @@ class Ajax {
   private handleRequest(config: AxiosRequestConfig): InternalAxiosRequestConfig {
     // 在这里可以添加一些请求前的处理，例如添加token到header      
     // 添加授权令牌
-    // debugger
+    // 
     if (config.headers) {
       // config.headers['Cookie'] = 'sessionid=52q1lw28tf8aztw5lohj42vj34amioi5; csrftoken=N4P5c8ytqVy1GbAcfQGkW9rW5zqgVo5efxbjxYsi6UsImITblLqzBdkBtRalSsk9'
       // config.headers['Referer'] = 'http://localhost:8081/'
