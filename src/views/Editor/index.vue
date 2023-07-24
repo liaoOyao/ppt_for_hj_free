@@ -586,110 +586,116 @@ export default defineComponent({
 
     // 获取doc 数据,并且获取 维度列表的信息
     const get_hz_ppt_by_dimension_and_year = async (dimension_obj: any, year: any) => {
-      // const get_hz_ppt_by_dimension_and_year = (dimension_obj: any, year: any) => {
-      const data1 = await http.get('/hz_ppt', { method_: "get_hz_ppt_by_dimension_and_year", ...dimension_obj, year: year, gridKey: gridKey.value })
-      // const data1 = {
-      //   "status": 200,
-      //   "msg": "查询成功",
-      //   "data": {
-      //     "id": 44,
-      //     "hiwin_deleted_time": null,
-      //     "hiwin_creator": 2,
-      //     "hiwin_updator": null,
-      //     "hiwin_is_deleted": false,
-      //     "grid_key": "ppt",
-      //     "year": 2022,
-      //     "dimension": "bupl_id_0_spfd_id_0_d_id_07000000",
-      //     "version": "",
-      //     "doc": "H4sIAAAAAAAAA91XW2/cRBT+K5Z5yEvXnasvIUSCoCpCJCRpaUWzeXB2x1mrjm3sSXYD6ktVqWoRbxHioRJVFYm8IOCpUkDqr9nd8i+Y8Xh3Z7Zp3KbQImbHlzkXz5xvzjlz1t7+tm3H3ba9aLVtzkreKpO4y1qwbV8RFJawfZbyUvKlJD/KmZIte6F8lUITddLZ3RrkipawiEsqkAOe5fIdgWrUj7u8J8eUuHLcY/FerxLGLnKoJB3GrP9JNqhmrbTEbUcy8lCptu01C4jf5+ISPPGUd3ndVvNHcZIowQ/obrDbpRPygHW3Qh5nkhmFSckkOcvDTsyPqgU7nqQUGQ95ZSq4e8VqsjzL7qwW0astN+3GCgfNbgTeh9VREuc3JYUXB6zBaM4G3LQ57qbe2sC0GVOqWe1SB1Fzx31qWg4pcXAAXCWXxClbnfEcJImdLOXCBdWkS/nyUsmLLN0TzzxMrZIfJeyjhUgItcr4G7ZoWRCifLCwPPr94ej7ZxsbN5auSsll8agVr+bLatmavXLYZVF4kPBr4lvr4X5t+FrcKbIyi7j1VSjWrRRryZUsyYoab4xx225GzSv5/s2Ni1BDFDfCRt3zkXkFIohIQIaPT8dnz0d/Ho9PzkY/PBifPh+eHY+PT6f4vDNY5D6bsFxL89slmYPFhTos2JejkodFxd0Wa1PRwdLqI9uUBBNSnsWTpNW21Vfb9o7CbLY2PUQq1Or4zhK5LGMH0N1Kezfs3NkrsgM1o5kVZlr6HFHVBAQKg3MyLWrKtC87Uc7X0y8/M9GCRHciSHxj/R6Epgd5nkMD7L122E3cSi6mFSbxXrpodQSfFR8uNIYk8Wv/G/1yMjy5P3r2x/DRk9GTB389/fE/FZz7W6uHm+smrggIpIDWsO6UJHB8gmhQd5dcIm4boD0f0mlI65AOH/46h+p7DGlvZfPTfmcupBF2QKDh5ZkR7mC9kYaAx+Lw8IWnT/u/Fv7kNWoAEPS/vtU37W0hz3G1BUKVxGqDCUaOhzUDPGNSCKjroMCddjx3dopqSeOK/gZFBALWikWA1RKXW3UIaiqsyVDRVYlR1xrQn0igWkK+wymnZtR0RVXVyuVKFL0iuXwGvij94ksUuofXe2xlPv/62KHQn3U9G3tU5JCZ32Njn11AHV1xLlMLisl+k22e7JteK06qx7fekOaYWMv7h95cjYggNLwa6SGBAHR8QGfN+19A9fJ/jObD6NbmFzc+nvs3hQFxAuCRadedLPAdCDTzkZnCoGdmiznoCPhHTv0q8hatuu654ADzQVWk3//pxW9PX/x8b/z4u1kp8K4qggqgrOheF1tT6dO3TDI79t81cRe4UA8AAA==",
-      //     "is_curr": true
-      //   }
-      // }
-
-      // const data1 = {
-      //   "status": 200,
-      //   "msg": "新的维度数据已创建",
-      //   "data": {
-      //     "id": 46,
-      //     "hiwin_deleted_time": null,
-      //     "hiwin_creator": 2,
-      //     "hiwin_updator": null,
-      //     "hiwin_is_deleted": 0,
-      //     "grid_key": "ppt",
-      //     "year": "2022",
-      //     "dimension": "bupl_id_0_spfd_id_1_d_id_0",
-      //     "version": "",
-      //     "doc": "H4sIAAAAAAAAA9VWW2sbRxT+K8v0wS+rzVz3VtfQugRTatd20oTG+GEtjawl693t7tiSG/xSAiENeTOlD4GGYKhfStungFvIr5GU/ouekfbmRKpsggsdzWh2z5yZPd+5zs4jFHaQj5TMVSuPwo5sEWQiGckDGasc+TuPkDpOJbDkvQBmc8rP23vbgxTeItlVyMcmUkmKfIrhqR92VA/5gtsm6slwvwcMzKaWMNFRKPufJQM4VnPC2DVRGmhutG5g+H0JA8gw6389HsBHumEUActHYs/b64gJYSA724EKE+R3gyiXJkrSoB2qY5DFckyUJSpQIDU+MWcDSJKHa1n3PQC1+ExDqcSn+EaF70Zheg/5KjuUs2VXcqBK0cNO7KwPKtGZEIXwtrCoqPXvihoAEdxiHrb1ehTGcq2kW9RE7SRWYG04ejldWc5VlsT7MKdBbOTqOJKfLHWBo5WH30nfMAih6WBpZfTH09Hz15ubd5dvac4VmIqNt9IV1EBhoo7sBoeRug2HbAQHGs562M6SPOkq45sAREQVz2oSJZnWFmMMzcHv5Org3uYM/FSwuQoQ9ns45+CjXMMbvjgfX7wZ/XU6PrsY/fhkfP5meHE6Pj2v0N4ASG2YEuTtOH2Q8xqkTUqQzDVRroIMqDvY1E4oY9ixI7g3eUuTcBq5CHajXQ27+FzlgRPUOiISiHhUKYyeAPde0H64nyWH+sw6dArG6qjupKETLf27CYTOSSBNG6ZqI/76iwoe4aUNCXcreRxCagM6jiU85izy39Ki+mOtIAr3Y99ow6LMPl5a6NvcLUw/+vVsePZ49PrP4Q8vRy+f/P3qp//cyw+21462NioNUQz4caOx0h+4Z7mcCq/oNr9aACxQ1GwFVbHRVNDw6W/v6OiGY8NZ3fq8365jgzILew0NOHWoWKzZ+OzIYZAcXXC8qn9gHPF5RQd7/W/v9yvBW9Sx7MZniQ7tieScUcthDZGc6nCChW1Rz646a2R5qLKNFegLqxbFxqrBsdGCYU86wQWVFGQypU9rWlHciFty0IJDP5NqpVgo6FPqtDxeuSbWZfA6WWl2SmJXudMc3enJ1UZOcpkliFv3MkM5AiKx9jdWmcbGwmpuaGQveLu8tNgypaqb94nyhnF9Hc7xyPW0f+TUdwlKyCXfom51sSOWi0XdnP8D6su3wjmJ9v7WV3c/ra+yDHPLww6veml2z7UIbqChdbwT53LYNTTA8YfWp4l3+0ZRcv8lObt4ci97/PPb31+9/eX78YtnddG6odoFKkiyzh1QMuwR1w3U3X8AWckOV34MAAA=",
-      //     "doc2": "H4sIAAAAAAAAA91XW2/cRBT+K5Z5yEvXnasvIUSCoCpCJCRpaUWzeXB2x1mrjm3sSXYD6ktVqWoRbxHioRJVFYm8IOCpUkDqr9nd8i+Y8Xh3Z7Zp3KbQImbHlzkXz5xvzjlz1t7+tm3H3ba9aLVtzkreKpO4y1qwbV8RFJawfZbyUvKlJD/KmZIte6F8lUITddLZ3RrkipawiEsqkAOe5fIdgWrUj7u8J8eUuHLcY/FerxLGLnKoJB3GrP9JNqhmrbTEbUcy8lCptu01C4jf5+ISPPGUd3ndVvNHcZIowQ/obrDbpRPygHW3Qh5nkhmFSckkOcvDTsyPqgU7nqQUGQ95ZSq4e8VqsjzL7qwW0astN+3GCgfNbgTeh9VREuc3JYUXB6zBaM4G3LQ57qbe2sC0GVOqWe1SB1Fzx31qWg4pcXAAXCWXxClbnfEcJImdLOXCBdWkS/nyUsmLLN0TzzxMrZIfJeyjhUgItcr4G7ZoWRCifLCwPPr94ej7ZxsbN5auSsll8agVr+bLatmavXLYZVF4kPBr4lvr4X5t+FrcKbIyi7j1VSjWrRRryZUsyYoab4xx225GzSv5/s2Ni1BDFDfCRt3zkXkFIohIQIaPT8dnz0d/Ho9PzkY/PBifPh+eHY+PT6f4vDNY5D6bsFxL89slmYPFhTos2JejkodFxd0Wa1PRwdLqI9uUBBNSnsWTpNW21Vfb9o7CbLY2PUQq1Or4zhK5LGMH0N1Kezfs3NkrsgM1o5kVZlr6HFHVBAQKg3MyLWrKtC87Uc7X0y8/M9GCRHciSHxj/R6Epgd5nkMD7L122E3cSi6mFSbxXrpodQSfFR8uNIYk8Wv/G/1yMjy5P3r2x/DRk9GTB389/fE/FZz7W6uHm+smrggIpIDWsO6UJHB8gmhQd5dcIm4boD0f0mlI65AOH/46h+p7DGlvZfPTfmcupBF2QKDh5ZkR7mC9kYaAx+Lw8IWnT/u/Fv7kNWoAEPS/vtU37W0hz3G1BUKVxGqDCUaOhzUDPGNSCKjroMCddjx3dopqSeOK/gZFBALWikWA1RKXW3UIaiqsyVDRVYlR1xrQn0igWkK+wymnZtR0RVXVyuVKFL0iuXwGvij94ksUuofXe2xlPv/62KHQn3U9G3tU5JCZ32Njn11AHV1xLlMLisl+k22e7JteK06qx7fekOaYWMv7h95cjYggNLwa6SGBAHR8QGfN+19A9fJ/jObD6NbmFzc+nvs3hQFxAuCRadedLPAdCDTzkZnCoGdmiznoCPhHTv0q8hatuu654ADzQVWk3//pxW9PX/x8b/z4u1kp8K4qggqgrOheF1tT6dO3TDI79t81cRe4UA8AAA==",
-      //     "is_curr": 1
-      //   }
-      // }
-      // const data1  = {"status":200,"msg":"ok","dimension_obj":{"pl_list":[{"name":"DSTE咨询及软件","id":2,"pk":2,"superior_id":0,"children_pk_list":[5,6],"is_valid_now":0},{"name":"内训","id":3,"pk":3,"superior_id":0,"children_pk_list":[7,8],"is_valid_now":0},{"name":"公开课","id":4,"pk":4,"superior_id":0,"children_pk_list":[9,10],"is_valid_now":0},{"name":"IPD咨询","id":11,"pk":11,"superior_id":0,"children_pk_list":[1],"is_valid_now":0},{"name":"布艺事业部","id":13,"pk":13,"superior_id":0,"children_pk_list":[14,15,16,17,18],"is_valid_now":0},{"name":"11","id":21,"pk":21,"superior_id":0,"children_pk_list":[22],"is_valid_now":0},{"name":"12","id":23,"pk":23,"superior_id":0,"children_pk_list":[24],"is_valid_now":1},{"name":"测试权限","id":25,"pk":25,"superior_id":0,"children_pk_list":[26],"is_valid_now":0},{"name":"布艺事业部 / 中高端品类","id":18,"pk":18,"superior_id":13,"is_valid_now":1}],"pl_id":null,"pl_name":null,"spfd_list":[{"id":7,"pk":7,"name":"供应链"},{"id":1,"pk":1,"name":"研发领域"},{"id":2,"pk":2,"name":"营销领域"},{"id":3,"pk":3,"name":"组织及人力资源"},{"id":4,"pk":4,"name":"财务"},{"id":5,"pk":5,"name":"品牌"},{"id":6,"pk":6,"name":"服务领域"},{"id":8,"pk":8,"name":"流程IT"},{"id":9,"pk":9,"name":"市场营销"},{"id":10,"pk":10,"name":"F-权限测试"}],"spfd_id":null,"spfd_name":null,"d_list":[{"id":"00000000","pk":"00000000","name":"汉捷公司","text":"汉捷公司","tree_name":"汉捷公司","level":0,"sales_position":1},{"pk":"01000000","name":"咨询一部","tree_name":"咨询一部","level":1,"sales_position":2,"superior_department__pk":"00000000","id":"01000000","text":"咨询一部"},{"pk":"06000000","name":"咨询二部","tree_name":"咨询二部","level":1,"sales_position":"","superior_department__pk":"00000000","id":"06000000","text":"咨询二部"},{"pk":"02000000","name":"销售一部","tree_name":"销售一部","level":1,"sales_position":1,"superior_department__pk":"00000000","id":"02000000","text":"销售一部"},{"pk":"03000000","name":"销售二部","tree_name":"销售二部","level":1,"sales_position":1,"superior_department__pk":"00000000","id":"03000000","text":"销售二部"},{"pk":"04000000","name":"市场部","tree_name":"市场部","level":1,"sales_position":"","superior_department__pk":"00000000","id":"04000000","text":"市场部"},{"pk":"05000000","name":"运作管理部","tree_name":"运作管理部","level":1,"sales_position":"","superior_department__pk":"00000000","id":"05000000","text":"运作管理部"},{"pk":"07000000","name":"总经理助理","tree_name":"总经理助理","level":1,"sales_position":"","superior_department__pk":"00000000","id":"07000000","text":"总经理助理"},{"pk":"08000000","name":"外部合作","tree_name":"外部合作","level":1,"sales_position":"","superior_department__pk":"00000000","id":"08000000","text":"外部合作"},{"pk":"09000000","name":"香港办事处","tree_name":"香港办事处","level":1,"sales_position":"","superior_department__pk":"00000000","id":"09000000","text":"香港办事处"},{"pk":"04010000","name":"软件中心","tree_name":"软件中心","level":1,"sales_position":"","superior_department__pk":"00000000","id":"04010000","text":"软件中心"},{"pk":"11000000","name":"测试权限","tree_name":"测试权限","level":1,"sales_position":"","superior_department__pk":"00000000","id":"11000000","text":"测试权限"},{"pk":"06010000","name":"IT实施组","tree_name":"咨询二部 / IT实施组","level":2,"sales_position":"","superior_department__pk":"06000000","id":"06010000","text":"IT实施组"},{"pk":"08010000","name":"外部合作销售","tree_name":"外部合作 / 外部合作销售","level":2,"sales_position":"","superior_department__pk":"08000000","id":"08010000","text":"外部合作销售"},{"pk":"11020000","name":"测试权限（二级部门）","tree_name":"测试权限 / 测试权限（二级部门）","level":2,"sales_position":"","superior_department__pk":"11000000","id":"11020000","text":"测试权限（二级部门）"},{"id":"07000000","pk":"07000000","text":"总经理助理","tree_name":"总经理助理","level":1},{"id":"04010000","pk":"04010000","text":"软件中心","tree_name":"软件中心","level":1},{"id":"06000000","pk":"06000000","text":"咨询二部","tree_name":"咨询二部","level":1}],"d_id":"00000000","d_name":"汉捷管理咨询有限公司","year_list":[{"id":2019,"name":2019},{"id":2020,"name":2020},{"id":2021,"name":2021},{"id":2022,"name":2022},{"id":2023,"name":2023},{"id":2024,"name":2024},{"id":2025,"name":2025},{"id":2026,"name":2026},{"id":2027,"name":2027},{"id":2028,"name":2028}],"cur_year":"2022"}}
-      if (data1 && data1.status === 200) {
-        // // 解析维度信息 
-        // try {
-        //   // if (!data1.dimension_obj.pl_id && !data1.dimension_obj.spfd_id && !data1.dimension_obj.d_id) {  // 公司维度
-        //   //   company_array.value = data1.dimension_obj.d_list
-        //   //   set_default_select_item(company_array.value[0].id, company_array.value[0].name, 'c')
-        //   // } 
-        //   // 如果之前传的
-        //   if (spfd_id.value && bupl_id.value && d_id.value && spfd_id.value === '' && bupl_id.value === '' && d_id.value === '') {
-        //     value_c.value = data1.dimension_obj.d_id
-
-        //     set_default_select_item(data1.dimension_obj.d_id, data1.dimension_obj.d_name, 'c')
+      open_loading()
+      try {
+        // const get_hz_ppt_by_dimension_and_year = (dimension_obj: any, year: any) => {
+        const data1 = await http.get('/hz_ppt', { method_: "get_hz_ppt_by_dimension_and_year", ...dimension_obj, year: year, gridKey: gridKey.value })
+        // const data1 = {
+        //   "status": 200,
+        //   "msg": "查询成功",
+        //   "data": {
+        //     "id": 44,
+        //     "hiwin_deleted_time": null,
+        //     "hiwin_creator": 2,
+        //     "hiwin_updator": null,
+        //     "hiwin_is_deleted": false,
+        //     "grid_key": "ppt",
+        //     "year": 2022,
+        //     "dimension": "bupl_id_0_spfd_id_0_d_id_07000000",
+        //     "version": "",
+        //     "doc": "H4sIAAAAAAAAA91XW2/cRBT+K5Z5yEvXnasvIUSCoCpCJCRpaUWzeXB2x1mrjm3sSXYD6ktVqWoRbxHioRJVFYm8IOCpUkDqr9nd8i+Y8Xh3Z7Zp3KbQImbHlzkXz5xvzjlz1t7+tm3H3ba9aLVtzkreKpO4y1qwbV8RFJawfZbyUvKlJD/KmZIte6F8lUITddLZ3RrkipawiEsqkAOe5fIdgWrUj7u8J8eUuHLcY/FerxLGLnKoJB3GrP9JNqhmrbTEbUcy8lCptu01C4jf5+ISPPGUd3ndVvNHcZIowQ/obrDbpRPygHW3Qh5nkhmFSckkOcvDTsyPqgU7nqQUGQ95ZSq4e8VqsjzL7qwW0astN+3GCgfNbgTeh9VREuc3JYUXB6zBaM4G3LQ57qbe2sC0GVOqWe1SB1Fzx31qWg4pcXAAXCWXxClbnfEcJImdLOXCBdWkS/nyUsmLLN0TzzxMrZIfJeyjhUgItcr4G7ZoWRCifLCwPPr94ej7ZxsbN5auSsll8agVr+bLatmavXLYZVF4kPBr4lvr4X5t+FrcKbIyi7j1VSjWrRRryZUsyYoab4xx225GzSv5/s2Ni1BDFDfCRt3zkXkFIohIQIaPT8dnz0d/Ho9PzkY/PBifPh+eHY+PT6f4vDNY5D6bsFxL89slmYPFhTos2JejkodFxd0Wa1PRwdLqI9uUBBNSnsWTpNW21Vfb9o7CbLY2PUQq1Or4zhK5LGMH0N1Kezfs3NkrsgM1o5kVZlr6HFHVBAQKg3MyLWrKtC87Uc7X0y8/M9GCRHciSHxj/R6Epgd5nkMD7L122E3cSi6mFSbxXrpodQSfFR8uNIYk8Wv/G/1yMjy5P3r2x/DRk9GTB389/fE/FZz7W6uHm+smrggIpIDWsO6UJHB8gmhQd5dcIm4boD0f0mlI65AOH/46h+p7DGlvZfPTfmcupBF2QKDh5ZkR7mC9kYaAx+Lw8IWnT/u/Fv7kNWoAEPS/vtU37W0hz3G1BUKVxGqDCUaOhzUDPGNSCKjroMCddjx3dopqSeOK/gZFBALWikWA1RKXW3UIaiqsyVDRVYlR1xrQn0igWkK+wymnZtR0RVXVyuVKFL0iuXwGvij94ksUuofXe2xlPv/62KHQn3U9G3tU5JCZ32Njn11AHV1xLlMLisl+k22e7JteK06qx7fekOaYWMv7h95cjYggNLwa6SGBAHR8QGfN+19A9fJ/jObD6NbmFzc+nvs3hQFxAuCRadedLPAdCDTzkZnCoGdmiznoCPhHTv0q8hatuu654ADzQVWk3//pxW9PX/x8b/z4u1kp8K4qggqgrOheF1tT6dO3TDI79t81cRe4UA8AAA==",
+        //     "is_curr": true
         //   }
-        //   else {
-        //     spfd_array.value = data1.dimension_obj.spfd_list
-        //     bupl_array.value = data1.dimension_obj.pl_list
-        //     dep_array.value = data1.dimension_obj.pl_list
-        //     if (data1.dimension_obj.pl_id) {
-        //       // 默认选中bupl
-        //       value_bupl.value = data1.dimension_obj.pl_id
-        //       set_default_select_item(data1.dimension_obj.pl_id, data1.dimension_obj.pl_name, 'bupl')
-        //     } else if (data1.dimension_obj.spfd_id) {
-        //       // 默认选中
-        //       value_spfd.value = data1.dimension_obj.spfd_id
-        //       set_default_select_item(data1.dimension_obj.spfd_id, data1.dimension_obj.spfd_name, 'spfd')
-        //     }
-        //     else if (data1.dimension_obj.d_id) {
-        //       // 默认选中
-        //       value_dep.value = data1.dimension_obj.d_list
-        //       set_default_select_item(data1.dimension_obj.d_id, data1.dimension_obj.d_name, 'd')
-        //     }
-        //   }
-
-
-        // } catch (error) {
-        //   ElMessage.error('解析维度失败请刷新重试!' + error)
         // }
-        // 解析doc信息
-        try {
-          if (data1.data.doc) {
-            debugger
-            const base64_data = data1.data.doc
-            const arrayBuffer = base64ToArrayBuffer(base64_data)
 
-            // 使用pako进行解压
-            const decompressedData = pako.inflate(arrayBuffer, { to: 'string' })
-            // 将解压后的数据转换回JSON对象
-            const data = JSON.parse(decompressedData)
-            importSpecificData(data)
-          } else {
-            ElMessage.error('解析data1.data.doc数据失败请刷新重试!')
+        // const data1 = {
+        //   "status": 200,
+        //   "msg": "新的维度数据已创建",
+        //   "data": {
+        //     "id": 46,
+        //     "hiwin_deleted_time": null,
+        //     "hiwin_creator": 2,
+        //     "hiwin_updator": null,
+        //     "hiwin_is_deleted": 0,
+        //     "grid_key": "ppt",
+        //     "year": "2022",
+        //     "dimension": "bupl_id_0_spfd_id_1_d_id_0",
+        //     "version": "",
+        //     "doc": "H4sIAAAAAAAAA9VWW2sbRxT+K8v0wS+rzVz3VtfQugRTatd20oTG+GEtjawl693t7tiSG/xSAiENeTOlD4GGYKhfStungFvIr5GU/ouekfbmRKpsggsdzWh2z5yZPd+5zs4jFHaQj5TMVSuPwo5sEWQiGckDGasc+TuPkDpOJbDkvQBmc8rP23vbgxTeItlVyMcmUkmKfIrhqR92VA/5gtsm6slwvwcMzKaWMNFRKPufJQM4VnPC2DVRGmhutG5g+H0JA8gw6389HsBHumEUActHYs/b64gJYSA724EKE+R3gyiXJkrSoB2qY5DFckyUJSpQIDU+MWcDSJKHa1n3PQC1+ExDqcSn+EaF70Zheg/5KjuUs2VXcqBK0cNO7KwPKtGZEIXwtrCoqPXvihoAEdxiHrb1ehTGcq2kW9RE7SRWYG04ejldWc5VlsT7MKdBbOTqOJKfLHWBo5WH30nfMAih6WBpZfTH09Hz15ubd5dvac4VmIqNt9IV1EBhoo7sBoeRug2HbAQHGs562M6SPOkq45sAREQVz2oSJZnWFmMMzcHv5Org3uYM/FSwuQoQ9ns45+CjXMMbvjgfX7wZ/XU6PrsY/fhkfP5meHE6Pj2v0N4ASG2YEuTtOH2Q8xqkTUqQzDVRroIMqDvY1E4oY9ixI7g3eUuTcBq5CHajXQ27+FzlgRPUOiISiHhUKYyeAPde0H64nyWH+sw6dArG6qjupKETLf27CYTOSSBNG6ZqI/76iwoe4aUNCXcreRxCagM6jiU85izy39Ki+mOtIAr3Y99ow6LMPl5a6NvcLUw/+vVsePZ49PrP4Q8vRy+f/P3qp//cyw+21462NioNUQz4caOx0h+4Z7mcCq/oNr9aACxQ1GwFVbHRVNDw6W/v6OiGY8NZ3fq8365jgzILew0NOHWoWKzZ+OzIYZAcXXC8qn9gHPF5RQd7/W/v9yvBW9Sx7MZniQ7tieScUcthDZGc6nCChW1Rz646a2R5qLKNFegLqxbFxqrBsdGCYU86wQWVFGQypU9rWlHciFty0IJDP5NqpVgo6FPqtDxeuSbWZfA6WWl2SmJXudMc3enJ1UZOcpkliFv3MkM5AiKx9jdWmcbGwmpuaGQveLu8tNgypaqb94nyhnF9Hc7xyPW0f+TUdwlKyCXfom51sSOWi0XdnP8D6su3wjmJ9v7WV3c/ra+yDHPLww6veml2z7UIbqChdbwT53LYNTTA8YfWp4l3+0ZRcv8lObt4ci97/PPb31+9/eX78YtnddG6odoFKkiyzh1QMuwR1w3U3X8AWckOV34MAAA=",
+        //     "doc2": "H4sIAAAAAAAAA91XW2/cRBT+K5Z5yEvXnasvIUSCoCpCJCRpaUWzeXB2x1mrjm3sSXYD6ktVqWoRbxHioRJVFYm8IOCpUkDqr9nd8i+Y8Xh3Z7Zp3KbQImbHlzkXz5xvzjlz1t7+tm3H3ba9aLVtzkreKpO4y1qwbV8RFJawfZbyUvKlJD/KmZIte6F8lUITddLZ3RrkipawiEsqkAOe5fIdgWrUj7u8J8eUuHLcY/FerxLGLnKoJB3GrP9JNqhmrbTEbUcy8lCptu01C4jf5+ISPPGUd3ndVvNHcZIowQ/obrDbpRPygHW3Qh5nkhmFSckkOcvDTsyPqgU7nqQUGQ95ZSq4e8VqsjzL7qwW0astN+3GCgfNbgTeh9VREuc3JYUXB6zBaM4G3LQ57qbe2sC0GVOqWe1SB1Fzx31qWg4pcXAAXCWXxClbnfEcJImdLOXCBdWkS/nyUsmLLN0TzzxMrZIfJeyjhUgItcr4G7ZoWRCifLCwPPr94ej7ZxsbN5auSsll8agVr+bLatmavXLYZVF4kPBr4lvr4X5t+FrcKbIyi7j1VSjWrRRryZUsyYoab4xx225GzSv5/s2Ni1BDFDfCRt3zkXkFIohIQIaPT8dnz0d/Ho9PzkY/PBifPh+eHY+PT6f4vDNY5D6bsFxL89slmYPFhTos2JejkodFxd0Wa1PRwdLqI9uUBBNSnsWTpNW21Vfb9o7CbLY2PUQq1Or4zhK5LGMH0N1Kezfs3NkrsgM1o5kVZlr6HFHVBAQKg3MyLWrKtC87Uc7X0y8/M9GCRHciSHxj/R6Epgd5nkMD7L122E3cSi6mFSbxXrpodQSfFR8uNIYk8Wv/G/1yMjy5P3r2x/DRk9GTB389/fE/FZz7W6uHm+smrggIpIDWsO6UJHB8gmhQd5dcIm4boD0f0mlI65AOH/46h+p7DGlvZfPTfmcupBF2QKDh5ZkR7mC9kYaAx+Lw8IWnT/u/Fv7kNWoAEPS/vtU37W0hz3G1BUKVxGqDCUaOhzUDPGNSCKjroMCddjx3dopqSeOK/gZFBALWikWA1RKXW3UIaiqsyVDRVYlR1xrQn0igWkK+wymnZtR0RVXVyuVKFL0iuXwGvij94ksUuofXe2xlPv/62KHQn3U9G3tU5JCZ32Njn11AHV1xLlMLisl+k22e7JteK06qx7fekOaYWMv7h95cjYggNLwa6SGBAHR8QGfN+19A9fJ/jObD6NbmFzc+nvs3hQFxAuCRadedLPAdCDTzkZnCoGdmiznoCPhHTv0q8hatuu654ADzQVWk3//pxW9PX/x8b/z4u1kp8K4qggqgrOheF1tT6dO3TDI79t81cRe4UA8AAA==",
+        //     "is_curr": 1
+        //   }
+        // }
+        // const data1  = {"status":200,"msg":"ok","dimension_obj":{"pl_list":[{"name":"DSTE咨询及软件","id":2,"pk":2,"superior_id":0,"children_pk_list":[5,6],"is_valid_now":0},{"name":"内训","id":3,"pk":3,"superior_id":0,"children_pk_list":[7,8],"is_valid_now":0},{"name":"公开课","id":4,"pk":4,"superior_id":0,"children_pk_list":[9,10],"is_valid_now":0},{"name":"IPD咨询","id":11,"pk":11,"superior_id":0,"children_pk_list":[1],"is_valid_now":0},{"name":"布艺事业部","id":13,"pk":13,"superior_id":0,"children_pk_list":[14,15,16,17,18],"is_valid_now":0},{"name":"11","id":21,"pk":21,"superior_id":0,"children_pk_list":[22],"is_valid_now":0},{"name":"12","id":23,"pk":23,"superior_id":0,"children_pk_list":[24],"is_valid_now":1},{"name":"测试权限","id":25,"pk":25,"superior_id":0,"children_pk_list":[26],"is_valid_now":0},{"name":"布艺事业部 / 中高端品类","id":18,"pk":18,"superior_id":13,"is_valid_now":1}],"pl_id":null,"pl_name":null,"spfd_list":[{"id":7,"pk":7,"name":"供应链"},{"id":1,"pk":1,"name":"研发领域"},{"id":2,"pk":2,"name":"营销领域"},{"id":3,"pk":3,"name":"组织及人力资源"},{"id":4,"pk":4,"name":"财务"},{"id":5,"pk":5,"name":"品牌"},{"id":6,"pk":6,"name":"服务领域"},{"id":8,"pk":8,"name":"流程IT"},{"id":9,"pk":9,"name":"市场营销"},{"id":10,"pk":10,"name":"F-权限测试"}],"spfd_id":null,"spfd_name":null,"d_list":[{"id":"00000000","pk":"00000000","name":"汉捷公司","text":"汉捷公司","tree_name":"汉捷公司","level":0,"sales_position":1},{"pk":"01000000","name":"咨询一部","tree_name":"咨询一部","level":1,"sales_position":2,"superior_department__pk":"00000000","id":"01000000","text":"咨询一部"},{"pk":"06000000","name":"咨询二部","tree_name":"咨询二部","level":1,"sales_position":"","superior_department__pk":"00000000","id":"06000000","text":"咨询二部"},{"pk":"02000000","name":"销售一部","tree_name":"销售一部","level":1,"sales_position":1,"superior_department__pk":"00000000","id":"02000000","text":"销售一部"},{"pk":"03000000","name":"销售二部","tree_name":"销售二部","level":1,"sales_position":1,"superior_department__pk":"00000000","id":"03000000","text":"销售二部"},{"pk":"04000000","name":"市场部","tree_name":"市场部","level":1,"sales_position":"","superior_department__pk":"00000000","id":"04000000","text":"市场部"},{"pk":"05000000","name":"运作管理部","tree_name":"运作管理部","level":1,"sales_position":"","superior_department__pk":"00000000","id":"05000000","text":"运作管理部"},{"pk":"07000000","name":"总经理助理","tree_name":"总经理助理","level":1,"sales_position":"","superior_department__pk":"00000000","id":"07000000","text":"总经理助理"},{"pk":"08000000","name":"外部合作","tree_name":"外部合作","level":1,"sales_position":"","superior_department__pk":"00000000","id":"08000000","text":"外部合作"},{"pk":"09000000","name":"香港办事处","tree_name":"香港办事处","level":1,"sales_position":"","superior_department__pk":"00000000","id":"09000000","text":"香港办事处"},{"pk":"04010000","name":"软件中心","tree_name":"软件中心","level":1,"sales_position":"","superior_department__pk":"00000000","id":"04010000","text":"软件中心"},{"pk":"11000000","name":"测试权限","tree_name":"测试权限","level":1,"sales_position":"","superior_department__pk":"00000000","id":"11000000","text":"测试权限"},{"pk":"06010000","name":"IT实施组","tree_name":"咨询二部 / IT实施组","level":2,"sales_position":"","superior_department__pk":"06000000","id":"06010000","text":"IT实施组"},{"pk":"08010000","name":"外部合作销售","tree_name":"外部合作 / 外部合作销售","level":2,"sales_position":"","superior_department__pk":"08000000","id":"08010000","text":"外部合作销售"},{"pk":"11020000","name":"测试权限（二级部门）","tree_name":"测试权限 / 测试权限（二级部门）","level":2,"sales_position":"","superior_department__pk":"11000000","id":"11020000","text":"测试权限（二级部门）"},{"id":"07000000","pk":"07000000","text":"总经理助理","tree_name":"总经理助理","level":1},{"id":"04010000","pk":"04010000","text":"软件中心","tree_name":"软件中心","level":1},{"id":"06000000","pk":"06000000","text":"咨询二部","tree_name":"咨询二部","level":1}],"d_id":"00000000","d_name":"汉捷管理咨询有限公司","year_list":[{"id":2019,"name":2019},{"id":2020,"name":2020},{"id":2021,"name":2021},{"id":2022,"name":2022},{"id":2023,"name":2023},{"id":2024,"name":2024},{"id":2025,"name":2025},{"id":2026,"name":2026},{"id":2027,"name":2027},{"id":2028,"name":2028}],"cur_year":"2022"}}
+        if (data1 && data1.status === 200) {
+          // // 解析维度信息 
+          // try {
+          //   // if (!data1.dimension_obj.pl_id && !data1.dimension_obj.spfd_id && !data1.dimension_obj.d_id) {  // 公司维度
+          //   //   company_array.value = data1.dimension_obj.d_list
+          //   //   set_default_select_item(company_array.value[0].id, company_array.value[0].name, 'c')
+          //   // } 
+          //   // 如果之前传的
+          //   if (spfd_id.value && bupl_id.value && d_id.value && spfd_id.value === '' && bupl_id.value === '' && d_id.value === '') {
+          //     value_c.value = data1.dimension_obj.d_id
+
+          //     set_default_select_item(data1.dimension_obj.d_id, data1.dimension_obj.d_name, 'c')
+          //   }
+          //   else {
+          //     spfd_array.value = data1.dimension_obj.spfd_list
+          //     bupl_array.value = data1.dimension_obj.pl_list
+          //     dep_array.value = data1.dimension_obj.pl_list
+          //     if (data1.dimension_obj.pl_id) {
+          //       // 默认选中bupl
+          //       value_bupl.value = data1.dimension_obj.pl_id
+          //       set_default_select_item(data1.dimension_obj.pl_id, data1.dimension_obj.pl_name, 'bupl')
+          //     } else if (data1.dimension_obj.spfd_id) {
+          //       // 默认选中
+          //       value_spfd.value = data1.dimension_obj.spfd_id
+          //       set_default_select_item(data1.dimension_obj.spfd_id, data1.dimension_obj.spfd_name, 'spfd')
+          //     }
+          //     else if (data1.dimension_obj.d_id) {
+          //       // 默认选中
+          //       value_dep.value = data1.dimension_obj.d_list
+          //       set_default_select_item(data1.dimension_obj.d_id, data1.dimension_obj.d_name, 'd')
+          //     }
+          //   }
+
+
+          // } catch (error) {
+          //   ElMessage.error('解析维度失败请刷新重试!' + error)
+          // }
+          // 解析doc信息
+          try {
+            if (data1.data.doc) {
+              debugger
+              const base64_data = data1.data.doc
+              const arrayBuffer = base64ToArrayBuffer(base64_data)
+
+              // 使用pako进行解压
+              const decompressedData = pako.inflate(arrayBuffer, { to: 'string' })
+              // 将解压后的数据转换回JSON对象
+              const data = JSON.parse(decompressedData)
+              importSpecificData(data)
+            } else {
+              ElMessage.error('解析data1.data.doc数据失败请刷新重试!')
+            }
+          }
+          catch (error) {
+            ElMessage.error('解析数据失败请刷新重试!' + error)
           }
         }
-        catch (error) {
-          ElMessage.error('解析数据失败请刷新重试!' + error)
+        else {
+          try {
+            ElMessage.error(data1.msg)
+          }
+          catch (error) {
+            ElMessage.error('获取失败请刷新重试！')
+          }
         }
+      } catch (error) {
+        ElMessage.error('首页维度和ppt数据获取失败，请刷新重试！')
       }
-      else {
-        try {
-          ElMessage.error(data1.msg)
-        }
-        catch (error) {
-          ElMessage.error('获取失败请刷新重试！')
-        }
-      }
+
       close_loading()
     }
 

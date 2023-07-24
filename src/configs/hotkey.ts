@@ -36,8 +36,8 @@ export const HOTKEY_DOC = [
     children: [
       { label: '剪切', value: 'Ctrl + X' },
       { label: '复制', value: 'Ctrl + C' },
-      { label: '保存数据', value: 'Ctrl + S' },
-      { label: '查看历史', value: 'Ctrl + H' },
+      // { label: '保存数据', value: 'Ctrl + S' },
+      // { label: '查看历史', value: 'Ctrl + H' },
       { label: '粘贴', value: 'Ctrl + V' },
       { label: '快速复制粘贴', value: 'Ctrl + D' },
       { label: '全选', value: 'Ctrl + A' },

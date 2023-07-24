@@ -12,7 +12,8 @@ import { LOCALSTORAGE_KEY_DISCARDED_DB } from '@/configs/storage'
 import { isPC } from './utils/common'
 
 import Editor from './views/Editor/indexForTemplate.vue'
-import Screen from './views/Screen/index.vue'
+// import Screen from './views/Screen/index.vue'
+import Screen from './views/Screen/indexTemplate.vue'
 import Mobile from './views/Mobile.vue'
 
 export default defineComponent({

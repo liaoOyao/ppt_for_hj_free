@@ -7,9 +7,9 @@
         </div>
         <template #overlay>
           <Menu>
-            <FileInput accept=".pptist" @change="files => importSpecificFile(files)">
+            <!-- <FileInput accept=".pptist" @change="files => importSpecificFile(files)">
               <MenuItem>导入 pptist 文件</MenuItem>
-            </FileInput>
+            </FileInput> -->
             <MenuItem @click="setDialogForExport('pptist')">导出 pptist 文件</MenuItem>
             <MenuItem @click="setDialogForExport('pptx')">导出 PPTX</MenuItem>
             <MenuItem @click="setDialogForExport('image')">导出图片</MenuItem>
@@ -34,7 +34,7 @@
           </Menu>
         </template>
       </Dropdown>
-      <Dropdown :trigger="['click']">
+      <!-- <Dropdown :trigger="['click']">
         <div class="menu-item">
           <IconPpt /> <span class="text">演示</span>
         </div>
@@ -44,11 +44,11 @@
             <MenuItem @click="enterScreening()">从当前页开始</MenuItem>
           </Menu>
         </template>
-      </Dropdown>
+      </Dropdown> -->
       <Dropdown :trigger="['click']">
-        <div class="menu-item">
+        <!-- <div class="menu-item">
           <IconHelpcenter /> <span class="text">帮助</span>
-        </div>
+        </div> -->
         <template #overlay>
           <Menu>
             <!-- <MenuItem @click="goIssues()">意见反馈</MenuItem> -->
@@ -79,9 +79,9 @@
       </a> -->
     </div>
 
-    <Drawer width="320" placement="right" :visible="hotkeyDrawerVisible" @close="hotkeyDrawerVisible = false">
+    <!-- <Drawer width="320" placement="right" :visible="hotkeyDrawerVisible" @close="hotkeyDrawerVisible = false">
       <HotkeyDoc />
-    </Drawer>
+    </Drawer> -->
   </div>
 </template>
 
@@ -94,7 +94,7 @@ import useSlideHandler from '@/hooks/useSlideHandler'
 import useHistorySnapshot from '@/hooks/useHistorySnapshot'
 import useExport from '@/hooks/useExport'
 
-import HotkeyDoc from './HotkeyDoc.vue'
+// import HotkeyDoc from './HotkeyDoc.vue'
 import { ElLoading, FormInstance, ElMessageBox, ElMessage } from 'element-plus'
 import http from '@/utils/http'
 import pako from '@/utils/pako/pako.min.js'
@@ -103,7 +103,7 @@ import { arrayBufferToBase64, base64ToArrayBuffer } from '@/utils/handle_data'
 export default defineComponent({
   name: 'editor-header',
   components: {
-    HotkeyDoc,
+    // HotkeyDoc,
   },
   // setup(_: unknown, props: { dimension_obj_for_index: Object },context: SetupContext) {
   setup() {
@@ -169,7 +169,7 @@ export default defineComponent({
     onUnmounted(() => {
       window.removeEventListener('beforeunload', beforeUnloadHandler)
     })
-    const data_for_template:any = (inject('data_for_template'))
+    const data_for_template: any = (inject('data_for_template'))
 
     return {
       redo,
@@ -246,5 +246,10 @@ export default defineComponent({
 
 .el-alert {
   z-index: 99999 !important;
+}
+
+.ant-drawer-left.ant-drawer-open,
+.ant-drawer-right.ant-drawer-open {
+  z-index: 99999;
 }
 </style>

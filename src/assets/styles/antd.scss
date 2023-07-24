@@ -3,6 +3,7 @@
 // popover
 .ant-popover {
   padding-top: 5px !important;
+  z-index: 999999;
 }
 .ant-popover-arrow {
   display: none;
@@ -18,9 +19,11 @@
 // dropdown
 .ant-dropdown {
   min-width: 120px;
+  z-index: 999999;
 }
 .ant-dropdown-menu {
   box-shadow: $boxShadow;
+  z-index: 999999;
 }
 .ant-dropdown-menu-item {
 
@@ -52,6 +55,9 @@
 // select
 .ant-select {
   user-select: none;
+}
+.ant-select-focused,.ant-select-open {
+  z-index: 999999;
 }
 .ant-select-item-option-active:not(.ant-select-item-option-disabled) {
   background-color: rgba($color: $themeColor, $alpha: .2);
