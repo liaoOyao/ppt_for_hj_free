@@ -161,9 +161,24 @@
   width: 8.3333333333%;
   min-height: 200px;
   border-right: 1px solid #ccc;
+  // border-right: 1px solid #f8f8f8;
+
   overflow-y: auto;
   padding-top: 10px;
   overflow-x: hidden;
+  transition: width 0.3s ease-in-out;
+}
+
+.shrink {
+  border-right: solid 10px #ccc !important;
+  cursor: pointer;
+  width: 0;
+  // width: 35px !important;
+}
+
+.expand {
+  width: calc(100% - 10px) !important;
+  // width: 88% !important;
 }
 
 .hj_slider_select {

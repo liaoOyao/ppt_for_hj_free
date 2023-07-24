@@ -54,11 +54,10 @@
       </div>
     </div>
     <div class="hj_all_ppt" id='hj_all_ppt_id'>
-      <div class="hj_slider">
+      <div class="hj_slider" @click="adjustWidth">
         <div class="hj_right_adjust_icon_father">
-          <div class="hj_right_adjust_icon"></div>
+          <div class="hj_right_adjust_icon" @click="adjustWidth"></div>
         </div>
-
         <!-- 公司： {{ company_array }} 侧边栏部分 -->
         <div v-if="dep_array && dep_array.length > 0" class="hj_sidebar_category_ppt">
           <span class="higet_ppt_span_bold " style="font-size: 1.1em;">公司维度</span>
@@ -138,7 +137,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, nextTick, watchEffect, watch, onUnmounted, reactive,provide } from 'vue'
+import { defineComponent, ref, onMounted, nextTick, watchEffect, watch, onUnmounted, reactive, provide } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useMainStore, useSlidesStore } from '@/store'
 import useGlobalHotkey from '@/hooks/useGlobalHotkey'
@@ -744,6 +743,8 @@ export default defineComponent({
       //   // ref.select1.$el.style.width = '212px'
       //   select2.value.$el.style.width = '120px'
       window.addEventListener('beforeunload', beforeUnloadHandler)
+      hjSlider.value = document.querySelector('.hj_slider')
+      pptistEditor.value = document.querySelector('.pptist-editor')
     })
     // const keyboardStore = useKeyboardStore()
     // const {
@@ -882,6 +883,19 @@ export default defineComponent({
       }
     }
     provide('get_hz_ppt_by_dimension_and_year', get_hz_ppt_by_dimension_and_year)
+    const hjSlider = ref(null)
+    const pptistEditor = ref(null)
+
+    const adjustWidth = () => {
+      const computedWidth = window.getComputedStyle(hjSlider.value).width
+      if (computedWidth === '0px' || computedWidth === '10px') {
+        hjSlider.value.classList.remove('shrink')
+        pptistEditor.value.classList.remove('expand')
+      } else {
+        hjSlider.value.classList.add('shrink')
+        pptistEditor.value.classList.add('expand')
+      }
+    }
     return {
       remarkHeight,
       dialogForExport,
@@ -918,7 +932,8 @@ export default defineComponent({
       select2,
       saveData,
       viewHis,
-      dimension_obj_for_index
+      dimension_obj_for_index,
+      adjustWidth,
     }
     // // 处理实时保存的问题
     // const stopWatch = watchEffect(() => {
@@ -962,6 +977,7 @@ export default defineComponent({
 .pptist-editor {
   width: 91.6666666667%;
   height: 100%;
+  transition: width 0.3s ease-in-out;
 }
 
 .layout-header {
