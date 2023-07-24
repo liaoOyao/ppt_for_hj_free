@@ -1,4 +1,4 @@
-# 🎨 PPTist
+# 🎨 PPTist(新增保存当前版本、查看当前版本、加载模版和编辑模版功能)
 > 一个基于 Vue3.x + TypeScript 的在线演示文稿（幻灯片）应用，还原了大部分 Office PowerPoint 常用功能，支持 文字、图片、形状、线条、图表、表格、视频、音频、公式 几种最常用的元素类型，每一种元素都拥有高度可编辑能力，同时支持丰富的快捷键和右键菜单，支持导出本地 PPTX 文件，您可以在此基础上搭建自己的在线幻灯片应用。
 
 在线体验地址：[https://pipipi-pikachu.github.io/PPTist/](https://pipipi-pikachu.github.io/PPTist/)

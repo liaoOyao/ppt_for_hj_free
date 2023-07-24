@@ -21,14 +21,19 @@ class Ajax {
     }
     return config as InternalAxiosRequestConfig
   }
-  private handleResponse({ data, status }: AxiosResponse): any {
-    // 在这里可以添加一些请求后的处理，例如错误处理
-    // 检查错误状态码
-    if (status >= 400) {
-      throw new Error(data.message)
-    }
+  private handleResponse({ data, status }: AxiosResponse): any { 
+    // 在这里可以添加一些请求后的处理，例如错误处理 
+    // 检查错误状态码 
+    if (status >= 400) { 
+        if (status === 403) {
+            // 跳转到提示页面
+            window.location.href = '@/errorpage/403page.html' // 这里替换成你的提示页面的路由
+        } else {
+            throw new Error(data.message)
+        }
+    } 
     return data
-  }
+}
 
   public request<T = any>(config: AxiosRequestConfig): Promise<T> {
     return this.instance.request(config)

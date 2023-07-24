@@ -138,7 +138,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, nextTick, watchEffect, watch, onUnmounted, reactive } from 'vue'
+import { defineComponent, ref, onMounted, nextTick, watchEffect, watch, onUnmounted, reactive,provide } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useMainStore, useSlidesStore } from '@/store'
 import useGlobalHotkey from '@/hooks/useGlobalHotkey'
@@ -205,7 +205,7 @@ export default defineComponent({
     // 根据参数渲染数据
     const handleUrlAndSleect = async () => {
       debugger
-    // const handleUrlAndSleect = (url: string) => {
+      // const handleUrlAndSleect = (url: string) => {
       // 创建一个新的URL对象
       const urlObj = new URL(url, 'http://example.com')
       // 使用URLSearchParams对象来获取查询参数
@@ -238,104 +238,109 @@ export default defineComponent({
           }
         } catch (e) {
           ElMessage.error('维度列表数据获取失败，请刷新重试！')
+          return
         }
 
         // if (params) {
         // 左侧列表和上侧下拉列表一样  除了公司
         // 接下来根据参数是否有获取数据信息
-        const dim_data = dimension_list_data.value.dimension_obj
-        if (!dim_data) {
-          ElMessage.error('维度列表数据获取失败，请刷新重试！')
-        } else {
-          try {
-            // 标记要显示的  填充当前选中的
-            if (params.has('spfd_id')) {
-              const temp = params.get('spfd_id')
-              if (temp && temp !== '-1') {
-                getSpfdData(dim_data.spfd_list)
-                spfd_id.value = temp // 标记是否显示
-              }
-            }
-            // bupl
-            if (params.has('bupl_id')) {
-              const temp = params.get('bupl_id')
-              if (temp && temp !== '-1') {
-                getBuplData(dim_data.pl_list)
-                bupl_id.value = temp // 标记是否显示
-              }
-            }
-            // d 部门
-            if (params.has('d_id')) {
-              const temp = params.get('d_id')
-              if (temp && temp !== '-1') {
-                getDepData(dim_data.d_list)
-                d_id.value = temp
-              }
-            }
-            // 年份
-            if (params.has('year')) {
-              const temp = params.get('year')
-              getYearData(dim_data.year_list)
-              if (temp) {
-                year_id.value = temp
-                value_year.value = Number(dim_data.cur_year)
-                current_year = Number(dim_data.cur_year)
-              }
-            } else { // 没有传年份
-              getYearData(dim_data.year_list)
-              year_id.value = new Date().getFullYear().toString()
-              value_year.value = Number(new Date().getFullYear())
-              current_year = Number(value_year.value)
-              my_funture_years_fun(current_year)
-            }
-
-            if (params.has('show_c')) {
-              // 如果其余3个皆为空时，公司也不用展示，因为就是公司
-              if (bupl_id.value !== '' || spfd_id.value !== '' || d_id.value !== '') {
-                const temp = params.get('show_c')
-                if (temp !== '-1') {
-                  getCompanyData(dim_data.d_list)
+        try {
+          const dim_data = dimension_list_data.value.dimension_obj
+          if (!dim_data) {
+            ElMessage.error('维度列表数据获取失败，请刷新重试！')
+          } else {
+            try {
+              // 标记要显示的  填充当前选中的
+              if (params.has('spfd_id')) {
+                const temp = params.get('spfd_id')
+                if (temp && temp !== '-1') {
+                  getSpfdData(dim_data.spfd_list)
+                  spfd_id.value = temp // 标记是否显示
                 }
               }
-            }
+              // bupl
+              if (params.has('bupl_id')) {
+                const temp = params.get('bupl_id')
+                if (temp && temp !== '-1') {
+                  getBuplData(dim_data.pl_list)
+                  bupl_id.value = temp // 标记是否显示
+                }
+              }
+              // d 部门
+              if (params.has('d_id')) {
+                const temp = params.get('d_id')
+                if (temp && temp !== '-1') {
+                  getDepData(dim_data.d_list)
+                  d_id.value = temp
+                }
+              }
+              // 年份
+              if (params.has('year')) {
+                const temp = params.get('year')
+                getYearData(dim_data.year_list)
+                if (temp) {
+                  year_id.value = temp
+                  value_year.value = Number(dim_data.cur_year)
+                  current_year = Number(dim_data.cur_year)
+                }
+              } else { // 没有传年份
+                getYearData(dim_data.year_list)
+                year_id.value = new Date().getFullYear().toString()
+                value_year.value = Number(new Date().getFullYear())
+                current_year = Number(value_year.value)
+                my_funture_years_fun(current_year)
+              }
 
-            // 获取标题
-            if (params.has('title')) {
-              const arrayParam = params.get('title')
-              // const arrayParam2 = params.get('d_id')
-              // console.log(typeof arrayParam)
-              // console.log(typeof arrayParam2)
-              if (arrayParam) {
-                title.value = arrayParam
+              if (params.has('show_c')) {
+                // 如果其余3个皆为空时，公司也不用展示，因为就是公司
+                if (bupl_id.value !== '' || spfd_id.value !== '' || d_id.value !== '') {
+                  const temp = params.get('show_c')
+                  if (temp !== '-1') {
+                    getCompanyData(dim_data.d_list)
+                  }
+                }
               }
-              else {
-                ElMessage.error('缺少页面标题')
-              }
-            }
 
-            // grid_key 
-            if (params.has('grid_key')) {
-              const arrayParam = params.get('grid_key')
-              if (arrayParam) {
-                console.log(arrayParam)
-                gridKey.value = arrayParam
+              // 获取标题
+              if (params.has('title')) {
+                const arrayParam = params.get('title')
+                // const arrayParam2 = params.get('d_id')
+                // console.log(typeof arrayParam)
+                // console.log(typeof arrayParam2)
+                if (arrayParam) {
+                  title.value = arrayParam
+                }
+                else {
+                  ElMessage.error('缺少页面标题')
+                }
               }
-              else {
+
+              // grid_key 
+              if (params.has('grid_key')) {
+                const arrayParam = params.get('grid_key')
+                if (arrayParam) {
+                  console.log(arrayParam)
+                  gridKey.value = arrayParam
+                }
+                else {
+                  ElMessage.error('缺少grid_key')
+                }
+              } else {
                 ElMessage.error('缺少grid_key')
               }
-            }  else {
-                ElMessage.error('缺少grid_key')
+              // 最后根据维度数据区获取当前选中的数据
+              const dimension_obj = {
+                'bupl_id': value_bupl.value || 0,
+                'spfd_id': value_spfd.value || 0,
+                'd_id': value_dep.value || 0,
               }
-            // 最后根据维度数据区获取当前选中的数据
-            const dimension_obj = {
-              'bupl_id': value_bupl.value || 0,
-              'spfd_id': value_spfd.value || 0,
-              'd_id': value_dep.value || 0,
+              get_hz_ppt_by_dimension_and_year(dimension_obj, value_year.value)
+            } catch (error) {
+              ElMessage.error('缺失维度或配置数据获数据出错')
             }
-            get_hz_ppt_by_dimension_and_year(dimension_obj, value_year.value)
-          } catch (error) {
-            ElMessage.error('缺失维度或配置数据获数据出错')
           }
+        } catch (e) {
+          ElMessage.error('维度数据获取失败')
         }
 
       }
@@ -790,8 +795,16 @@ export default defineComponent({
         'spfd_id': value_spfd.value || 0,
         'd_id': value_dep.value || 0,
       }
-      const resp = await http.post('/hz_ppt', { method_: "insert_or_update_hz_ppt", ...dimension_obj, year: value_year.value, gridKey: gridKey.value, doc: base64_data })
-      // 发送数据给后端
+      let resp = null
+      try {
+        // 发送数据给后端
+        resp = await http.post('/hz_ppt', { method_: "insert_or_update_hz_ppt", ...dimension_obj, year: value_year.value, gridKey: gridKey.value, doc: base64_data })
+      }
+      catch (e) {
+        message.error('更新失败，请重试')
+        close_loading()
+        return
+      }
       if (resp && resp.status === 200) {
         // 返回响应
         slidesStore.setIschanged(true)
@@ -803,7 +816,7 @@ export default defineComponent({
           message.error(resp.msg)
           close_loading()
         } catch (e) {
-          message.error('更新出错，请重试')
+          message.error('更新失败，请重试')
           close_loading()
         }
       }
@@ -868,7 +881,7 @@ export default defineComponent({
         event.returnValue = '你还没有保存数据，确定要离开吗？'
       }
     }
-
+    provide('get_hz_ppt_by_dimension_and_year', get_hz_ppt_by_dimension_and_year)
     return {
       remarkHeight,
       dialogForExport,
@@ -995,6 +1008,7 @@ export default defineComponent({
 }
 
 .hz_ppt_year_select {
+  position: "absolute";
   width: 120px !important;
   max-width: 120px !important;
 }
@@ -1002,8 +1016,9 @@ export default defineComponent({
 /* .hz_ppt_year_select .el-select-dropdown {
   width: 120px !important;
 } */
-.hz_ppt_year_select .el-popper {
+
+/* .hz_ppt_year_select .el-popper {
   width: 120px !important;
   max-width: 120px !important;
-}
+} */
 </style>

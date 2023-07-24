@@ -3,7 +3,8 @@
 module.exports = {
   extends: 'stylelint-config-standard',
   rules: {
-    'indentation': 2,
+    'indentation': null,
+    // 'indentation': 2 || 4,
     'max-nesting-depth': 5,
     'max-empty-lines': null,
     'no-eol-whitespace': true,

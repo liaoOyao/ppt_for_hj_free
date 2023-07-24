@@ -524,3 +524,30 @@
   display: flex;
   align-items: center;
 }
+
+// 历史弹窗模块
+.HZPPTTemplateAll {
+  // height: 100%;
+  height: calc(100vh - 140.1px) !important;
+  width: 100%;
+  // overflow-y: auto;
+}
+
+.HZPPTTemplateHead {
+  height: 40px;
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+}
+
+.HZPPTTemplateHead_load {
+  width: 48%;
+}
+
+.HZPPTTemplateHead_edit {
+  width: 48%;
+}
+
+.ppt_template_content {
+  margin: 8px 0;
+}

@@ -57,13 +57,13 @@
         </template>
       </Dropdown>
       <Tooltip :mouseLeaveDelay="0" title="加载模版">
-        <div class="menu-item" @click="openHistory(2)">
-          <IconDownloadOne size="18" fill="#666"></IconDownloadOne><span class="text">加载</span>
+        <div class="menu-item" @click="openTemplate(1)">
+          <IconDownloadOne fill="#666"></IconDownloadOne><span class="text">加载模版</span>
         </div>
       </Tooltip>
       <Tooltip :mouseLeaveDelay="0" title="编辑模版">
-        <div class="menu-item" @click="openHistory(2)">
-          <IconFileEditing size="18" fill="#666"></IconFileEditing><span class="text">编辑</span>
+        <div class="menu-item" @click="openTemplate(2)">
+          <IconFileEditing fill="#666"></IconFileEditing><span class="text">编辑模版</span>
         </div>
       </Tooltip>
     </div>
@@ -175,16 +175,83 @@
               <APP />
             </div>
           </div>
-          <div class="pptNull" v-if="pptNULLVisable"><span class="higet_color_red">(没有可查看数据或暂无权限查看)</span></div>
+          <div class="pptNull" v-if="pptNULLVisable"><span class="higet_color_red">没有可查看数据或暂无权限查看</span></div>
         </div>
 
       </div>
       <template #footer>
         <span class="dialog-footer ">
-          <el-button @click="historyDrawerViewHisVisible = false" class="hzppt_view_close">关闭</el-button>
+          <el-button @click="closeHisView" class="hzppt_view_close">关闭</el-button>
           <!-- <el-button type="primary" @click="historyDrawerViewHisVisible = false">
             确定
           </el-button> -->
+        </span>
+      </template>
+    </el-dialog>
+
+    <!-- 编辑模版和加载模版对话框 -->
+    <el-dialog v-model="templateDrawerVisible" :title="template_type === 1 ? '加载模版' : '编辑模版'" width="98%" height="98%"
+      draggable align-center :before-close="(done: any) => handleBeforeCloseViewHis(done)" :close-on-click-modal="false"
+      :destroy-on-close="true" class="full-dialog" :show-close="false">
+      <div class="HZPPTTemplateAll">
+        <div v-if="!pptTemplateNULLVisable">
+          <!-- 内容区域 -->
+          <div class="HZPPTTemplateHead ">
+            <div :class="template_type === 1 ? 'HZPPTTemplateHead_load' : 'HZPPTTemplateHead_edit'">
+              <el-select filterable v-model="value_template" placeholder="请选择模版"
+                @change="(value: number) => handleTemplateChange(value)" width="100%" class="template_ppt_select">
+                <el-option v-for="item in ppt_template_list" :key="item.id" :label="item.name" :value="item.id">
+                </el-option>
+              </el-select>
+            </div>
+            <div v-if="template_type === 2">
+              <el-button @click="updateTemplateName" type="primary" plain size="default">修改名称</el-button>
+              <el-button size="default" @click="addTemplate_start" type="primary">新增模版</el-button>
+              <el-button type="danger" @click="delTemplate(value_template)" size="default">删除模板</el-button>
+              <!-- <el-button @click="hjTable.get_table_data" size="large">显示数据</el-button> -->
+            </div>
+          </div>
+          <div class="ppt_template_content">
+            <!-- 加载模版 -->
+            <!-- <div v-if="template_type === 1"> -->
+            <AppForTemplate />
+            <!-- </div> -->
+            <!-- 编辑模版 -->
+            <!-- <div v-else>
+              <AppForTemplate />
+            </div> -->
+          </div>
+        </div>
+        <div class="pptNull" v-else><span class="higet_color_red">(没有可查看数据或暂无权限查看)</span></div>
+      </div>
+      <template #footer>
+        <span class="dialog-footer ">
+          <el-button @click="cancelTemplate" class="">关闭</el-button>
+          <el-button v-if="template_type === 1" type="primary" @click="sureTemplate">
+            确定
+          </el-button>
+        </span>
+      </template>
+    </el-dialog>
+
+    <el-dialog v-model="pptTemplateUpdateNameVisable" title="模版名称" width="30%" draggable align-center
+      :before-close="handleBeforeClose" :close-on-click-modal="false" :destroy-on-close="true">
+      <el-form ref="formTemplateRef" :model="verisonNameValidateForm" label-width="100px" class="demo-ruleForm"
+        style="margin-top: 25px;">
+        <el-form-item label="模版名称" prop="verison_name" :rules="[
+          { required: true, message: '请输入模版名称', key: 1, },
+          { type: 'string', message: '最大长度256', max: 256, key: 2 },
+        ]">
+          <el-input v-model="verisonNameValidateForm.verison_name" placeholder="请输入模版名称" clearable />
+        </el-form-item>
+        <el-form-item>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="resetTemlateForm(formTemplateRef)">取消</el-button>
+          <el-button type="primary" @click="submitTemplateForm(formTemplateRef)">确定
+          </el-button>
         </span>
       </template>
     </el-dialog>
@@ -193,7 +260,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, reactive, ComponentOptions, onMounted, SetupContext, onUnmounted } from 'vue'
+import { defineComponent, ref, reactive, ComponentOptions, onMounted, SetupContext, onUnmounted, provide, inject } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useMainStore, useSlidesStore } from '@/store'
 import useScreening from '@/hooks/useScreening'
@@ -203,6 +270,7 @@ import useExport from '@/hooks/useExport'
 // import saveHistory from '../../Editor/histtoryDialog/SaveHistory.vue'
 // import viewHistory from '../../Editor/histtoryDialog/ViewHistory.vue'
 import APP from '@/views/components/App.vue'
+import AppForTemplate from '@/AppForTemplate.vue'
 // import APP from '@/App.vue'
 
 import HotkeyDoc from './HotkeyDoc.vue'
@@ -213,6 +281,7 @@ import http from '@/utils/http'
 import pako from '@/utils/pako/pako.min.js'
 import { arrayBufferToBase64, base64ToArrayBuffer } from '@/utils/handle_data'
 import { IntermediateMode, Message } from '@icon-park/vue-next'
+import { tr } from 'element-plus/es/locale'
 // import { fa } from 'element-plus/es/locale'
 // import { method } from 'lodash'
 export default defineComponent({
@@ -220,7 +289,7 @@ export default defineComponent({
   components: {
     HotkeyDoc,
     APP,
-    // Editor
+    AppForTemplate,
   },
   // props:['dimension_obj_for_index'],
   props: {
@@ -273,8 +342,6 @@ export default defineComponent({
         historyDrawerViewHisVisible.value = true
         // 设置标题
         const my_dimession = props.dimension_obj_for_index
-
-
         if (!my_dimession) {
           ElMessage.error('首页的维度对象没有获取到，请刷新重试！')
           return
@@ -313,18 +380,21 @@ export default defineComponent({
         console.log(localDimensionObj, 'localDimensionObj')
         const data = await http.get('/hz_ppt', { method_: "get_ppt_history_list", ...localDimensionObj })
         if (data && data.status === 200) {
-          pptNULLVisable.value = false
-          version_list.value = data.data.version_list
-          debugger
-          current_version_obj = data.data.current_version_obj
-          // 导入当前页面的数据
-          import_my_data(current_version_obj)
-          // 默认选中样式和填充值
-          hj_ppt_sidebar_his_view_select(current_version_obj.id, current_version_obj.name, true)
-        } else if (data && data.status === 404) {
-          // 空
-          // show_ppt.value =false
-          pptNULLVisable.value = true
+          if (data.version_list && data.version_list.lenth > 0) {
+            pptNULLVisable.value = false
+            version_list.value = data.data.version_list
+            debugger
+            current_version_obj = data.data.current_version_obj
+            // 导入当前页面的数据
+            import_my_data(current_version_obj)
+            // 默认选中样式和填充值
+            hj_ppt_sidebar_his_view_select(current_version_obj.id, current_version_obj.name, true)
+          } else {
+            // 空
+            // show_ppt.value =false
+            pptNULLVisable.value = true
+          }
+
         } else {
           ElMessage.error(data ? data.msg ? data.msg : '获取失败请刷新重试' : '获取失败请刷新重试')
         }
@@ -334,6 +404,7 @@ export default defineComponent({
     }
     // 保存历史版本模块
     const formRef = ref<FormInstance>()
+
 
     const verisonNameValidateForm = reactive({
       verison_name: '',
@@ -391,15 +462,13 @@ export default defineComponent({
       historyDrawerVisible.value = false
     }
     const handleBeforeClose = function (done: any) {
-      // 
-      // if (!formEl) return
-      // formEl.resetFields()
       done()
       historyDrawerVisible.value = false
     }
 
     // 查看历史版本模块
     const handleBeforeCloseViewHis = function (done: any) {
+      flush_index()
       done()
       historyDrawerViewHisVisible.value = false
     }
@@ -561,6 +630,261 @@ export default defineComponent({
       //   // ref.select1.$el.style.width = '212px'
       //   select2.value.$el.style.width = '120px'
     })
+    // 模版模块
+    const pptTemplateNULLVisable = ref<boolean>(false)
+    const ppt_template_list = ref([])
+    const templateDrawerVisible = ref<boolean>(false)
+    const template_type = ref<number>(null)
+    const value_template = ref<number>(null) //标记当前模版选择了那个id
+    const value_template_name = ref<string>('') //标记当前模版选择了那个名称
+    const pptTemplateUpdateNameVisable = ref<boolean>(false)
+    // const get_ppt_template_list = async () => {
+    const get_ppt_template_list = () => {
+      // 获取模版列表
+      try {
+        const data = { "status": 200, "msg": "ok", "data": { "template_list": [{ "id": 3, "name": "无模版时自动创建2023-07-21 14:06:43", "create_time": "2023-07-21 14:06:43", "hiwin_creator": "李海", "doc": "H4sIAAAAAAAAA9VWW2sbRxT+K8v0wS+rzVz3VtfQugRTatd20oTG+GEtjawl693t7tiSG/xSAiENeTOlD4GGYKhfStungFvIr5GU/ouekfbmRKpsggsdzWh2z5yZPd+5zs4jFHaQj5TMVSuPwo5sEWQiGckDGasc+TuPkDpOJbDkvQBmc8rP23vbgxTeItlVyMcmUkmKfIrhqR92VA/5gtsm6slwvwcMzKaWMNFRKPufJQM4VnPC2DVRGmhutG5g+H0JA8gw6389HsBHumEUActHYs/b64gJYSA724EKE+R3gyiXJkrSoB2qY5DFckyUJSpQIDU+MWcDSJKHa1n3PQC1+ExDqcSn+EaF70Zheg/5KjuUs2VXcqBK0cNO7KwPKtGZEIXwtrCoqPXvihoAEdxiHrb1ehTGcq2kW9RE7SRWYG04ejldWc5VlsT7MKdBbOTqOJKfLHWBo5WH30nfMAih6WBpZfTH09Hz15ubd5dvac4VmIqNt9IV1EBhoo7sBoeRug2HbAQHGs562M6SPOkq45sAREQVz2oSJZnWFmMMzcHv5Org3uYM/FSwuQoQ9ns45+CjXMMbvjgfX7wZ/XU6PrsY/fhkfP5meHE6Pj2v0N4ASG2YEuTtOH2Q8xqkTUqQzDVRroIMqDvY1E4oY9ixI7g3eUuTcBq5CHajXQ27+FzlgRPUOiISiHhUKYyeAPde0H64nyWH+sw6dArG6qjupKETLf27CYTOSSBNG6ZqI/76iwoe4aUNCXcreRxCagM6jiU85izy39Ki+mOtIAr3Y99ow6LMPl5a6NvcLUw/+vVsePZ49PrP4Q8vRy+f/P3qp//cyw+21462NioNUQz4caOx0h+4Z7mcCq/oNr9aACxQ1GwFVbHRVNDw6W/v6OiGY8NZ3fq8365jgzILew0NOHWoWKzZ+OzIYZAcXXC8qn9gHPF5RQd7/W/v9yvBW9Sx7MZniQ7tieScUcthDZGc6nCChW1Rz646a2R5qLKNFegLqxbFxqrBsdGCYU86wQWVFGQypU9rWlHciFty0IJDP5NqpVgo6FPqtDxeuSbWZfA6WWl2SmJXudMc3enJ1UZOcpkliFv3MkM5AiKx9jdWmcbGwmpuaGQveLu8tNgypaqb94nyhnF9Hc7xyPW0f+TUdwlKyCXfom51sSOWi0XdnP8D6su3wjmJ9v7WV3c/ra+yDHPLww6veml2z7UIbqChdbwT53LYNTTA8YfWp4l3+0ZRcv8lObt4ci97/PPb31+9/eX78YtnddG6odoFKkiyzh1QMuwR1w3U3X8AWckOV34MAAA=" }], "current_template_obj": { "id": 3, "name": "无模版时自动创建2023-07-21 14:06:43", "create_time": "2023-07-21 14:06:43", "hiwin_creator": "李海", "doc": "H4sIAAAAAAAAA9VWW2sbRxT+K8v0wS+rzVz3VtfQugRTatd20oTG+GEtjawl693t7tiSG/xSAiENeTOlD4GGYKhfStungFvIr5GU/ouekfbmRKpsggsdzWh2z5yZPd+5zs4jFHaQj5TMVSuPwo5sEWQiGckDGasc+TuPkDpOJbDkvQBmc8rP23vbgxTeItlVyMcmUkmKfIrhqR92VA/5gtsm6slwvwcMzKaWMNFRKPufJQM4VnPC2DVRGmhutG5g+H0JA8gw6389HsBHumEUActHYs/b64gJYSA724EKE+R3gyiXJkrSoB2qY5DFckyUJSpQIDU+MWcDSJKHa1n3PQC1+ExDqcSn+EaF70Zheg/5KjuUs2VXcqBK0cNO7KwPKtGZEIXwtrCoqPXvihoAEdxiHrb1ehTGcq2kW9RE7SRWYG04ejldWc5VlsT7MKdBbOTqOJKfLHWBo5WH30nfMAih6WBpZfTH09Hz15ubd5dvac4VmIqNt9IV1EBhoo7sBoeRug2HbAQHGs562M6SPOkq45sAREQVz2oSJZnWFmMMzcHv5Org3uYM/FSwuQoQ9ns45+CjXMMbvjgfX7wZ/XU6PrsY/fhkfP5meHE6Pj2v0N4ASG2YEuTtOH2Q8xqkTUqQzDVRroIMqDvY1E4oY9ixI7g3eUuTcBq5CHajXQ27+FzlgRPUOiISiHhUKYyeAPde0H64nyWH+sw6dArG6qjupKETLf27CYTOSSBNG6ZqI/76iwoe4aUNCXcreRxCagM6jiU85izy39Ki+mOtIAr3Y99ow6LMPl5a6NvcLUw/+vVsePZ49PrP4Q8vRy+f/P3qp//cyw+21462NioNUQz4caOx0h+4Z7mcCq/oNr9aACxQ1GwFVbHRVNDw6W/v6OiGY8NZ3fq8365jgzILew0NOHWoWKzZ+OzIYZAcXXC8qn9gHPF5RQd7/W/v9yvBW9Sx7MZniQ7tieScUcthDZGc6nCChW1Rz646a2R5qLKNFegLqxbFxqrBsdGCYU86wQWVFGQypU9rWlHciFty0IJDP5NqpVgo6FPqtDxeuSbWZfA6WWl2SmJXudMc3enJ1UZOcpkliFv3MkM5AiKx9jdWmcbGwmpuaGQveLu8tNgypaqb94nyhnF9Hc7xyPW0f+TUdwlKyCXfom51sSOWi0XdnP8D6su3wjmJ9v7WV3c/ra+yDHPLww6veml2z7UIbqChdbwT53LYNTTA8YfWp4l3+0ZRcv8lObt4ci97/PPb31+9/eX78YtnddG6odoFKkiyzh1QMuwR1w3U3X8AWckOV34MAAA=" } } }
+        // const data = await http.get('/hz_ppt', { method_: "get_ppt_template_list" })
+        if (data && data.status === 200) {
+          if (data.data && data.data.template_list.length > 0) {
+            pptTemplateNULLVisable.value = false
+            ppt_template_list.value = data.data.template_list
+            // 选中第一个
+            value_template.value = data.data.template_list[0].id
+            // 导入当前的ppt doc
+            import_my_data(data.data.current_template_obj)
+          } else {
+            // ppt 是空的
+            pptTemplateNULLVisable.value = true
+          }
+        }
+        else {
+          ElMessage.error(data ? data.msg ? data.msg : '获取模版列表失败，请刷新重试' : '获取模版列表失败，请刷新重试')
+        }
+      } catch (error) {
+        ElMessage.error('获取模版列表失败，请刷新重试')
+      }
+    }
+    const openTemplate = (index: number) => {
+      if (index === 1) {
+        // 设置标题
+        // 加载模版
+        templateDrawerVisible.value = true
+        template_type.value = 1
+        // const my_dimession = props.dimension_obj_for_index
+        // if (!my_dimession) {
+        //   ElMessage.error('首页的维度对象没有获取到，请刷新重试！')
+        //   return
+        // }
+        get_ppt_template_list()
+        // his_title.value = (my_dimession.title ? my_dimession.title : '无') + ' 历史版本  ' + '(' + (my_dimession.select_pk_name ? my_dimession.select_pk_name : '空维度') + ' ' + (my_dimession.year ? my_dimession.year : '无年份') + ')'
+      } else if (index === 2) {
+        // 编辑模版
+        templateDrawerVisible.value = true
+        template_type.value = 2
+        get_ppt_template_list()
+      }
+    }
+    const TemplateNameValidateForm = reactive({
+      template_name: '',
+    })
+    const handle_templat_button_type = ref<number>(1) // 1默认为修改名称  2 为 新增模版
+    const handleTemplateChange = async (id: number) => {
+      if (template_type.value === 1) {
+        // 加载模版
+        try {
+          const data = await http.get('/hz_ppt', { method_: "get_ppt_template_by_id", id: id })
+          if (data && data.status === 200) {
+            if (data.data && data.template_list > 0) {
+              pptTemplateNULLVisable.value = false
+              ppt_template_list.value = data.template_list
+              // 导入当前的ppt doc
+              import_my_data(data.current_template_obj)
+            } else {
+              // ppt 是空的
+              pptTemplateNULLVisable.value = true
+            }
+          }
+          else {
+            ElMessage.error(data ? data.msg ? data.msg : '获取模版失败，请刷新重试' : '获取模版失败，请刷新重试')
+          }
+        } catch (error) {
+          ElMessage.error('获取模版失败，请刷新重试')
+        }
+      }
+      else {
+        // 编辑模版
+        try {
+          const data = await http.get('/hz_ppt', { method_: "get_ppt_template_by_id", id: id })
+          if (data && data.status === 200) {
+            if (data.data && data.template_list > 0) {
+              pptTemplateNULLVisable.value = false
+              ppt_template_list.value = data.template_list
+              // 导入当前的ppt doc
+              import_my_data(data.current_template_obj)
+            } else {
+              // ppt 是空的
+              pptTemplateNULLVisable.value = true
+            }
+          }
+          else {
+            ElMessage.error(data ? data.msg ? data.msg : '获取模版列表失败请刷新重试' : '获取模版列表失败请刷新重试')
+          }
+        } catch (error) {
+          ElMessage.error('获取模版列表失败请刷新重试')
+        }
+      }
+    }
+
+    const updateTemplateName = () => {
+      // 对话框
+      for (const item of ppt_template_list.value) {
+        if (Number(item.id) === value_template.value) {
+          value_template_name.value = item.name
+          // 打开对话框
+          verisonNameValidateForm.verison_name = value_template_name.value
+          pptTemplateUpdateNameVisable.value = true
+          break
+        }
+      }
+      console.log('更新模版名称')
+    }
+
+    const addTemplate_start = () => {
+      handle_templat_button_type.value = 2
+      pptTemplateUpdateNameVisable.value = true
+    }
+
+    const addTemplate = async () => {
+      // 对话框
+      try {
+        const data = await http.post('/hz_ppt', { method_: "insert_or_update_ppt_template", handle_type: 1, name: verisonNameValidateForm.verison_name })
+        if (data && data.status === 200) {
+          ElMessage.success('新增成功！')
+        }
+        else {
+          ElMessage.error(data.msg ? data.msg : '新增模版失败,请刷新重试！')
+        }
+        // console.log('新增模版名称')
+      } catch (error) {
+        ElMessage.error('新增模版失败,请刷新重试!')
+      }
+    }
+
+    const delTemplate = async (id: number) => {
+      try {
+        const data = await http.post('/hz_ppt', { method_: "delete_ppt_template_by_id", id: value_template.value })
+        if (data && data.status === 200) {
+          ElMessage.success('删除成功！')
+        }
+        else {
+          ElMessage.error(data.msg ? data.msg : '删除失败,请刷新重试！')
+        }
+      } catch (e) {
+        ElMessage.error('删除失败,请刷新重试！')
+      }
+      // console.log('删除模版名称')
+    }
+
+    const submitTemplateForm = (formEl: FormInstance | undefined) => {
+      if (!formEl) return
+      formEl.validate(async (valid) => {
+        if (valid) {
+          if (handle_templat_button_type.value === 1) {
+            try {
+              const data = await http.post('/hz_ppt', { method_: "insert_or_update_ppt_template", id: value_template.value, name: verisonNameValidateForm.verison_name, handle_type: 2, })
+              if (data && data.status === 200) {
+                ElMessage.success('保存成功！')
+                formEl.resetFields()
+                pptTemplateUpdateNameVisable.value = false
+                get_ppt_template_list()
+              }
+              else {
+                ElMessage.error(data.msg ? data.msg : '保存失败请刷新重试！')
+              }
+            } catch (e) {
+              ElMessage.error('保存失败请刷新重试！')
+            }
+          }
+          else if (handle_templat_button_type.value === 2) {
+            // 新增模版
+            try {
+              const data = await http.post('/hz_ppt', { method_: "insert_or_update_ppt_template", id: value_template.value, name: verisonNameValidateForm.verison_name, handle_type: 1, })
+              if (data && data.status === 200) {
+                ElMessage.success('新增模版成功！')
+                formEl.resetFields()
+                pptTemplateUpdateNameVisable.value = false
+                get_ppt_template_list()
+              }
+              else {
+                ElMessage.error(data.msg ? data.msg : '新增失败，请刷新重试！')
+              }
+            } catch (e) {
+              ElMessage.error('新增失败，请刷新重试！')
+            }
+          }
+        } else {
+          return false
+        }
+      })
+    }
+    const formTemplateRef = ref<FormInstance>()
+
+    const resetTemlateForm = (formEl: FormInstance | undefined) => {
+      if (!formEl) return
+      formEl.resetFields()
+      pptTemplateUpdateNameVisable.value = false
+    }
+    const data_for_template = reactive(
+      {
+        id: value_template,
+        type: template_type
+      }
+    )
+    provide('data_for_template', data_for_template)
+    const cancelTemplate = () => {
+      flush_index()
+      templateDrawerVisible.value = false
+    }
+    const sureTemplate = async () => {
+      // 加载模版的确定按钮
+      try {
+        const localDimensionObj = reactive({
+          ...props.dimension_obj_for_index
+        })
+        console.log(props.dimension_obj_for_index, 'localDimensionObj')
+        localDimensionObj.bupl_id = localDimensionObj.bupl_id || 0
+        localDimensionObj.spfd_id = localDimensionObj.spfd_id || 0
+        localDimensionObj.d_id = localDimensionObj.d_id || 0
+        const data = await http.post('/hz_ppt', { method_: "sure_ppt_template_by_id", id: value_template.value, ...localDimensionObj })
+        if (data && data.status === 200) {
+          ElMessage.success('确定加载模版成功！')
+          templateDrawerVisible.value = false
+          flush_index()
+        }
+        else {
+          ElMessage.error(data.msg ? data.msg : '确定加载模版失败，请刷新重试！')
+        }
+      } catch (e) {
+        ElMessage.error('新增失确定加载模版失败，请刷新重试！')
+      }
+    }
+    // const get_hz_ppt_by_dimension_and_year = inject('get_hz_ppt_by_dimension_and_year')
+    const get_hz_ppt_by_dimension_and_year: (localDimensionObj, year) => any = inject('get_hz_ppt_by_dimension_and_year') // 接受
+    const closeHisView = () => {
+      historyDrawerViewHisVisible.value = false
+      flush_index()
+    }
+    const flush_index = () => {
+      const localDimensionObj = reactive({
+        ...props.dimension_obj_for_index
+      })
+      console.log(props.dimension_obj_for_index, 'localDimensionObj')
+      localDimensionObj.bupl_id = localDimensionObj.bupl_id || 0
+      localDimensionObj.spfd_id = localDimensionObj.spfd_id || 0
+      localDimensionObj.d_id = localDimensionObj.d_id || 0
+      get_hz_ppt_by_dimension_and_year(localDimensionObj, localDimensionObj.year)
+    }
+    provide('flush_index', flush_index)
     return {
       redo,
       undo,
@@ -595,7 +919,28 @@ export default defineComponent({
       openDialog,
       handleSaveData,
       his_title,
-      // deleteItem,
+      templateDrawerVisible,
+      template_type,
+      openTemplate,
+      pptTemplateNULLVisable,
+      ppt_template_list,
+      value_template,
+      handleTemplateChange,
+      updateTemplateName,
+      addTemplate,
+      delTemplate,
+      value_template_name,
+      TemplateNameValidateForm,
+      pptTemplateUpdateNameVisable,
+      resetTemlateForm,
+      submitTemplateForm,
+      formTemplateRef,
+      addTemplate_start,
+      handle_templat_button_type,
+      data_for_template,
+      sureTemplate,
+      cancelTemplate,
+      closeHisView,
     }
   },
 })
@@ -672,15 +1017,15 @@ export default defineComponent({
 }
 
 //  矫正一下样式不对的问题
-.slide-content[data-v-2ee3d44c] {
-  background-color: #fff;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.slide-content {
+  // background-color: #fff;
+  // position: absolute;
+  // top: 50%;
+  // left: 50%;
+  // transform: translate(-50%, -50%);
+  // display: flex;
+  // justify-content: center;
+  // align-items: center;
 
   width: 100% !important;
   height: 100% !important;
@@ -709,5 +1054,31 @@ export default defineComponent({
 
 .hzppt_view_close {
   margin-top: 11px;
+}
+
+.full-dialog .el-dialog__wrapper {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.full-dialog .el-dialog {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+// .template_ppt_select {
+//   // width: 48% !important;
+//   width: 320px;
+//   position: absolute;
+//   height: 40px !important;
+//   line-height: 40px !important;
+// }
+// .select-trigger
+.el-select {
+  // width: 212px;
+  width: 320px !important;
+  position: absolute;
+  height: 40px !important;
+  line-height: 40px !important;
 }
 </style>
