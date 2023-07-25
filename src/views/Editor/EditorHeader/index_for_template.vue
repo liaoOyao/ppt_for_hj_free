@@ -18,7 +18,7 @@
           </Menu>
         </template>
       </Dropdown>
-      <Dropdown :trigger="['click']">
+      <Dropdown v-if="data_for_template.type === 2" :trigger="['click']">
         <div class="menu-item">
           <IconEdit /> <span class="text">编辑</span>
         </div>

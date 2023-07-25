@@ -2,10 +2,12 @@
   <div 
     class="screen-slide"
     :style="{
-      // width: VIEWPORT_SIZE + 'px',
-      // height: VIEWPORT_SIZE * viewportRatio + 'px',
-      // transform: `scale(${scale})`,
-      transform: `scale(1)`,
+      width: VIEWPORT_SIZE + 'px',
+      height: VIEWPORT_SIZE * viewportRatio + 'px',
+      // height: '100%',
+      // height: '100vh',
+      transform: `scale(${scale})`,
+      // transform: `scale(1)`,
       overflow: 'auto',
     }"
   >
@@ -80,7 +82,8 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .screen-slide {
-  position: absolute;
+  // position: absolute;
+  position: relative;
   top: 0;
   left: 0;
   transform-origin: 0 0;
@@ -90,6 +93,6 @@ export default defineComponent({
   width: 100%;
   height: 100%;
   background-position: center;
-  position: absolute;
+  position: relative;
 }
 </style>

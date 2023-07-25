@@ -149,14 +149,6 @@ export default defineComponent({
   }
 }
 .slide-content {
-  background-color: #fff;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  display: flex;
-  justify-content: center;
-  align-items: center;
   width: 100% !important;
   height: 100% !important;
 }

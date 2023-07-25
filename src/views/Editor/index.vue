@@ -54,9 +54,9 @@
       </div>
     </div>
     <div class="hj_all_ppt" id='hj_all_ppt_id'>
-      <div class="hj_slider" @click="adjustWidth">
+      <div class="hj_slider" @click="adjustWidth(1)">
         <div class="hj_right_adjust_icon_father">
-          <div class="hj_right_adjust_icon" @click="adjustWidth"></div>
+          <div class="hj_right_adjust_icon" @click.stop="adjustWidth(2)"></div>
         </div>
         <!-- 公司： {{ company_array }} 侧边栏部分 -->
         <div v-if="dep_array && dep_array.length > 0" class="hj_sidebar_category_ppt">
@@ -891,17 +891,47 @@ export default defineComponent({
     provide('get_hz_ppt_by_dimension_and_year', get_hz_ppt_by_dimension_and_year)
     const hjSlider = ref(null)
     const pptistEditor = ref(null)
-
-    const adjustWidth = () => {
+    // const isSliderSmall = ref( false) // 用于判断 hj_slider 是否变小
+    // const adjustWidth = () => {
+    //   const computedWidth = window.getComputedStyle(hjSlider.value).width
+    //   if (computedWidth === '0px' || computedWidth === '10px') {
+    //     hjSlider.value.classList.remove('shrink')
+    //     pptistEditor.value.classList.remove('expand')
+    //   } else {
+    //     hjSlider.value.classList.add('shrink')
+    //     pptistEditor.value.classList.add('expand')
+    //   }
+    // }
+    const isSliderSmall = ref(false) // 用于判断 hj_slider 是否变小
+    const adjustWidth = (source_type: number) => {
+      if (source_type === 1 && !isSliderSmall.value) {
+        // 是hj_slider 触发   并且 hj_slider 没变小 
+        return
+      }
       const computedWidth = window.getComputedStyle(hjSlider.value).width
       if (computedWidth === '0px' || computedWidth === '10px') {
         hjSlider.value.classList.remove('shrink')
         pptistEditor.value.classList.remove('expand')
+        isSliderSmall.value = false
       } else {
         hjSlider.value.classList.add('shrink')
         pptistEditor.value.classList.add('expand')
+        isSliderSmall.value = true
+      }
+
+      // 当 hj_slider 变小以后，不再阻止 hj_slider 的点击事件
+      if (isSliderSmall.value) {
+        sliderClicked()
       }
     }
+
+    const sliderClicked = () => {
+      // 当 hj_slider 变小以后，hj_slider 的点击事件可以生效
+      if (isSliderSmall.value) {
+        // 执行你的逻辑
+      }
+    }
+
     return {
       remarkHeight,
       dialogForExport,
@@ -1029,10 +1059,17 @@ export default defineComponent({
   height: 38px;
 }
 
-.hz_ppt_year_select {
+/* .hz_ppt_year_select {
   position: "absolute";
   width: 120px !important;
   max-width: 120px !important;
+} */
+
+.hz_ppt_year_select {
+  width: 120px !important;
+  position: absolute;
+  height: 40px !important;
+  line-height: 40px !important;
 }
 
 /* .hz_ppt_year_select .el-select-dropdown {

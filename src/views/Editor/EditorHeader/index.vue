@@ -194,7 +194,7 @@
       draggable align-center :before-close="(done: any) => handleBeforeCloseViewHis(done)" :close-on-click-modal="false"
       :destroy-on-close="true" class="full-dialog" :show-close="false">
       <div class="HZPPTTemplateAll">
-        <div v-if="!pptTemplateNULLVisable">
+        <div>
           <!-- 内容区域 -->
           <div class="HZPPTTemplateHead ">
             <div :class="template_type === 1 ? 'HZPPTTemplateHead_load' : 'HZPPTTemplateHead_edit'">
@@ -207,11 +207,11 @@
             <div v-if="template_type === 2">
               <el-button @click="updateTemplateName" type="primary" plain size="default">修改名称</el-button>
               <el-button size="default" @click="addTemplate_start" type="primary">新增模版</el-button>
-              <el-button type="danger" @click="delTemplate(value_template)" size="default">删除模板</el-button>
+              <el-button type="danger" @click="delTemplateDialog(value_template)" size="default">删除模板</el-button>
               <!-- <el-button @click="hjTable.get_table_data" size="large">显示数据</el-button> -->
             </div>
           </div>
-          <div class="ppt_template_content">
+          <div class="ppt_template_content" v-if="!pptTemplateNULLVisable">
             <!-- 加载模版 -->
             <!-- <div v-if="template_type === 1"> -->
             <AppForTemplate />
@@ -222,7 +222,7 @@
             </div> -->
           </div>
         </div>
-        <div class="pptNull" v-else><span class="higet_color_red">(没有可查看数据或暂无权限查看)</span></div>
+        <div class="pptNull" v-if="pptTemplateNULLVisable"><span class="higet_color_red">(没有可查看数据或暂无权限查看)</span></div>
       </div>
       <template #footer>
         <span class="dialog-footer ">
@@ -234,8 +234,9 @@
       </template>
     </el-dialog>
 
-    <el-dialog v-model="pptTemplateUpdateNameVisable" title="模版名称" width="30%" draggable align-center
-      :before-close="handleBeforeClose" :close-on-click-modal="false" :destroy-on-close="true">
+    <el-dialog v-model="pptTemplateUpdateNameVisable" :title="handle_templat_button_type === 1 ? '修改模版名称' : '新增模版'"
+      width="30%" draggable align-center :before-close="handleBeforeClose" :close-on-click-modal="false"
+      :destroy-on-close="true">
       <el-form ref="formTemplateRef" :model="verisonNameValidateForm" label-width="100px" class="demo-ruleForm"
         style="margin-top: 25px;">
         <el-form-item label="模版名称" prop="verison_name" :rules="[
@@ -280,7 +281,6 @@ import http from '@/utils/http'
 // import { fa } from 'element-plus/es/locale'
 import pako from '@/utils/pako/pako.min.js'
 import { arrayBufferToBase64, base64ToArrayBuffer } from '@/utils/handle_data'
-import { IntermediateMode, Message } from '@icon-park/vue-next'
 import { tr } from 'element-plus/es/locale'
 // import { fa } from 'element-plus/es/locale'
 // import { method } from 'lodash'
@@ -352,23 +352,36 @@ export default defineComponent({
         get_ppt_history_list()
       }
     }
+
     const { importSpecificData } = useExport()
     const import_my_data = (current_version_obj_temp: any) => {
-      const base64_data = current_version_obj_temp.doc
-      const arrayBuffer = base64ToArrayBuffer(base64_data)
-      // 使用pako进行解压
-      const decompressedData = pako.inflate(arrayBuffer, { to: 'string' })
-      // 将解压后的数据转换回JSON对象
-      const data = JSON.parse(decompressedData)
-      importSpecificData(data)
+      try {
+        if (current_version_obj_temp) {
+          const base64_data = current_version_obj_temp.doc
+          const arrayBuffer = base64ToArrayBuffer(base64_data)
+          // 使用pako进行解压
+          const decompressedData = pako.inflate(arrayBuffer, { to: 'string' })
+          // 将解压后的数据转换回JSON对象
+          const data = JSON.parse(decompressedData)
+          importSpecificData(data)
+          if (current_version_obj_temp && current_version_obj_temp.theme) {
+            try {
+              slidesStore.setTheme(current_version_obj_temp.theme)
+            } catch (error) {
+            }
+          }
+        }
+        else {
+          ElMessage.error('没有获取到ppt数据，请刷新重试！')
+        }
+      } catch (error) {
+        ElMessage.error('加载ppt数据出错，请联系管理员')
+      }
     }
     const his_title = ref<string>('')
     const get_ppt_history_list = async () => {
       // const get_ppt_history_list = () => {
       // 获取ppt历史记录
-      pptNULLVisable.value = true
-      const data = { "status": 200, "msg": "ok", "data": { "version_list": [{ "id": 66, "name": "123-8", "create_time": "2023-07-20 10:09:28", "hiwin_creator": "李海" }, { "id": 64, "name": "123-7", "create_time": "2023-07-20 10:09:24", "hiwin_creator": "李海" }, { "id": 62, "name": "123-6", "create_time": "2023-07-20 10:09:19", "hiwin_creator": "李海" }, { "id": 60, "name": "123-5", "create_time": "2023-07-20 10:09:15", "hiwin_creator": "李海" }, { "id": 58, "name": "123-4", "create_time": "2023-07-20 10:09:11", "hiwin_creator": "李海" }, { "id": 56, "name": "123-3", "create_time": "2023-07-20 10:09:07", "hiwin_creator": "李海" }, { "id": 54, "name": "123-2", "create_time": "2023-07-20 10:09:03", "hiwin_creator": "李海" }, { "id": 52, "name": "123-1", "create_time": "2023-07-20 10:08:58", "hiwin_creator": "李海" }, { "id": 51, "name": "123", "create_time": "2023-07-20 10:07:47", "hiwin_creator": "李海" }, { "id": 50, "name": "123", "create_time": "2023-07-20 10:07:45", "hiwin_creator": "李海" }], "current_version_obj": { "id": 66, "name": "123-8", "doc": "H4sIAAAAAAAAA9VWW2sbRxT+K8v0wS+rzVz3VtfQugRTatd20oTG+GEtjawl693t7tiSG/xSAiENeTOlD4GGYKhfStungFvIr5GU/ouekfbmRKpsggsdzWh2z5yZPd+5zs4jFHaQj5TMVSuPwo5sEWQiGckDGasc+TuPkDpOJbDkvQBmc8rP23vbgxTeItlVyMcmUkmKfIrhqR92VA/5gtsm6slwvwcMzKaWMNFRKPufJQM4VnPC2DVRGmhutG5g+H0JA8gw6389HsBHumEUActHYs/b64gJYSA724EKE+R3gyiXJkrSoB2qY5DFckyUJSpQIDU+MWcDSJKHa1n3PQC1+ExDqcSn+EaF70Zheg/5KjuUs2VXcqBK0cNO7KwPKtGZEIXwtrCoqPXvihoAEdxiHrb1ehTGcq2kW9RE7SRWYG04ejldWc5VlsT7MKdBbOTqOJKfLHWBo5WH30nfMAih6WBpZfTH09Hz15ubd5dvac4VmIqNt9IV1EBhoo7sBoeRug2HbAQHGs562M6SPOkq45sAREQVz2oSJZnWFmMMzcHv5Org3uYM/FSwuQoQ9ns45+CjXMMbvjgfX7wZ/XU6PrsY/fhkfP5meHE6Pj2v0N4ASG2YEuTtOH2Q8xqkTUqQzDVRroIMqDvY1E4oY9ixI7g3eUuTcBq5CHajXQ27+FzlgRPUOiISiHhUKYyeAPde0H64nyWH+sw6dArG6qjupKETLf27CYTOSSBNG6ZqI/76iwoe4aUNCXcreRxCagM6jiU85izy39Ki+mOtIAr3Y99ow6LMPl5a6NvcLUw/+vVsePZ49PrP4Q8vRy+f/P3qp//cyw+21462NioNUQz4caOx0h+4Z7mcCq/oNr9aACxQ1GwFVbHRVNDw6W/v6OiGY8NZ3fq8365jgzILew0NOHWoWKzZ+OzIYZAcXXC8qn9gHPF5RQd7/W/v9yvBW9Sx7MZniQ7tieScUcthDZGc6nCChW1Rz646a2R5qLKNFegLqxbFxqrBsdGCYU86wQWVFGQypU9rWlHciFty0IJDP5NqpVgo6FPqtDxeuSbWZfA6WWl2SmJXudMc3enJ1UZOcpkliFv3MkM5AiKx9jdWmcbGwmpuaGQveLu8tNgypaqb94nyhnF9Hc7xyPW0f+TUdwlKyCXfom51sSOWi0XdnP8D6su3wjmJ9v7WV3c/ra+yDHPLww6veml2z7UIbqChdbwT53LYNTTA8YfWp4l3+0ZRcv8lObt4ci97/PPb31+9/eX78YtnddG6odoFKkiyzh1QMuwR1w3U3X8AWckOV34MAAA=", "create_time": "2023-07-20 10:09:28", "hiwin_creator": "李海" } } }
-      // const data = { "status": 200, "msg": "ok", "data": { "version_list": [{ "id": 66, "name": "123-8", "create_time": "2023-07-20T10:09:28.707", "hiwin_creator": "李海" }, { "id": 64, "name": "123-7", "create_time": "2023-07-20T10:09:24.027", "hiwin_creator": "李海" }, { "id": 62, "name": "123-6", "create_time": "2023-07-20T10:09:19.153", "hiwin_creator": "李海" }, { "id": 60, "name": "123-5", "create_time": "2023-07-20T10:09:15.276", "hiwin_creator": "李海" }, { "id": 58, "name": "123-4", "create_time": "2023-07-20T10:09:11.971", "hiwin_creator": "李海" }, { "id": 56, "name": "123-3", "create_time": "2023-07-20T10:09:07.667", "hiwin_creator": "李海" }, { "id": 54, "name": "123-2", "create_time": "2023-07-20T10:09:03.031", "hiwin_creator": "李海" }, { "id": 52, "name": "123-1", "create_time": "2023-07-20T10:08:58.225", "hiwin_creator": "李海" }, { "id": 51, "name": "123", "create_time": "2023-07-20T10:07:47.011", "hiwin_creator": "李海" }, { "id": 50, "name": "123", "create_time": "2023-07-20T10:07:45.346", "hiwin_creator": "李海" }], "current_version_obj": { "id": 66, "name": "123-8", "doc": "H4sIAAAAAAAAA9VWW2sbRxT+K8v0wS+rzVz3VtfQugRTatd20oTG+GEtjawl693t7tiSG/xSAiENeTOlD4GGYKhfStungFvIr5GU/ouekfbmRKpsggsdzWh2z5yZPd+5zs4jFHaQj5TMVSuPwo5sEWQiGckDGasc+TuPkDpOJbDkvQBmc8rP23vbgxTeItlVyMcmUkmKfIrhqR92VA/5gtsm6slwvwcMzKaWMNFRKPufJQM4VnPC2DVRGmhutG5g+H0JA8gw6389HsBHumEUActHYs/b64gJYSA724EKE+R3gyiXJkrSoB2qY5DFckyUJSpQIDU+MWcDSJKHa1n3PQC1+ExDqcSn+EaF70Zheg/5KjuUs2VXcqBK0cNO7KwPKtGZEIXwtrCoqPXvihoAEdxiHrb1ehTGcq2kW9RE7SRWYG04ejldWc5VlsT7MKdBbOTqOJKfLHWBo5WH30nfMAih6WBpZfTH09Hz15ubd5dvac4VmIqNt9IV1EBhoo7sBoeRug2HbAQHGs562M6SPOkq45sAREQVz2oSJZnWFmMMzcHv5Org3uYM/FSwuQoQ9ns45+CjXMMbvjgfX7wZ/XU6PrsY/fhkfP5meHE6Pj2v0N4ASG2YEuTtOH2Q8xqkTUqQzDVRroIMqDvY1E4oY9ixI7g3eUuTcBq5CHajXQ27+FzlgRPUOiISiHhUKYyeAPde0H64nyWH+sw6dArG6qjupKETLf27CYTOSSBNG6ZqI/76iwoe4aUNCXcreRxCagM6jiU85izy39Ki+mOtIAr3Y99ow6LMPl5a6NvcLUw/+vVsePZ49PrP4Q8vRy+f/P3qp//cyw+21462NioNUQz4caOx0h+4Z7mcCq/oNr9aACxQ1GwFVbHRVNDw6W/v6OiGY8NZ3fq8365jgzILew0NOHWoWKzZ+OzIYZAcXXC8qn9gHPF5RQd7/W/v9yvBW9Sx7MZniQ7tieScUcthDZGc6nCChW1Rz646a2R5qLKNFegLqxbFxqrBsdGCYU86wQWVFGQypU9rWlHciFty0IJDP5NqpVgo6FPqtDxeuSbWZfA6WWl2SmJXudMc3enJ1UZOcpkliFv3MkM5AiKx9jdWmcbGwmpuaGQveLu8tNgypaqb94nyhnF9Hc7xyPW0f+TUdwlKyCXfom51sSOWi0XdnP8D6su3wjmJ9v7WV3c/ra+yDHPLww6veml2z7UIbqChdbwT53LYNTTA8YfWp4l3+0ZRcv8lObt4ci97/PPb31+9/eX78YtnddG6odoFKkiyzh1QMuwR1w3U3X8AWckOV34MAAA=", "create_time": "2023-07-20T10:09:28.707", "hiwin_creator": "李海" } } }
       try {
         const localDimensionObj = reactive({
           ...props.dimension_obj_for_index
@@ -378,28 +391,28 @@ export default defineComponent({
         localDimensionObj.spfd_id = localDimensionObj.spfd_id || 0
         localDimensionObj.d_id = localDimensionObj.d_id || 0
         console.log(localDimensionObj, 'localDimensionObj')
+        // const data = { "status": 200, "msg": "ok", "data": { "version_list": [{ "id": 105, "name": "加载模版时时自动生成2023-07-24 18:53", "create_time": "2023-07-24 18:50:41", "hiwin_creator": "李海" }, { "id": 104, "name": "加载模版时时自动生成2023-07-24 18:50", "create_time": "2023-07-24 18:50:22", "hiwin_creator": "李海" }, { "id": 103, "name": "加载模版时时自动生成2023-07-24 18:50", "create_time": "2023-07-24 18:48:32", "hiwin_creator": "李海" }, { "id": 102, "name": "加载模版时时自动生成2023-07-24 18:48", "create_time": "2023-07-24 18:37:35", "hiwin_creator": "李海" }, { "id": 101, "name": "加载模版时时自动生成2023-07-24 18:36", "create_time": "2023-07-24 17:51:54", "hiwin_creator": "李海" }, { "id": 100, "name": "123", "create_time": "2023-07-24 17:51:54", "hiwin_creator": "李海" }, { "id": 98, "name": "加载模版时时自动生成2023-07-24 17:51", "create_time": "2023-07-24 17:02:22", "hiwin_creator": "李海" }, { "id": 97, "name": "12312", "create_time": "2023-07-24 17:02:22", "hiwin_creator": "李海" }, { "id": 95, "name": "12312", "create_time": "2023-07-24 17:02:16", "hiwin_creator": "李海" }, { "id": 66, "name": "123-8", "create_time": "2023-07-20 10:09:28", "hiwin_creator": "李海" }, { "id": 64, "name": "123-7", "create_time": "2023-07-20 10:09:24", "hiwin_creator": "李海" }, { "id": 62, "name": "123-6", "create_time": "2023-07-20 10:09:19", "hiwin_creator": "李海" }, { "id": 60, "name": "123-5", "create_time": "2023-07-20 10:09:15", "hiwin_creator": "李海" }, { "id": 58, "name": "123-4", "create_time": "2023-07-20 10:09:11", "hiwin_creator": "李海" }, { "id": 56, "name": "123-3", "create_time": "2023-07-20 10:09:07", "hiwin_creator": "李海" }, { "id": 54, "name": "123-2", "create_time": "2023-07-20 10:09:03", "hiwin_creator": "李海" }, { "id": 52, "name": "123-1", "create_time": "2023-07-20 10:08:58", "hiwin_creator": "李海" }, { "id": 51, "name": "123", "create_time": "2023-07-20 10:07:47", "hiwin_creator": "李海" }, { "id": 50, "name": "123", "create_time": "2023-07-20 10:07:45", "hiwin_creator": "李海" }], "current_version_obj": { "id": 105, "name": "加载模版时时自动生成2023-07-24 18:53", "doc": "H4sIAAAAAAAAA9VWT2/cRBT/KtZwyMXrzj97bBMiQVAVIRKStLSiaQ7O7mzWqmMbe5LdUOWCKlUFcYsQh0pUVSRyQcCpUqDqp9nd8C143rXH3rIhiapUYnZmbb95M/N+7+9sPUZhB/lIyVy18ijsyBZBJpKR3JOxypG/9Ripw1QCS94L4GlO+Xl7Z3OQwlckuwr52EQqSZFPMbz1w47qId/mjol6MtztAQNzqGWb6CCU/U+SAWxbcMLYNlEaFNxo1cDw+xwGkOFZ/BfjARzSDaMIWD6wd7ydjj0hDGRnM1BhgvxuEOXSREkatEN1CLJYwkRZogIFUuMjcz6AJHm0knX/BaAWnxVQtPgU36jw3ShM7yFfZftyvuxKDlQletiJxepAi05cx+IOdgQntmCYMVFiaQnLZoRyr2yuU9vGtWtw1HUt4RIKpCiM5UpJJhY1UTuJFTgCnLqYGrk6jORHD9FDtLSYqyyJd+GZBrGe6AJ3Kw+/kb5BCE0HwDj649noh1fr63eH3704f/168VaxYAke5fpb6RJqQDZRR3aD/Ujdhq3Wgr0C+2rYzpI86SrjqwBkRppnOYmSrFAtYwxdoCyRq71761pZzLYrV7WZVUCepxHbmUU+A3OhgdKgPB0sLA2fn47P3oz+Oh6fnI1+fDo+fTM8Ox4fn2q0NwCyMFUF8nacPsh5DdIhFUjmmihXQQbULWwWHitjWLFlc2/ylSbhNMwRrEbbBezyOO2uE9RF+CSQHpBWGD0C7p2g/Wg3S/aLPes4Kxn1Vt1JQ0eF9G9nG3pBtmnaMFVr8Zef1Q7PKxsS7mp5BCG1AQW4vsfEFT16oTisFUThbuwbbZiU2YcLc128aXvulqYf/XoyPHkyevUnuPjoxdO/X/703r18b3PlYGNNa4hiwI8bjVX+wD3L5dT2yu7wqwXAJYqaryAdG00FDZ/99paObjg2xPLGp/12HRuUWdhraEDUoWKxZuPzI4fZ3HLB8XR/xzjiF1Uo7PW/vt/XgreosJzGsaQI7YnknFFLsIZIQm9OsO1Y1HN0Z7WNCZTkxgz0S0scxcaywbHRguFMOsEllZRkMqVPC2BZCYlbcdCSo3gneqacKOlT6rSWXrmA1jXzOllpfkpiV7kAHdzpyeVGTnKZZRO37lWGEjZEYu1vTJvGwbbVXNDIXvA1O3W5ZSpVNy8f1XXk+jq8wCNX0/6BqC8elJAZ36KuvgUSy8V23cT/AfXsFfKCRHt/44u7H9f3Xoa55WHBda/M7rkWwQ00tI53ImbDrqEBjt+1Pk282zfKkvsfydnFRXIePfn5/PeX5798O37+fV20bqh2gQqSrHMHlAxr7OsG6vY/ftPVEqsMAAA=", "create_time": "2023-07-24 18:50:41", "hiwin_creator": "李海" } } }
         const data = await http.get('/hz_ppt', { method_: "get_ppt_history_list", ...localDimensionObj })
         if (data && data.status === 200) {
-          if (data.version_list && data.version_list.lenth > 0) {
+          if (data.data.version_list && data.data.version_list.length > 0) {
             pptNULLVisable.value = false
             version_list.value = data.data.version_list
-            debugger
             current_version_obj = data.data.current_version_obj
             // 导入当前页面的数据
             import_my_data(current_version_obj)
             // 默认选中样式和填充值
             hj_ppt_sidebar_his_view_select(current_version_obj.id, current_version_obj.name, true)
-          } else {
-            // 空
-            // show_ppt.value =false
+          } else if (data.data.version_list && data.data.version_list.length === 0) {
             pptNULLVisable.value = true
           }
-
+          else {
+            ElMessage.error(data ? data.msg ? data.msg : '获取历史列表失败，请刷新重试' : '获取历史列表失败，请刷新重试')
+          }
         } else {
-          ElMessage.error(data ? data.msg ? data.msg : '获取失败请刷新重试' : '获取失败请刷新重试')
+          ElMessage.error(data ? data.msg ? data.msg : '获取历史列表失败，请刷新重试' : '获取历史列表失败，请刷新重试')
         }
       } catch (e) {
-        ElMessage.error('获取失败请刷新重试')
+        ElMessage.error('获取历史列表失败，请刷新重试')
       }
     }
     // 保存历史版本模块
@@ -434,11 +447,10 @@ export default defineComponent({
             console.log(localDimensionObj, 'localDimensionObj')
             const data = await http.post('/hz_ppt', { method_: "save_ppt_history", ...localDimensionObj, version: verisonNameValidateForm.verison_name, doc: base64_data })
             if (data && data.status === 200) {
-              if (data.version_list) {
-                ElMessage.success('保存成功！')
-                formEl.resetFields()
-                historyDrawerVisible.value = false
-              }
+              ElMessage.success('保存成功！')
+              get_ppt_history_list()
+              formEl.resetFields()
+              historyDrawerVisible.value = false
             }
             else {
               ElMessage.error(data.msg ? data.msg : '保存失败请刷新重试！')
@@ -460,10 +472,12 @@ export default defineComponent({
       if (!formEl) return
       formEl.resetFields()
       historyDrawerVisible.value = false
+      verisonNameValidateForm.verison_name = ''
     }
     const handleBeforeClose = function (done: any) {
       done()
       historyDrawerVisible.value = false
+      verisonNameValidateForm.verison_name = ''
     }
 
     // 查看历史版本模块
@@ -502,7 +516,7 @@ export default defineComponent({
                   if (!is_first_default) {
                     const data = await http.get('/hz_ppt', { method_: "get_one_ppt_history_by_id", id: pk })
                     if (data && data.status === 200) {
-                      import_my_data(data.current_version_obj_temp)
+                      import_my_data(data.data[0])
                     }
                     else {
                       ElMessage.error(data ? data.msg ? data.msg : '获取失败请刷新重试' : '获取失败请刷新重试')
@@ -555,13 +569,6 @@ export default defineComponent({
     //   })
     // }
 
-    // version_list.value = [
-    //   { id: 1, name: '版本1', 'creator': '李小明', 'created_time': '2023-07-01 14:59' },
-    //   { id: 2, name: '版本2', 'creator': '李小明', 'created_time': '2023-07-01 14:59' },
-    //   { id: 3, name: '版本3', 'creator': '李小明', 'created_time': '2023-07-01 14:59' },
-
-    // ]
-
     const dialogVisible = ref(false)
     const version_info = ref({
       'version_name': null,
@@ -571,7 +578,7 @@ export default defineComponent({
     const openDialog = function (item: any) {
       if (item.name) {
         ElMessageBox.confirm(
-          '确定删除版本”' + name + '”吗？',
+          '确定删除版本”' + item.name + '”吗？',
           '信息',
           {
             confirmButtonText: '确定',
@@ -581,23 +588,14 @@ export default defineComponent({
         )
           .then(async () => {
             const data = await http.post('/hz_ppt', { method_: "delete_ppt_version_by_id", id: item.id })
-            if (data && data.sttaus === 200) {
-              ElMessage({
-                type: 'success',
-                message: '删除成功！',
-              })
+            if (data && data.status === 200) {
+              ElMessage.success('删除成功！')
+              get_ppt_history_list()
             } else {
-              ElMessage({
-                type: 'error',
-                message: data ? data.msg ? data.msg : '删除失败请刷新重试' : '删除失败请刷新重试',
-              })
+              ElMessage.error(data ? data.msg ? data.msg : '删除失败请刷新重试' : '删除失败请刷新重试')
             }
           })
           .catch((e) => {
-            ElMessage({
-              type: 'error',
-              message: '删除失败请刷新重试',
-            })
           })
       } else {
         ElMessage({
@@ -638,15 +636,15 @@ export default defineComponent({
     const value_template = ref<number>(null) //标记当前模版选择了那个id
     const value_template_name = ref<string>('') //标记当前模版选择了那个名称
     const pptTemplateUpdateNameVisable = ref<boolean>(false)
-    // const get_ppt_template_list = async () => {
-    const get_ppt_template_list = () => {
+    const get_ppt_template_list = async () => {
+      // const get_ppt_template_list = () => {
       // 获取模版列表
+      pptTemplateNULLVisable.value = false
       try {
-        const data = { "status": 200, "msg": "ok", "data": { "template_list": [{ "id": 3, "name": "无模版时自动创建2023-07-21 14:06:43", "create_time": "2023-07-21 14:06:43", "hiwin_creator": "李海", "doc": "H4sIAAAAAAAAA9VWW2sbRxT+K8v0wS+rzVz3VtfQugRTatd20oTG+GEtjawl693t7tiSG/xSAiENeTOlD4GGYKhfStungFvIr5GU/ouekfbmRKpsggsdzWh2z5yZPd+5zs4jFHaQj5TMVSuPwo5sEWQiGckDGasc+TuPkDpOJbDkvQBmc8rP23vbgxTeItlVyMcmUkmKfIrhqR92VA/5gtsm6slwvwcMzKaWMNFRKPufJQM4VnPC2DVRGmhutG5g+H0JA8gw6389HsBHumEUActHYs/b64gJYSA724EKE+R3gyiXJkrSoB2qY5DFckyUJSpQIDU+MWcDSJKHa1n3PQC1+ExDqcSn+EaF70Zheg/5KjuUs2VXcqBK0cNO7KwPKtGZEIXwtrCoqPXvihoAEdxiHrb1ehTGcq2kW9RE7SRWYG04ejldWc5VlsT7MKdBbOTqOJKfLHWBo5WH30nfMAih6WBpZfTH09Hz15ubd5dvac4VmIqNt9IV1EBhoo7sBoeRug2HbAQHGs562M6SPOkq45sAREQVz2oSJZnWFmMMzcHv5Org3uYM/FSwuQoQ9ns45+CjXMMbvjgfX7wZ/XU6PrsY/fhkfP5meHE6Pj2v0N4ASG2YEuTtOH2Q8xqkTUqQzDVRroIMqDvY1E4oY9ixI7g3eUuTcBq5CHajXQ27+FzlgRPUOiISiHhUKYyeAPde0H64nyWH+sw6dArG6qjupKETLf27CYTOSSBNG6ZqI/76iwoe4aUNCXcreRxCagM6jiU85izy39Ki+mOtIAr3Y99ow6LMPl5a6NvcLUw/+vVsePZ49PrP4Q8vRy+f/P3qp//cyw+21462NioNUQz4caOx0h+4Z7mcCq/oNr9aACxQ1GwFVbHRVNDw6W/v6OiGY8NZ3fq8365jgzILew0NOHWoWKzZ+OzIYZAcXXC8qn9gHPF5RQd7/W/v9yvBW9Sx7MZniQ7tieScUcthDZGc6nCChW1Rz646a2R5qLKNFegLqxbFxqrBsdGCYU86wQWVFGQypU9rWlHciFty0IJDP5NqpVgo6FPqtDxeuSbWZfA6WWl2SmJXudMc3enJ1UZOcpkliFv3MkM5AiKx9jdWmcbGwmpuaGQveLu8tNgypaqb94nyhnF9Hc7xyPW0f+TUdwlKyCXfom51sSOWi0XdnP8D6su3wjmJ9v7WV3c/ra+yDHPLww6veml2z7UIbqChdbwT53LYNTTA8YfWp4l3+0ZRcv8lObt4ci97/PPb31+9/eX78YtnddG6odoFKkiyzh1QMuwR1w3U3X8AWckOV34MAAA=" }], "current_template_obj": { "id": 3, "name": "无模版时自动创建2023-07-21 14:06:43", "create_time": "2023-07-21 14:06:43", "hiwin_creator": "李海", "doc": "H4sIAAAAAAAAA9VWW2sbRxT+K8v0wS+rzVz3VtfQugRTatd20oTG+GEtjawl693t7tiSG/xSAiENeTOlD4GGYKhfStungFvIr5GU/ouekfbmRKpsggsdzWh2z5yZPd+5zs4jFHaQj5TMVSuPwo5sEWQiGckDGasc+TuPkDpOJbDkvQBmc8rP23vbgxTeItlVyMcmUkmKfIrhqR92VA/5gtsm6slwvwcMzKaWMNFRKPufJQM4VnPC2DVRGmhutG5g+H0JA8gw6389HsBHumEUActHYs/b64gJYSA724EKE+R3gyiXJkrSoB2qY5DFckyUJSpQIDU+MWcDSJKHa1n3PQC1+ExDqcSn+EaF70Zheg/5KjuUs2VXcqBK0cNO7KwPKtGZEIXwtrCoqPXvihoAEdxiHrb1ehTGcq2kW9RE7SRWYG04ejldWc5VlsT7MKdBbOTqOJKfLHWBo5WH30nfMAih6WBpZfTH09Hz15ubd5dvac4VmIqNt9IV1EBhoo7sBoeRug2HbAQHGs562M6SPOkq45sAREQVz2oSJZnWFmMMzcHv5Org3uYM/FSwuQoQ9ns45+CjXMMbvjgfX7wZ/XU6PrsY/fhkfP5meHE6Pj2v0N4ASG2YEuTtOH2Q8xqkTUqQzDVRroIMqDvY1E4oY9ixI7g3eUuTcBq5CHajXQ27+FzlgRPUOiISiHhUKYyeAPde0H64nyWH+sw6dArG6qjupKETLf27CYTOSSBNG6ZqI/76iwoe4aUNCXcreRxCagM6jiU85izy39Ki+mOtIAr3Y99ow6LMPl5a6NvcLUw/+vVsePZ49PrP4Q8vRy+f/P3qp//cyw+21462NioNUQz4caOx0h+4Z7mcCq/oNr9aACxQ1GwFVbHRVNDw6W/v6OiGY8NZ3fq8365jgzILew0NOHWoWKzZ+OzIYZAcXXC8qn9gHPF5RQd7/W/v9yvBW9Sx7MZniQ7tieScUcthDZGc6nCChW1Rz646a2R5qLKNFegLqxbFxqrBsdGCYU86wQWVFGQypU9rWlHciFty0IJDP5NqpVgo6FPqtDxeuSbWZfA6WWl2SmJXudMc3enJ1UZOcpkliFv3MkM5AiKx9jdWmcbGwmpuaGQveLu8tNgypaqb94nyhnF9Hc7xyPW0f+TUdwlKyCXfom51sSOWi0XdnP8D6su3wjmJ9v7WV3c/ra+yDHPLww6veml2z7UIbqChdbwT53LYNTTA8YfWp4l3+0ZRcv8lObt4ci97/PPb31+9/eX78YtnddG6odoFKkiyzh1QMuwR1w3U3X8AWckOV34MAAA=" } } }
-        // const data = await http.get('/hz_ppt', { method_: "get_ppt_template_list" })
+        // const data = { "status": 200, "msg": "ok", "data": { "template_list": [{ "id": 3, "name": "无模版时自动创建2023-07-21 14:06:43", "create_time": "2023-07-21 14:06:43", "hiwin_creator": "李海", "doc": "H4sIAAAAAAAAA9VWW2sbRxT+K8v0wS+rzVz3VtfQugRTatd20oTG+GEtjawl693t7tiSG/xSAiENeTOlD4GGYKhfStungFvIr5GU/ouekfbmRKpsggsdzWh2z5yZPd+5zs4jFHaQj5TMVSuPwo5sEWQiGckDGasc+TuPkDpOJbDkvQBmc8rP23vbgxTeItlVyMcmUkmKfIrhqR92VA/5gtsm6slwvwcMzKaWMNFRKPufJQM4VnPC2DVRGmhutG5g+H0JA8gw6389HsBHumEUActHYs/b64gJYSA724EKE+R3gyiXJkrSoB2qY5DFckyUJSpQIDU+MWcDSJKHa1n3PQC1+ExDqcSn+EaF70Zheg/5KjuUs2VXcqBK0cNO7KwPKtGZEIXwtrCoqPXvihoAEdxiHrb1ehTGcq2kW9RE7SRWYG04ejldWc5VlsT7MKdBbOTqOJKfLHWBo5WH30nfMAih6WBpZfTH09Hz15ubd5dvac4VmIqNt9IV1EBhoo7sBoeRug2HbAQHGs562M6SPOkq45sAREQVz2oSJZnWFmMMzcHv5Org3uYM/FSwuQoQ9ns45+CjXMMbvjgfX7wZ/XU6PrsY/fhkfP5meHE6Pj2v0N4ASG2YEuTtOH2Q8xqkTUqQzDVRroIMqDvY1E4oY9ixI7g3eUuTcBq5CHajXQ27+FzlgRPUOiISiHhUKYyeAPde0H64nyWH+sw6dArG6qjupKETLf27CYTOSSBNG6ZqI/76iwoe4aUNCXcreRxCagM6jiU85izy39Ki+mOtIAr3Y99ow6LMPl5a6NvcLUw/+vVsePZ49PrP4Q8vRy+f/P3qp//cyw+21462NioNUQz4caOx0h+4Z7mcCq/oNr9aACxQ1GwFVbHRVNDw6W/v6OiGY8NZ3fq8365jgzILew0NOHWoWKzZ+OzIYZAcXXC8qn9gHPF5RQd7/W/v9yvBW9Sx7MZniQ7tieScUcthDZGc6nCChW1Rz646a2R5qLKNFegLqxbFxqrBsdGCYU86wQWVFGQypU9rWlHciFty0IJDP5NqpVgo6FPqtDxeuSbWZfA6WWl2SmJXudMc3enJ1UZOcpkliFv3MkM5AiKx9jdWmcbGwmpuaGQveLu8tNgypaqb94nyhnF9Hc7xyPW0f+TUdwlKyCXfom51sSOWi0XdnP8D6su3wjmJ9v7WV3c/ra+yDHPLww6veml2z7UIbqChdbwT53LYNTTA8YfWp4l3+0ZRcv8lObt4ci97/PPb31+9/eX78YtnddG6odoFKkiyzh1QMuwR1w3U3X8AWckOV34MAAA=" }], "current_template_obj": { "id": 3, "name": "无模版时自动创建2023-07-21 14:06:43", "create_time": "2023-07-21 14:06:43", "hiwin_creator": "李海", "doc": "H4sIAAAAAAAAA9VWW2sbRxT+K8v0wS+rzVz3VtfQugRTatd20oTG+GEtjawl693t7tiSG/xSAiENeTOlD4GGYKhfStungFvIr5GU/ouekfbmRKpsggsdzWh2z5yZPd+5zs4jFHaQj5TMVSuPwo5sEWQiGckDGasc+TuPkDpOJbDkvQBmc8rP23vbgxTeItlVyMcmUkmKfIrhqR92VA/5gtsm6slwvwcMzKaWMNFRKPufJQM4VnPC2DVRGmhutG5g+H0JA8gw6389HsBHumEUActHYs/b64gJYSA724EKE+R3gyiXJkrSoB2qY5DFckyUJSpQIDU+MWcDSJKHa1n3PQC1+ExDqcSn+EaF70Zheg/5KjuUs2VXcqBK0cNO7KwPKtGZEIXwtrCoqPXvihoAEdxiHrb1ehTGcq2kW9RE7SRWYG04ejldWc5VlsT7MKdBbOTqOJKfLHWBo5WH30nfMAih6WBpZfTH09Hz15ubd5dvac4VmIqNt9IV1EBhoo7sBoeRug2HbAQHGs562M6SPOkq45sAREQVz2oSJZnWFmMMzcHv5Org3uYM/FSwuQoQ9ns45+CjXMMbvjgfX7wZ/XU6PrsY/fhkfP5meHE6Pj2v0N4ASG2YEuTtOH2Q8xqkTUqQzDVRroIMqDvY1E4oY9ixI7g3eUuTcBq5CHajXQ27+FzlgRPUOiISiHhUKYyeAPde0H64nyWH+sw6dArG6qjupKETLf27CYTOSSBNG6ZqI/76iwoe4aUNCXcreRxCagM6jiU85izy39Ki+mOtIAr3Y99ow6LMPl5a6NvcLUw/+vVsePZ49PrP4Q8vRy+f/P3qp//cyw+21462NioNUQz4caOx0h+4Z7mcCq/oNr9aACxQ1GwFVbHRVNDw6W/v6OiGY8NZ3fq8365jgzILew0NOHWoWKzZ+OzIYZAcXXC8qn9gHPF5RQd7/W/v9yvBW9Sx7MZniQ7tieScUcthDZGc6nCChW1Rz646a2R5qLKNFegLqxbFxqrBsdGCYU86wQWVFGQypU9rWlHciFty0IJDP5NqpVgo6FPqtDxeuSbWZfA6WWl2SmJXudMc3enJ1UZOcpkliFv3MkM5AiKx9jdWmcbGwmpuaGQveLu8tNgypaqb94nyhnF9Hc7xyPW0f+TUdwlKyCXfom51sSOWi0XdnP8D6su3wjmJ9v7WV3c/ra+yDHPLww6veml2z7UIbqChdbwT53LYNTTA8YfWp4l3+0ZRcv8lObt4ci97/PPb31+9/eX78YtnddG6odoFKkiyzh1QMuwR1w3U3X8AWckOV34MAAA=" } } }
+        const data = await http.get('/hz_ppt', { method_: "get_ppt_template_list" })
         if (data && data.status === 200) {
           if (data.data && data.data.template_list.length > 0) {
-            pptTemplateNULLVisable.value = false
             ppt_template_list.value = data.data.template_list
             // 选中第一个
             value_template.value = data.data.template_list[0].id
@@ -675,78 +673,60 @@ export default defineComponent({
         //   ElMessage.error('首页的维度对象没有获取到，请刷新重试！')
         //   return
         // }
-        get_ppt_template_list()
         // his_title.value = (my_dimession.title ? my_dimession.title : '无') + ' 历史版本  ' + '(' + (my_dimession.select_pk_name ? my_dimession.select_pk_name : '空维度') + ' ' + (my_dimession.year ? my_dimession.year : '无年份') + ')'
       } else if (index === 2) {
         // 编辑模版
         templateDrawerVisible.value = true
         template_type.value = 2
-        get_ppt_template_list()
       }
+      get_ppt_template_list()
     }
     const TemplateNameValidateForm = reactive({
       template_name: '',
     })
     const handle_templat_button_type = ref<number>(1) // 1默认为修改名称  2 为 新增模版
     const handleTemplateChange = async (id: number) => {
-      if (template_type.value === 1) {
-        // 加载模版
-        try {
-          const data = await http.get('/hz_ppt', { method_: "get_ppt_template_by_id", id: id })
-          if (data && data.status === 200) {
-            if (data.data && data.template_list > 0) {
-              pptTemplateNULLVisable.value = false
-              ppt_template_list.value = data.template_list
-              // 导入当前的ppt doc
-              import_my_data(data.current_template_obj)
-            } else {
-              // ppt 是空的
-              pptTemplateNULLVisable.value = true
-            }
-          }
-          else {
-            ElMessage.error(data ? data.msg ? data.msg : '获取模版失败，请刷新重试' : '获取模版失败，请刷新重试')
-          }
-        } catch (error) {
-          ElMessage.error('获取模版失败，请刷新重试')
+      pptTemplateNULLVisable.value = false
+      // const handleTemplateChange = (id: number) => {
+      // if (template_type.value === 1) {
+      // 加载模版
+      try {
+        const data = await http.get('/hz_ppt', { method_: "get_ppt_template_by_id", id: id })
+        if (data && data.status === 200 && data.data.length > 0) {
+          // ppt_template_list.value = data.template_list
+          // 导入当前的ppt doc
+          import_my_data(data.data[0])
         }
-      }
-      else {
-        // 编辑模版
-        try {
-          const data = await http.get('/hz_ppt', { method_: "get_ppt_template_by_id", id: id })
-          if (data && data.status === 200) {
-            if (data.data && data.template_list > 0) {
-              pptTemplateNULLVisable.value = false
-              ppt_template_list.value = data.template_list
-              // 导入当前的ppt doc
-              import_my_data(data.current_template_obj)
-            } else {
-              // ppt 是空的
-              pptTemplateNULLVisable.value = true
-            }
-          }
-          else {
-            ElMessage.error(data ? data.msg ? data.msg : '获取模版列表失败请刷新重试' : '获取模版列表失败请刷新重试')
-          }
-        } catch (error) {
-          ElMessage.error('获取模版列表失败请刷新重试')
+        else if (data && data.status === 200 && data.data.length === 0) {
+          // ppt 是空的
+          pptTemplateNULLVisable.value = true
         }
+        else {
+          ElMessage.error(data ? data.msg ? data.msg : '获取模版失败，请刷新重试' : '获取模版失败，请刷新重试')
+        }
+      } catch (error) {
+        ElMessage.error('获取模版失败，请刷新重试')
       }
     }
 
     const updateTemplateName = () => {
       // 对话框
-      for (const item of ppt_template_list.value) {
-        if (Number(item.id) === value_template.value) {
-          value_template_name.value = item.name
-          // 打开对话框
-          verisonNameValidateForm.verison_name = value_template_name.value
-          pptTemplateUpdateNameVisable.value = true
-          break
+      if (ppt_template_list.value && ppt_template_list.value.length > 0) {
+        for (const item of ppt_template_list.value) {
+          if (Number(item.id) === value_template.value) {
+            value_template_name.value = item.name
+            // 打开对话框
+            handle_templat_button_type.value = 1
+            verisonNameValidateForm.verison_name = value_template_name.value
+            pptTemplateUpdateNameVisable.value = true
+            break
+          }
         }
       }
-      console.log('更新模版名称')
+      else {
+        ElMessage.error('没有获取到模版名称')
+      }
+
     }
 
     const addTemplate_start = () => {
@@ -760,6 +740,7 @@ export default defineComponent({
         const data = await http.post('/hz_ppt', { method_: "insert_or_update_ppt_template", handle_type: 1, name: verisonNameValidateForm.verison_name })
         if (data && data.status === 200) {
           ElMessage.success('新增成功！')
+          get_ppt_template_list()
         }
         else {
           ElMessage.error(data.msg ? data.msg : '新增模版失败,请刷新重试！')
@@ -769,12 +750,36 @@ export default defineComponent({
         ElMessage.error('新增模版失败,请刷新重试!')
       }
     }
+    const delTemplateDialog = function (id: number) {
+      if (id) {
+        ElMessageBox.confirm(
+          '确定删除模版吗？',
+          '信息',
+          {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning',
+          }
+        )
+          .then(() => {
+            delTemplate(id)
+          })
+          .catch((e) => {
 
+          })
+      } else {
+        ElMessage({
+          type: 'info',
+          message: '没有获取到当前模版，请刷新重试！',
+        })
+      }
+    }
     const delTemplate = async (id: number) => {
       try {
         const data = await http.post('/hz_ppt', { method_: "delete_ppt_template_by_id", id: value_template.value })
         if (data && data.status === 200) {
           ElMessage.success('删除成功！')
+          get_ppt_template_list()
         }
         else {
           ElMessage.error(data.msg ? data.msg : '删除失败,请刷新重试！')
@@ -833,6 +838,7 @@ export default defineComponent({
       if (!formEl) return
       formEl.resetFields()
       pptTemplateUpdateNameVisable.value = false
+      verisonNameValidateForm.verison_name = ''
     }
     const data_for_template = reactive(
       {
@@ -844,6 +850,7 @@ export default defineComponent({
     const cancelTemplate = () => {
       flush_index()
       templateDrawerVisible.value = false
+      verisonNameValidateForm.verison_name = ''
     }
     const sureTemplate = async () => {
       // 加载模版的确定按钮
@@ -860,6 +867,8 @@ export default defineComponent({
           ElMessage.success('确定加载模版成功！')
           templateDrawerVisible.value = false
           flush_index()
+          verisonNameValidateForm.verison_name = ''
+
         }
         else {
           ElMessage.error(data.msg ? data.msg : '确定加载模版失败，请刷新重试！')
@@ -928,7 +937,6 @@ export default defineComponent({
       handleTemplateChange,
       updateTemplateName,
       addTemplate,
-      delTemplate,
       value_template_name,
       TemplateNameValidateForm,
       pptTemplateUpdateNameVisable,
@@ -941,6 +949,7 @@ export default defineComponent({
       sureTemplate,
       cancelTemplate,
       closeHisView,
+      delTemplateDialog,
     }
   },
 })
@@ -1017,20 +1026,20 @@ export default defineComponent({
 }
 
 //  矫正一下样式不对的问题
-.slide-content {
-  // background-color: #fff;
-  // position: absolute;
-  // top: 50%;
-  // left: 50%;
-  // transform: translate(-50%, -50%);
-  // display: flex;
-  // justify-content: center;
-  // align-items: center;
+// .slide-content {
+//   // background-color: #fff;
+//   // position: absolute;
+//   // top: 50%;
+//   // left: 50%;
+//   // transform: translate(-50%, -50%);
+//   // display: flex;
+//   // justify-content: center;
+//   // align-items: center;
 
-  width: 100% !important;
-  height: 100% !important;
-  // position: relative;
-}
+//   width: 100% !important;
+//   height: 100% !important;
+//   // position: relative;
+// }
 
 .el-message {
   z-index: 2147483647 !important;
@@ -1040,13 +1049,13 @@ export default defineComponent({
   z-index: 99999 !important;
 }
 
-.screen-slide {
-  // width: 100vh !important;
-  // height: calc(100% - 20px) !important;
-  width: 100% !important;
-  height: 100% !important;
-  position: relative !important;
-}
+// .screen-slide {
+//   // width: 100vh !important;
+//   // height: calc(100% - 20px) !important;
+//   width: 100% !important;
+//   height: 100% !important;
+//   position: relative !important;
+// }
 
 // .el-button {
 //   margin-top: 11px;
@@ -1074,7 +1083,7 @@ export default defineComponent({
 //   line-height: 40px !important;
 // }
 // .select-trigger
-.el-select {
+.template_ppt_select {
   // width: 212px;
   width: 320px !important;
   position: absolute;
