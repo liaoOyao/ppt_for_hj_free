@@ -714,13 +714,14 @@ export default defineComponent({
           setTimeout(() => {
             loading.value.close()
           }, 10)
-        } else {
-          // console.log('loading.value.close is not a function')
-        }
-      } else {
-
-        console.log('loading.value does not exist')
+        } 
+        // else {
+        //   // console.log('loading.value.close is not a function')
+        // }
       }
+      //  else {
+      //   console.log('loading.value does not exist')
+      // }
     }
 
     // handleUrlAndSleect('/primary_data/hz_ppt?bupl_id=0&spfd_id=0&d_id=0&year=2023&grid_key=ppt&show_c=1&title=ppt页面')

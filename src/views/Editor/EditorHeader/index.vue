@@ -464,10 +464,7 @@ export default defineComponent({
         }
       })
     }
-    // 保存历史版本
-    const save_his_version = () => {
-      alert('保存版本')
-    }
+
     const resetForm = (formEl: FormInstance | undefined) => {
       if (!formEl) return
       formEl.resetFields()
@@ -545,7 +542,7 @@ export default defineComponent({
       if (loading.value) {
         // console.log('loading.value exists')
         if (typeof loading.value.close === 'function') {
-          console.log('loading.value.close is a function')
+          // console.log('loading.value.close is a function')
           setTimeout(() => {
             loading.value.close()
           }, 20)
@@ -922,7 +919,6 @@ export default defineComponent({
       handleBeforeCloseViewHis,
       pptNULLVisable,
       version_list,
-      save_his_version,
       hj_ppt_sidebar_his_view_select,
       version_info,
       dialogVisible,
