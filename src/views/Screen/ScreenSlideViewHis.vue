@@ -82,8 +82,8 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .screen-slide {
-  // position: absolute;
-  position: relative;
+  position: absolute;
+  // position: relative;
   top: 0;
   left: 0;
   transform-origin: 0 0;
@@ -93,6 +93,6 @@ export default defineComponent({
   width: 100%;
   height: 100%;
   background-position: center;
-  position: relative;
+  position: absolute;
 }
 </style>
