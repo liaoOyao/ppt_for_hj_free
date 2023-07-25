@@ -169,12 +169,6 @@ export default defineComponent({
 
     const elementList = ref<PPTElement[]>([])
     const setLocalElementList = () => {
-      // 
-      console.log(currentSlide,"currentSlide")
-      console.log(currentSlide.value,'currentSlide.value')
-      console.log(currentSlide.value.elements,'currentSlide.value.elements')
-
-      
       elementList.value = currentSlide.value ? JSON.parse(JSON.stringify(currentSlide.value.elements)) : []
     }
     watchEffect(setLocalElementList)

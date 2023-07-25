@@ -203,14 +203,14 @@ export default defineComponent({
     const dimension_list_data = ref<any>()
     // 根据参数渲染数据
     const handleUrlAndSleect = async () => {
-      debugger
+      
       // const handleUrlAndSleect = (url: string) => {
       // 创建一个新的URL对象
       const urlObj = new URL(url, 'http://example.com')
       // 使用URLSearchParams对象来获取查询参数
       // const params = new URLSearchParams(urlObj.search)
       const params = new URLSearchParams(window.location.search)
-      console.log(params, "最终的params")
+      // console.log(params, "最终的params")
       if (params) {
         // if (urlObj && urlObj.search) {
         // 构造维度对象 去获取列表
@@ -220,7 +220,7 @@ export default defineComponent({
           'd_id': params.has('d_id') ? params.get('d_id') : 0,
         }
         try {
-          console.log(dimension_obj_for_index, 'dimension_obj_for_index')
+          // console.log(dimension_obj_for_index, 'dimension_obj_for_index')
           // dimension_list_data.value  = {"status":200,"msg":"ok","dimension_obj":{"pl_list":[{"name":"DSTE咨询及软件","id":2,"pk":2,"superior_id":0,"children_pk_list":[5,6],"is_valid_now":0},{"name":"内训","id":3,"pk":3,"superior_id":0,"children_pk_list":[7,8],"is_valid_now":0},{"name":"公开课","id":4,"pk":4,"superior_id":0,"children_pk_list":[9,10],"is_valid_now":0},{"name":"IPD咨询","id":11,"pk":11,"superior_id":0,"children_pk_list":[1],"is_valid_now":0},{"name":"布艺事业部","id":13,"pk":13,"superior_id":0,"children_pk_list":[14,15,16,17,18],"is_valid_now":0},{"name":"11","id":21,"pk":21,"superior_id":0,"children_pk_list":[22],"is_valid_now":0},{"name":"12","id":23,"pk":23,"superior_id":0,"children_pk_list":[24],"is_valid_now":1},{"name":"测试权限","id":25,"pk":25,"superior_id":0,"children_pk_list":[26],"is_valid_now":0},{"name":"布艺事业部 / 中高端品类","id":18,"pk":18,"superior_id":13,"is_valid_now":1}],"pl_id":null,"pl_name":null,"spfd_list":[{"id":7,"pk":7,"name":"供应链"},{"id":1,"pk":1,"name":"研发领域"},{"id":2,"pk":2,"name":"营销领域"},{"id":3,"pk":3,"name":"组织及人力资源"},{"id":4,"pk":4,"name":"财务"},{"id":5,"pk":5,"name":"品牌"},{"id":6,"pk":6,"name":"服务领域"},{"id":8,"pk":8,"name":"流程IT"},{"id":9,"pk":9,"name":"市场营销"},{"id":10,"pk":10,"name":"F-权限测试"}],"spfd_id":null,"spfd_name":null,"d_list":[{"id":"00000000","pk":"00000000","name":"汉捷公司","text":"汉捷公司","tree_name":"汉捷公司","level":0,"sales_position":1},{"pk":"01000000","name":"咨询一部","tree_name":"咨询一部","level":1,"sales_position":2,"superior_department__pk":"00000000","id":"01000000","text":"咨询一部"},{"pk":"06000000","name":"咨询二部","tree_name":"咨询二部","level":1,"sales_position":"","superior_department__pk":"00000000","id":"06000000","text":"咨询二部"},{"pk":"02000000","name":"销售一部","tree_name":"销售一部","level":1,"sales_position":1,"superior_department__pk":"00000000","id":"02000000","text":"销售一部"},{"pk":"03000000","name":"销售二部","tree_name":"销售二部","level":1,"sales_position":1,"superior_department__pk":"00000000","id":"03000000","text":"销售二部"},{"pk":"04000000","name":"市场部","tree_name":"市场部","level":1,"sales_position":"","superior_department__pk":"00000000","id":"04000000","text":"市场部"},{"pk":"05000000","name":"运作管理部","tree_name":"运作管理部","level":1,"sales_position":"","superior_department__pk":"00000000","id":"05000000","text":"运作管理部"},{"pk":"07000000","name":"总经理助理","tree_name":"总经理助理","level":1,"sales_position":"","superior_department__pk":"00000000","id":"07000000","text":"总经理助理"},{"pk":"08000000","name":"外部合作","tree_name":"外部合作","level":1,"sales_position":"","superior_department__pk":"00000000","id":"08000000","text":"外部合作"},{"pk":"09000000","name":"香港办事处","tree_name":"香港办事处","level":1,"sales_position":"","superior_department__pk":"00000000","id":"09000000","text":"香港办事处"},{"pk":"04010000","name":"软件中心","tree_name":"软件中心","level":1,"sales_position":"","superior_department__pk":"00000000","id":"04010000","text":"软件中心"},{"pk":"11000000","name":"测试权限","tree_name":"测试权限","level":1,"sales_position":"","superior_department__pk":"00000000","id":"11000000","text":"测试权限"},{"pk":"06010000","name":"IT实施组","tree_name":"咨询二部 / IT实施组","level":2,"sales_position":"","superior_department__pk":"06000000","id":"06010000","text":"IT实施组"},{"pk":"08010000","name":"外部合作销售","tree_name":"外部合作 / 外部合作销售","level":2,"sales_position":"","superior_department__pk":"08000000","id":"08010000","text":"外部合作销售"},{"pk":"11020000","name":"测试权限（二级部门）","tree_name":"测试权限 / 测试权限（二级部门）","level":2,"sales_position":"","superior_department__pk":"11000000","id":"11020000","text":"测试权限（二级部门）"},{"id":"07000000","pk":"07000000","text":"总经理助理","tree_name":"总经理助理","level":1},{"id":"04010000","pk":"04010000","text":"软件中心","tree_name":"软件中心","level":1},{"id":"06000000","pk":"06000000","text":"咨询二部","tree_name":"咨询二部","level":1}],"d_id":"00000000","d_name":null,"year_list":[{"id":2019,"name":2019},{"id":2020,"name":2020},{"id":2021,"name":2021},{"id":2022,"name":2022},{"id":2023,"name":2023},{"id":2024,"name":2024},{"id":2025,"name":2025},{"id":2026,"name":2026},{"id":2027,"name":2027},{"id":2028,"name":2028}],"cur_year":"2023"}}
           dimension_list_data.value = await http.get('/hz_ppt', { method_: "get_dimension_list", ...dimension_obj })
           if (dimension_list_data.value) {
@@ -318,7 +318,7 @@ export default defineComponent({
               if (params.has('grid_key')) {
                 const arrayParam = params.get('grid_key')
                 if (arrayParam) {
-                  console.log(arrayParam)
+                  // console.log(arrayParam)
                   gridKey.value = arrayParam
                 }
                 else {
@@ -456,7 +456,7 @@ export default defineComponent({
     const set_default_select_item = (pk: any, pk_name: any, type: string) => {
       // 根据传入的pk、pk_name (用来渲染标题中的部门的)  设置默认选中
       if (pk && type) {
-        debugger
+        
         const elements = document.querySelectorAll('.hj_sidebar_ppt_item') // 获取元素
         elements.forEach((element) => {
           // 
@@ -465,7 +465,7 @@ export default defineComponent({
           if (formType !== type || pk.toString() !== data_table_pk) {
             element.classList.remove('hj_sidebar_categroy_ppt_this')
           } else {
-            debugger
+            
             element.classList.add('hj_sidebar_categroy_ppt_this')
             // 更新标题中的部门
             select_pk_name.value = pk_name
@@ -488,7 +488,7 @@ export default defineComponent({
           elements.forEach((element) => {
             const formType = element.getAttribute('data-form_type')
             const data_table_pk = element.getAttribute('data-table_pk')
-            console.log(formType)
+            // console.log(formType)
             if (formType !== name || pk.toString() !== data_table_pk) {
               element.classList.remove('hj_sidebar_categroy_ppt_this')
             }
@@ -537,8 +537,7 @@ export default defineComponent({
                   'd_id': 0,
                 }
               }
-              console.log(dimension_obj, 'dimension_obj')
-
+              // console.log(dimension_obj, 'dimension_obj')
               get_hz_ppt_by_dimension_and_year(dimension_obj, value_year.value)
               // 更新标题中的部门
               select_pk_name.value = pk_name
@@ -666,7 +665,7 @@ export default defineComponent({
           // 解析doc信息
           try {
             if (data1.data.doc) {
-              debugger
+              
               const base64_data = data1.data.doc
               const arrayBuffer = base64ToArrayBuffer(base64_data)
 
@@ -709,14 +708,14 @@ export default defineComponent({
     }
     const close_loading = () => {
       if (loading.value) {
-        console.log('loading.value exists')
+        // console.log('loading.value exists')
         if (typeof loading.value.close === 'function') {
-          console.log('loading.value.close is a function')
+          // console.log('loading.value.close is a function')
           setTimeout(() => {
             loading.value.close()
-          }, 1000)
+          }, 10)
         } else {
-          console.log('loading.value.close is not a function')
+          // console.log('loading.value.close is not a function')
         }
       } else {
 
@@ -788,10 +787,8 @@ export default defineComponent({
     // }
     const saveData = async () => {
       open_loading('保存中...')
-      // const slidesStore = useSlidesStore()
       const { slides, theme } = storeToRefs(slidesStore)
-      console.log(theme)
-
+      // console.log(theme)
       // 获取数据 
       const data_ppt = pako.gzip(JSON.stringify(slides.value ? slides.value : null))
       // data_ppt转换为Base64编码时，String.fromCharCode.apply函数调用栈溢出了,因为data太大了，因此将unit8array 分块处理

@@ -171,7 +171,7 @@ export default defineComponent({
           if (arrayParam) {
             try {
               array_top.value = JSON.parse(decodeURIComponent(arrayParam.replace(/'/g, '"')))
-              console.log(array_top, 'array_top')
+              // console.log(array_top, 'array_top')
             } catch (e) {
               ElMessage.error('参数解析错误')
             }

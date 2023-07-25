@@ -386,11 +386,11 @@ export default defineComponent({
         const localDimensionObj = reactive({
           ...props.dimension_obj_for_index
         })
-        console.log(props.dimension_obj_for_index, 'localDimensionObj')
+        // console.log(props.dimension_obj_for_index, 'localDimensionObj')
         localDimensionObj.bupl_id = localDimensionObj.bupl_id || 0
         localDimensionObj.spfd_id = localDimensionObj.spfd_id || 0
         localDimensionObj.d_id = localDimensionObj.d_id || 0
-        console.log(localDimensionObj, 'localDimensionObj')
+        // console.log(localDimensionObj, 'localDimensionObj')
         // const data = { "status": 200, "msg": "ok", "data": { "version_list": [{ "id": 105, "name": "加载模版时时自动生成2023-07-24 18:53", "create_time": "2023-07-24 18:50:41", "hiwin_creator": "李海" }, { "id": 104, "name": "加载模版时时自动生成2023-07-24 18:50", "create_time": "2023-07-24 18:50:22", "hiwin_creator": "李海" }, { "id": 103, "name": "加载模版时时自动生成2023-07-24 18:50", "create_time": "2023-07-24 18:48:32", "hiwin_creator": "李海" }, { "id": 102, "name": "加载模版时时自动生成2023-07-24 18:48", "create_time": "2023-07-24 18:37:35", "hiwin_creator": "李海" }, { "id": 101, "name": "加载模版时时自动生成2023-07-24 18:36", "create_time": "2023-07-24 17:51:54", "hiwin_creator": "李海" }, { "id": 100, "name": "123", "create_time": "2023-07-24 17:51:54", "hiwin_creator": "李海" }, { "id": 98, "name": "加载模版时时自动生成2023-07-24 17:51", "create_time": "2023-07-24 17:02:22", "hiwin_creator": "李海" }, { "id": 97, "name": "12312", "create_time": "2023-07-24 17:02:22", "hiwin_creator": "李海" }, { "id": 95, "name": "12312", "create_time": "2023-07-24 17:02:16", "hiwin_creator": "李海" }, { "id": 66, "name": "123-8", "create_time": "2023-07-20 10:09:28", "hiwin_creator": "李海" }, { "id": 64, "name": "123-7", "create_time": "2023-07-20 10:09:24", "hiwin_creator": "李海" }, { "id": 62, "name": "123-6", "create_time": "2023-07-20 10:09:19", "hiwin_creator": "李海" }, { "id": 60, "name": "123-5", "create_time": "2023-07-20 10:09:15", "hiwin_creator": "李海" }, { "id": 58, "name": "123-4", "create_time": "2023-07-20 10:09:11", "hiwin_creator": "李海" }, { "id": 56, "name": "123-3", "create_time": "2023-07-20 10:09:07", "hiwin_creator": "李海" }, { "id": 54, "name": "123-2", "create_time": "2023-07-20 10:09:03", "hiwin_creator": "李海" }, { "id": 52, "name": "123-1", "create_time": "2023-07-20 10:08:58", "hiwin_creator": "李海" }, { "id": 51, "name": "123", "create_time": "2023-07-20 10:07:47", "hiwin_creator": "李海" }, { "id": 50, "name": "123", "create_time": "2023-07-20 10:07:45", "hiwin_creator": "李海" }], "current_version_obj": { "id": 105, "name": "加载模版时时自动生成2023-07-24 18:53", "doc": "H4sIAAAAAAAAA9VWT2/cRBT/KtZwyMXrzj97bBMiQVAVIRKStLSiaQ7O7mzWqmMbe5LdUOWCKlUFcYsQh0pUVSRyQcCpUqDqp9nd8C143rXH3rIhiapUYnZmbb95M/N+7+9sPUZhB/lIyVy18ijsyBZBJpKR3JOxypG/9Ripw1QCS94L4GlO+Xl7Z3OQwlckuwr52EQqSZFPMbz1w47qId/mjol6MtztAQNzqGWb6CCU/U+SAWxbcMLYNlEaFNxo1cDw+xwGkOFZ/BfjARzSDaMIWD6wd7ydjj0hDGRnM1BhgvxuEOXSREkatEN1CLJYwkRZogIFUuMjcz6AJHm0knX/BaAWnxVQtPgU36jw3ShM7yFfZftyvuxKDlQletiJxepAi05cx+IOdgQntmCYMVFiaQnLZoRyr2yuU9vGtWtw1HUt4RIKpCiM5UpJJhY1UTuJFTgCnLqYGrk6jORHD9FDtLSYqyyJd+GZBrGe6AJ3Kw+/kb5BCE0HwDj649noh1fr63eH3704f/168VaxYAke5fpb6RJqQDZRR3aD/Ujdhq3Wgr0C+2rYzpI86SrjqwBkRppnOYmSrFAtYwxdoCyRq71761pZzLYrV7WZVUCepxHbmUU+A3OhgdKgPB0sLA2fn47P3oz+Oh6fnI1+fDo+fTM8Ox4fn2q0NwCyMFUF8nacPsh5DdIhFUjmmihXQQbULWwWHitjWLFlc2/ylSbhNMwRrEbbBezyOO2uE9RF+CSQHpBWGD0C7p2g/Wg3S/aLPes4Kxn1Vt1JQ0eF9G9nG3pBtmnaMFVr8Zef1Q7PKxsS7mp5BCG1AQW4vsfEFT16oTisFUThbuwbbZiU2YcLc128aXvulqYf/XoyPHkyevUnuPjoxdO/X/703r18b3PlYGNNa4hiwI8bjVX+wD3L5dT2yu7wqwXAJYqaryAdG00FDZ/99paObjg2xPLGp/12HRuUWdhraEDUoWKxZuPzI4fZ3HLB8XR/xzjiF1Uo7PW/vt/XgreosJzGsaQI7YnknFFLsIZIQm9OsO1Y1HN0Z7WNCZTkxgz0S0scxcaywbHRguFMOsEllZRkMqVPC2BZCYlbcdCSo3gneqacKOlT6rSWXrmA1jXzOllpfkpiV7kAHdzpyeVGTnKZZRO37lWGEjZEYu1vTJvGwbbVXNDIXvA1O3W5ZSpVNy8f1XXk+jq8wCNX0/6BqC8elJAZ36KuvgUSy8V23cT/AfXsFfKCRHt/44u7H9f3Xoa55WHBda/M7rkWwQ00tI53ImbDrqEBjt+1Pk282zfKkvsfydnFRXIePfn5/PeX5798O37+fV20bqh2gQqSrHMHlAxr7OsG6vY/ftPVEqsMAAA=", "create_time": "2023-07-24 18:50:41", "hiwin_creator": "李海" } } }
         const data = await http.get('/hz_ppt', { method_: "get_ppt_history_list", ...localDimensionObj })
         if (data && data.status === 200) {
@@ -430,7 +430,7 @@ export default defineComponent({
           // console.log('submit!')
           // 保存当前版数据
           const { slides, theme } = storeToRefs(slidesStore)
-          console.log(theme)
+          // console.log(theme)
 
           // 获取数据 
           const data_ppt = pako.gzip(JSON.stringify(slides.value ? slides.value : null))
@@ -440,11 +440,11 @@ export default defineComponent({
             const localDimensionObj = reactive({
               ...props.dimension_obj_for_index
             })
-            console.log(props.dimension_obj_for_index, 'localDimensionObj')
+            // console.log(props.dimension_obj_for_index, 'localDimensionObj')
             localDimensionObj.bupl_id = localDimensionObj.bupl_id || 0
             localDimensionObj.spfd_id = localDimensionObj.spfd_id || 0
             localDimensionObj.d_id = localDimensionObj.d_id || 0
-            console.log(localDimensionObj, 'localDimensionObj')
+            // console.log(localDimensionObj, 'localDimensionObj')
             const data = await http.post('/hz_ppt', { method_: "save_ppt_history", ...localDimensionObj, version: verisonNameValidateForm.verison_name, doc: base64_data })
             if (data && data.status === 200) {
               ElMessage.success('保存成功！')
@@ -502,7 +502,7 @@ export default defineComponent({
 
                   element.classList.remove('hiwin_ppt_snapshot_models_sidebar_row_select')
                 } else {
-                  debugger
+                  
                   //找到要选中的对象了
                   element.classList.add('hiwin_ppt_snapshot_models_sidebar_row_select')
                   // get_hz_ppt_by_dimension_and_year(dimension_obj, value_year.value)
@@ -543,19 +543,20 @@ export default defineComponent({
     }
     const close_loading = () => {
       if (loading.value) {
-        console.log('loading.value exists')
+        // console.log('loading.value exists')
         if (typeof loading.value.close === 'function') {
           console.log('loading.value.close is a function')
           setTimeout(() => {
             loading.value.close()
-          }, 1000)
-        } else {
-          console.log('loading.value.close is not a function')
-        }
-      } else {
-
-        console.log('loading.value does not exist')
-      }
+          }, 20)
+        } 
+        // else {
+        //   // console.log('loading.value.close is not a function')
+        // }
+      } 
+      // else {
+      //   // console.log('loading.value does not exist')
+      // }
     }
     const pptNULLVisable = ref(false)
     // 版本信息模块
@@ -617,7 +618,7 @@ export default defineComponent({
     // const hanldeDefaultSelect = () => {
     //   // 直接选中当前对象
     //   // 选中第一个
-    //   debugger
+    //   
     //   hj_ppt_sidebar_his_view_select(current_version_obj ? current_version_obj.id : null, current_version_obj ? current_version_obj.name : null, true)
     // }
     onMounted(() => {
@@ -858,7 +859,7 @@ export default defineComponent({
         const localDimensionObj = reactive({
           ...props.dimension_obj_for_index
         })
-        console.log(props.dimension_obj_for_index, 'localDimensionObj')
+        // console.log(props.dimension_obj_for_index, 'localDimensionObj')
         localDimensionObj.bupl_id = localDimensionObj.bupl_id || 0
         localDimensionObj.spfd_id = localDimensionObj.spfd_id || 0
         localDimensionObj.d_id = localDimensionObj.d_id || 0
@@ -887,7 +888,7 @@ export default defineComponent({
       const localDimensionObj = reactive({
         ...props.dimension_obj_for_index
       })
-      console.log(props.dimension_obj_for_index, 'localDimensionObj')
+      // console.log(props.dimension_obj_for_index, 'localDimensionObj')
       localDimensionObj.bupl_id = localDimensionObj.bupl_id || 0
       localDimensionObj.spfd_id = localDimensionObj.spfd_id || 0
       localDimensionObj.d_id = localDimensionObj.d_id || 0
