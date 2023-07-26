@@ -22,9 +22,7 @@ export default () => {
     
     for (const element of elements) {
       const inCurrentSlide = currentSlideElementIdList.includes(element.id)
-      
       element.id = elIdMap[element.id]
-
       if (inCurrentSlide) {
         element.left = element.left + 10
         element.top = element.top + 10

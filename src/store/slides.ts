@@ -28,17 +28,17 @@ export interface SlidesState {
   slideIndex: number;
   viewportRatio: number;
   isChanged: boolean;
-  isFirst: -1;
 }
 export const useSlidesStore = defineStore('slides', {
   state: (): SlidesState => ({
     theme: theme, // 主题样式
     // slides: hj_slides, // 幻灯片页面数据
-    slides: slides, // 幻灯片页面数据
+    slides: [], // 幻灯片页面数据
     slideIndex: 0, // 当前页面索引
     viewportRatio: 0.5625, // 可是区域比例，默认16:9
+    // isChanged: false, //当前数据是否改变，点击首页保存后设置为false
+    // isFirst: -1, //是否为第一次加载 -1 为首次加载  1 为多次加载
     isChanged: false, //当前数据是否改变，点击首页保存后设置为false
-    isFirst: -1, //是否为第一次加载 -1 为首次加载  1 为多次加载
   }),
 
 
@@ -110,37 +110,23 @@ export const useSlidesStore = defineStore('slides', {
   },
 
   actions: {
-    handle_is_first() {
-        if (this.isFirst === -1) {
-          this.isFirst = 0
-        }
-        else if (this.isFirst === 0) { //第一次加载而非改变时会被设置为0
-          this.isFirst = 1
-        }
-        else if (this.isFirst === 1) { //数据改变
-          this.isFirst = 1
-          this.isChanged = true
-        }
-    },
-    setTheme(themeProps: Partial<SlideTheme>) {
 
+    setTheme(themeProps: Partial<SlideTheme>) {
       // this.$patch({ theme: { ...this.theme, ...themeProps } })
       this.theme = { ...this.theme, ...themeProps }
     },
 
     setViewportRatio(viewportRatio: number) {
-      this.$patch({ viewportRatio: viewportRatio })
+      // this.$patch({ viewportRatio: viewportRatio })
       this.viewportRatio = viewportRatio
     },
 
     setSlides(slides: Slide[]) {
-      this.isChanged = true
-      this.$patch({ slides: slides })
       this.slides = slides
+     
     },
 
     addSlide(slide: Slide | Slide[]) {
-      this.isChanged = true
       const slides = Array.isArray(slide) ? slide : [slide]
       const addIndex = this.slideIndex + 1
       this.slides.splice(addIndex, 0, ...slides)
@@ -148,7 +134,6 @@ export const useSlidesStore = defineStore('slides', {
     },
 
     updateSlide(props: Partial<Slide>) {
-      this.isChanged = true
       const slideIndex = this.slideIndex
       this.slides[slideIndex] = { ...this.slides[slideIndex], ...props }
       // this.$patch({ slides[slideIndex]:  { ...this.slides[slideIndex], ...props } })
@@ -156,9 +141,7 @@ export const useSlidesStore = defineStore('slides', {
     },
 
     deleteSlide(slideId: string | string[]) {
-      this.isChanged = true
       const slidesId = Array.isArray(slideId) ? slideId : [slideId]
-
       const deleteSlidesIndex = []
       for (let i = 0; i < slidesId.length; i++) {
         const index = this.slides.findIndex(item => item.id === slidesId[i])
@@ -174,12 +157,10 @@ export const useSlidesStore = defineStore('slides', {
     },
 
     updateSlideIndex(index: number) {
-      this.isChanged = true
       this.slideIndex = index
     },
 
     addElement(element: PPTElement | PPTElement[]) {
-      this.isChanged = true
       const elements = Array.isArray(element) ? element : [element]
       const currentSlideEls = this.slides[this.slideIndex].elements
       const newEls = [...currentSlideEls, ...elements]
@@ -187,7 +168,6 @@ export const useSlidesStore = defineStore('slides', {
     },
 
     deleteElement(elementId: string | string[]) {
-      this.isChanged = true
       const elementIdList = Array.isArray(elementId) ? elementId : [elementId]
       const currentSlideEls = this.slides[this.slideIndex].elements
       const newEls = currentSlideEls.filter(item => !elementIdList.includes(item.id))
@@ -195,7 +175,6 @@ export const useSlidesStore = defineStore('slides', {
     },
 
     updateElement(data: UpdateElementData) {
-      this.isChanged = true
       const { id, props } = data
       const elIdList = typeof id === 'string' ? [id] : id
 
@@ -208,7 +187,6 @@ export const useSlidesStore = defineStore('slides', {
     },
 
     removeElementProps(data: RemoveElementPropData) {
-      this.isChanged = true
       const { id, propName } = data
       const propsNames = typeof propName === 'string' ? [propName] : propName
 
@@ -220,16 +198,13 @@ export const useSlidesStore = defineStore('slides', {
       this.slides[slideIndex].elements = (elements as PPTElement[])
     },
 
-    setIschanged(is_change: boolean) {
-      this.isChanged = is_change
-      this.isFirst = -1
-    }
-    // updated(type: string,range:any, data: any) {
-    //   // type是改变类型，
-    //   console.log(type,'type',range,'range',data,'data')
+    setChanged_init() {
+      this.isChanged = false
+    },
 
-    //   return { 'type': type, 'range':range,'data': data }
-    // }
+    setChanged() {
+      this.isChanged = true
+    }
   },
 
 })

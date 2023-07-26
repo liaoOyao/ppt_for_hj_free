@@ -155,20 +155,20 @@ export default defineComponent({
     }
     const slidesStore = useSlidesStore()  // slider 仓库
 
-    const beforeUnloadHandler = (event) => {
-      const { isChanged } = storeToRefs(slidesStore)
-      if (process.env.NODE_ENV === 'production' && isChanged) {
-        // if (isChanged) {
-        event.preventDefault()
-        event.returnValue = '你还没有保存数据，确定要离开吗？'
-      }
-    }
-    onMounted(() => {
-      window.addEventListener('beforeunload', beforeUnloadHandler)
-    })
-    onUnmounted(() => {
-      window.removeEventListener('beforeunload', beforeUnloadHandler)
-    })
+    // const beforeUnloadHandler = (event) => {
+    //   const { isChanged } = storeToRefs(slidesStore)
+    //   if (process.env.NODE_ENV === 'production' && isChanged) {
+    //     // if (isChanged) {
+    //     event.preventDefault()
+    //     event.returnValue = '你还没有保存数据，确定要离开吗？'
+    //   }
+    // }
+    // onMounted(() => {
+    //   // window.addEventListener('beforeunload', beforeUnloadHandler)
+    // })
+    // onUnmounted(() => {
+    //   // window.removeEventListener('beforeunload', beforeUnloadHandler)
+    // })
     const data_for_template: any = (inject('data_for_template'))
 
     return {
