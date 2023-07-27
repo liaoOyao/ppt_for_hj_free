@@ -626,10 +626,10 @@ export default defineComponent({
     //   // dialogVisible.value = false
     // }
     // 调用父亲的保存方法
-    const handleSaveData = () => {
+    const handleSaveData = async () => {
       // const data = '需要保存的数据';
       // this.$emit('save-data', data);
-      context.emit('save_data')
+      await context.emit('save_data')
     }
     // const hanldeDefaultSelect = () => {
     //   // 直接选中当前对象
@@ -679,7 +679,7 @@ export default defineComponent({
         ElMessage.error('获取模版列表失败，请刷新重试')
       }
     }
-    const openTemplate = (index: number) => {
+    const openTemplate = async (index: number) => {
       if (index === 1) {
         // 设置标题
         // 加载模版
@@ -693,6 +693,27 @@ export default defineComponent({
         // his_title.value = (my_dimession.title ? my_dimession.title : '无') + ' 历史版本  ' + '(' + (my_dimession.select_pk_name ? my_dimession.select_pk_name : '空维度') + ' ' + (my_dimession.year ? my_dimession.year : '无年份') + ')'
       } else if (index === 2) {
         // 编辑模版
+        // 如果首页有数据更改，弹窗提醒保存
+        const { isChanged } = storeToRefs(slidesStore)
+        if (isChanged.value) {
+          const confirmSave = await openRemindDialog()
+          if (confirmSave === 'save') {
+            // 执行保存操作
+            try {
+              await handleSaveData()
+              slidesStore.setChanged_init()
+            } catch (error) {
+              ElMessage.error('保存失败，请刷新重试！')
+              return
+            }
+          } else if (confirmSave === 'discard') {
+            // 不保存，执行下一步操作
+            slidesStore.setChanged_init()
+          } else if (confirmSave === 'cancel') {
+            // 取消操作
+            return
+          }
+        }
         templateDrawerVisible.value = true
         template_type.value = 2
       }
@@ -994,22 +1015,20 @@ export default defineComponent({
         ElMessage.error('新增失确定加载模版失败，请刷新重试！')
       }
     }
-    // const get_hz_ppt_by_dimension_and_year = inject('get_hz_ppt_by_dimension_and_year')
-    const get_hz_ppt_by_dimension_and_year: (localDimensionObj, year) => any = inject('get_hz_ppt_by_dimension_and_year') // 接受
     const closeHisView = () => {
       historyDrawerViewHisVisible.value = false
       flush_index()
     }
+    // const get_hz_ppt_by_dimension_and_year = inject('get_hz_ppt_by_dimension_and_year')
+    const get_hz_ppt_by_dimension_and_year: (localDimensionObj, year) => any = inject('get_hz_ppt_by_dimension_and_year') // 接受
     const flush_index = () => {
       const localDimensionObj = reactive({
         ...props.dimension_obj_for_index
       })
-      debugger
       // console.log(props.dimension_obj_for_index, 'localDimensionObj')
       localDimensionObj.bupl_id = localDimensionObj.bupl_id || 0
       localDimensionObj.spfd_id = localDimensionObj.spfd_id || 0
       localDimensionObj.d_id = localDimensionObj.d_id || 0
-      debugger
       get_hz_ppt_by_dimension_and_year(localDimensionObj, localDimensionObj.year)
     }
 
