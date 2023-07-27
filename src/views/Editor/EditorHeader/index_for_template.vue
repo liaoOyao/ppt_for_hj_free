@@ -155,6 +155,11 @@ export default defineComponent({
     }
     const slidesStore = useSlidesStore()  // slider 仓库
 
+    // 给首页使用的保存模版对象和对象下的方法
+    const handleSaveTemplateDataUsedByIndex = ref(null)
+    handleSaveTemplateDataUsedByIndex.value = {
+      handleSaveTemplateData,
+    }
     // const beforeUnloadHandler = (event) => {
     //   const { isChanged } = storeToRefs(slidesStore)
     //   if (process.env.NODE_ENV === 'production' && isChanged) {
@@ -170,7 +175,28 @@ export default defineComponent({
     //   // window.removeEventListener('beforeunload', beforeUnloadHandler)
     // })
     const data_for_template: any = (inject('data_for_template'))
+    // 给爷爷组件使用的保存模版数据方法
+    // const saveTemplateData: any = ref(inject('saveTemplateData'))
+    // // 创建监听器
+    // watch(
+    //   saveTemplateData,
+    //   (newValue, oldValue) => {
+    //     debugger
+    //     if (newValue !== oldValue) {
+    //       save_template()
+    //     }
+    //   },
+    //   { deep: true }
+    // )
 
+  
+    window.onbeforeunload = (event) => {
+      // 自定义确认消息
+      // return '你确定要离开当前页面吗？'
+      handleSaveTemplateData()
+    }
+
+  
     return {
       redo,
       undo,

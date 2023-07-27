@@ -33,7 +33,7 @@ export const useSlidesStore = defineStore('slides', {
   state: (): SlidesState => ({
     theme: theme, // 主题样式
     // slides: hj_slides, // 幻灯片页面数据
-    slides: [], // 幻灯片页面数据
+    slides: slides, // 幻灯片页面数据
     slideIndex: 0, // 当前页面索引
     viewportRatio: 0.5625, // 可是区域比例，默认16:9
     // isChanged: false, //当前数据是否改变，点击首页保存后设置为false

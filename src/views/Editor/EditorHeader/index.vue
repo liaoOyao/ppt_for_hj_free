@@ -66,6 +66,11 @@
           <IconFileEditing fill="#666"></IconFileEditing><span class="text">编辑模版</span>
         </div>
       </Tooltip>
+      <!-- <Tooltip :mouseLeaveDelay="0" title="打开提醒对话框">
+        <div class="menu-item" @click="openRemindDialog">
+          <IconDownloadOne fill="#666"></IconDownloadOne><span class="text">打开提醒对话框</span>
+        </div>
+      </Tooltip> -->
     </div>
 
     <div class="right">
@@ -98,7 +103,9 @@
         </div>
       </Tooltip>
       <!-- <a href="https://github.com/pipipi-pikachu/PPTist" target="_blank">
-        <div class="menu-item"><IconGithub size="18" fill="#666" /></div>
+        <div class="menu-item">
+          <IconGithub size="18" fill="#666" />
+        </div>
       </a> -->
     </div>
 
@@ -257,11 +264,23 @@
       </template>
     </el-dialog>
   </div>
-  <!-- {{ dimension_obj_for_index }} -->
+  <el-dialog v-model="dialogVisibleForRemind" title="提醒" width="30%" draggable align-center :close-on-click-modal="false"
+    :destroy-on-close="true">
+    <div class="hz_ppt_remind_body">
+      <div>
+        <span class="el-dialog__title">保存当前所做更改吗？</span>
+      </div>
+      <div class="dialog-footer_ppt_remind">
+        <el-button type="primary" ref="confirmButton" id="confirm-button-ppt">保存</el-button>
+        <el-button ref="discardButton" id="discard-button-ppt">不保存</el-button>
+        <el-button ref="cancelButton" id="cancel-button-ppt">取消</el-button>
+      </div>
+    </div>
+  </el-dialog>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, reactive, ComponentOptions, onMounted, SetupContext, onUnmounted, provide, inject } from 'vue'
+import { defineComponent, ref, reactive, ComponentOptions, onMounted, SetupContext, onUnmounted, provide, inject, nextTick } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useMainStore, useSlidesStore } from '@/store'
 import useScreening from '@/hooks/useScreening'
@@ -499,7 +518,7 @@ export default defineComponent({
 
                   element.classList.remove('hiwin_ppt_snapshot_models_sidebar_row_select')
                 } else {
-                  
+
                   //找到要选中的对象了
                   element.classList.add('hiwin_ppt_snapshot_models_sidebar_row_select')
                   // get_hz_ppt_by_dimension_and_year(dimension_obj, value_year.value)
@@ -546,11 +565,11 @@ export default defineComponent({
           setTimeout(() => {
             loading.value.close()
           }, 20)
-        } 
+        }
         // else {
         //   // console.log('loading.value.close is not a function')
         // }
-      } 
+      }
       // else {
       //   // console.log('loading.value does not exist')
       // }
@@ -844,8 +863,108 @@ export default defineComponent({
         type: template_type
       }
     )
+    // 给编辑模版页面用的弹窗提醒功能
+    const dialogVisibleForRemind = ref(false)
+    // const openRemindDialog = () => {
+    //   debugger
+    //   dialogVisible.value = true
+    // }
+
+
+    let confirmButton = null
+    let discardButton = null
+    let cancelButton = null
+    const openRemindDialog = async () => {
+      dialogVisibleForRemind.value = true
+      return await new Promise<string>((resolve) => {
+        const handleConfirmClick = () => {
+          resolve('save')
+          dialogVisibleForRemind.value = false
+        }
+
+        const handleDiscardClick = () => {
+          resolve('discard')
+          dialogVisibleForRemind.value = false
+        }
+
+        const handleCancelClick = () => {
+          resolve('cancel')
+          dialogVisibleForRemind.value = false
+        }
+        // 添加 nextTick 来确保在下一次 DOM 更新之后获取到正确的元素对象
+        nextTick(() => {
+          confirmButton = document.getElementById('confirm-button-ppt')
+          discardButton = document.getElementById('discard-button-ppt')
+          cancelButton = document.getElementById('cancel-button-ppt')
+          addClickEventIfNotExists(confirmButton, handleConfirmClick)
+          addClickEventIfNotExists(discardButton, handleDiscardClick)
+          addClickEventIfNotExists(cancelButton, handleCancelClick)
+          // confirmButton.addEventListener('click', handleConfirmClick)
+          // discardButton.addEventListener('click', handleDiscardClick)
+          // cancelButton.addEventListener('click', handleCancelClick)
+        })
+      })
+    }
+    const addClickEventIfNotExists = (button, eventListener) => {
+      if (!button.hasEventListener) {
+        button.hasEventListener = true
+        button.addEventListener('click', eventListener)
+      }
+    }
+
     provide('data_for_template', data_for_template)
-    const cancelTemplate = () => {
+    // 弹窗时调用的保存当前编辑模版数据的方法
+    const saveEditTemplate = async () => {
+      // 调用编辑模版页面的父亲的方法
+      // context.emit('save_data')
+      if (data_for_template && data_for_template.id) {
+        // ElMessage.success('首页的维度对象获取到！' + JSON.stringify(data_for_template))
+        try {
+          const { slides, theme } = storeToRefs(slidesStore)
+          // 获取数据 
+          const data_ppt = pako.gzip(JSON.stringify(slides.value ? slides.value : null))
+          // data_ppt转换为Base64编码时，String.fromCharCode.apply函数调用栈溢出了,因为data太大了，因此将unit8array 分块处理
+          const base64_data = arrayBufferToBase64(data_ppt)
+          const data = await http.post('/hz_ppt', { method_: "save_template_doc_by_id", id: data_for_template.id, doc: base64_data })
+          if (data && data.status === 200) {
+            ElMessage.success('保存成功！')
+          }
+          else {
+            ElMessage.error(data.msg ? data.msg : '保存失败请刷新重试！')
+          }
+        } catch (e) {
+          ElMessage.error('保存失败请刷新重试！')
+        }
+      }
+      else {
+        ElMessage.error('首页的维度对象没有获取到，请刷新重试！')
+      }
+    }
+    const cancelTemplate = async () => {
+      // 刷新前检查数据是否保存
+      if (template_type.value === 2) {
+        // 编辑模版
+        const { isChanged } = storeToRefs(slidesStore)
+        if (isChanged.value) {
+          const confirmSave = await openRemindDialog()
+          if (confirmSave === 'save') {
+            // 执行保存操作
+            try {
+              await saveEditTemplate()
+              slidesStore.setChanged_init()
+            } catch (error) {
+              ElMessage.error('保存失败，请刷新重试！')
+              return
+            }
+          } else if (confirmSave === 'discard') {
+            // 不保存，执行下一步操作
+            slidesStore.setChanged_init()
+          } else if (confirmSave === 'cancel') {
+            // 取消操作
+            return
+          }
+        }
+      }
       flush_index()
       templateDrawerVisible.value = false
       verisonNameValidateForm.verison_name = ''
@@ -885,13 +1004,17 @@ export default defineComponent({
       const localDimensionObj = reactive({
         ...props.dimension_obj_for_index
       })
+      debugger
       // console.log(props.dimension_obj_for_index, 'localDimensionObj')
       localDimensionObj.bupl_id = localDimensionObj.bupl_id || 0
       localDimensionObj.spfd_id = localDimensionObj.spfd_id || 0
       localDimensionObj.d_id = localDimensionObj.d_id || 0
+      debugger
       get_hz_ppt_by_dimension_and_year(localDimensionObj, localDimensionObj.year)
     }
+
     provide('flush_index', flush_index)
+
     return {
       redo,
       undo,
@@ -947,6 +1070,8 @@ export default defineComponent({
       cancelTemplate,
       closeHisView,
       delTemplateDialog,
+      openRemindDialog,
+      dialogVisibleForRemind,
     }
   },
 })

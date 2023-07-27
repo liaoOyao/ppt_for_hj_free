@@ -117,7 +117,8 @@
 
       </div>
       <div class="pptist-editor">
-        <EditorHeader class="layout-header" @save_data="saveData" :dimension_obj_for_index="dimension_obj_for_index" />
+        <EditorHeader class="layout-header" @save_data="saveData" :dimension_obj_for_index="dimension_obj_for_index"
+          @openRemindDialog="openRemindDialog" />
         <div class="layout-content">
           <Thumbnails class="layout-content-left" />
           <div class="layout-content-center">
@@ -133,11 +134,25 @@
       @cancel="closeExportDialog()">
       <ExportDialog />
     </Modal>
+
   </div>
+  <el-dialog v-model="dialogVisible" title="提醒" width="30%" draggable align-center :close-on-click-modal="false"
+    :destroy-on-close="true">
+    <div class="hz_ppt_remind_body">
+      <div>
+        <span class="el-dialog__title">保存当前所做更改吗？</span>
+      </div>
+      <div class="dialog-footer_ppt_remind">
+        <el-button type="primary" ref="confirmButton" id="confirm-button-ppt">保存</el-button>
+        <el-button ref="discardButton" id="discard-button-ppt">不保存</el-button>
+        <el-button ref="cancelButton" id="cancel-button-ppt">取消</el-button>
+      </div>
+    </div>
+  </el-dialog>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, nextTick, watchEffect, watch, onUnmounted, reactive, provide } from 'vue'
+import { defineComponent, ref, onMounted, onUnmounted, reactive, provide, nextTick } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useMainStore, useSlidesStore } from '@/store'
 import useGlobalHotkey from '@/hooks/useGlobalHotkey'
@@ -476,8 +491,29 @@ export default defineComponent({
 
     // 点击切换    选择的维度
     const a_click_hj_ppt_sidebar_select = async (pk: any, pk_name: string, name: string) => {
-      await remindSave()
-      open_loading()
+      // await remindSave()
+      const { isChanged } = storeToRefs(slidesStore)
+      if (isChanged.value) {
+        const confirmSave = await openRemindDialog()
+        if (confirmSave === 'save') {
+          // 执行保存操作
+          try {
+            await saveData()
+            slidesStore.setChanged_init()
+          } catch (error) {
+            ElMessage.error('保存失败，请重试！')
+            close_loading()
+            return
+          }
+        } else if (confirmSave === 'discard') {
+          // 不保存，执行下一步操作
+          slidesStore.setChanged_init()
+        } else if (confirmSave === 'cancel') {
+          // 取消操作
+          return
+        }
+      }
+      // open_loading()
       // name  是type
       let dimension_obj = {}
       if (name !== 'year') {
@@ -580,29 +616,29 @@ export default defineComponent({
     }
 
     // 获取doc 数据,并且获取 维度列表的信息
-    // const get_hz_ppt_by_dimension_and_year = async (dimension_obj: any, year: any) => {
-    const get_hz_ppt_by_dimension_and_year = (dimension_obj: any, year: any) => {
+    const get_hz_ppt_by_dimension_and_year = async (dimension_obj: any, year: any) => {
+      // const get_hz_ppt_by_dimension_and_year = (dimension_obj: any, year: any) => {
       open_loading()
       try {
-        // const data1 = await http.get('/hz_ppt', { method_: "get_hz_ppt_by_dimension_and_year", ...dimension_obj, year: year, gridKey: gridKey.value })
-        const data1 = {
-          "status": 200,
-          "msg": "新的维度数据已创建",
-          "data": {
-            "id": 46,
-            "hiwin_deleted_time": null,
-            "hiwin_creator": 2,
-            "hiwin_updator": null,
-            "hiwin_is_deleted": 0,
-            "grid_key": "ppt",
-            "year": "2022",
-            "dimension": "bupl_id_0_spfd_id_1_d_id_0",
-            "version": "",
-            "doc": "H4sIAAAAAAAAA9VWW2sbRxT+K8v0wS+rzVz3VtfQugRTatd20oTG+GEtjawl693t7tiSG/xSAiENeTOlD4GGYKhfStungFvIr5GU/ouekfbmRKpsggsdzWh2z5yZPd+5zs4jFHaQj5TMVSuPwo5sEWQiGckDGasc+TuPkDpOJbDkvQBmc8rP23vbgxTeItlVyMcmUkmKfIrhqR92VA/5gtsm6slwvwcMzKaWMNFRKPufJQM4VnPC2DVRGmhutG5g+H0JA8gw6389HsBHumEUActHYs/b64gJYSA724EKE+R3gyiXJkrSoB2qY5DFckyUJSpQIDU+MWcDSJKHa1n3PQC1+ExDqcSn+EaF70Zheg/5KjuUs2VXcqBK0cNO7KwPKtGZEIXwtrCoqPXvihoAEdxiHrb1ehTGcq2kW9RE7SRWYG04ejldWc5VlsT7MKdBbOTqOJKfLHWBo5WH30nfMAih6WBpZfTH09Hz15ubd5dvac4VmIqNt9IV1EBhoo7sBoeRug2HbAQHGs562M6SPOkq45sAREQVz2oSJZnWFmMMzcHv5Org3uYM/FSwuQoQ9ns45+CjXMMbvjgfX7wZ/XU6PrsY/fhkfP5meHE6Pj2v0N4ASG2YEuTtOH2Q8xqkTUqQzDVRroIMqDvY1E4oY9ixI7g3eUuTcBq5CHajXQ27+FzlgRPUOiISiHhUKYyeAPde0H64nyWH+sw6dArG6qjupKETLf27CYTOSSBNG6ZqI/76iwoe4aUNCXcreRxCagM6jiU85izy39Ki+mOtIAr3Y99ow6LMPl5a6NvcLUw/+vVsePZ49PrP4Q8vRy+f/P3qp//cyw+21462NioNUQz4caOx0h+4Z7mcCq/oNr9aACxQ1GwFVbHRVNDw6W/v6OiGY8NZ3fq8365jgzILew0NOHWoWKzZ+OzIYZAcXXC8qn9gHPF5RQd7/W/v9yvBW9Sx7MZniQ7tieScUcthDZGc6nCChW1Rz646a2R5qLKNFegLqxbFxqrBsdGCYU86wQWVFGQypU9rWlHciFty0IJDP5NqpVgo6FPqtDxeuSbWZfA6WWl2SmJXudMc3enJ1UZOcpkliFv3MkM5AiKx9jdWmcbGwmpuaGQveLu8tNgypaqb94nyhnF9Hc7xyPW0f+TUdwlKyCXfom51sSOWi0XdnP8D6su3wjmJ9v7WV3c/ra+yDHPLww6veml2z7UIbqChdbwT53LYNTTA8YfWp4l3+0ZRcv8lObt4ci97/PPb31+9/eX78YtnddG6odoFKkiyzh1QMuwR1w3U3X8AWckOV34MAAA=",
-            "doc2": "H4sIAAAAAAAAA91XW2/cRBT+K5Z5yEvXnasvIUSCoCpCJCRpaUWzeXB2x1mrjm3sSXYD6ktVqWoRbxHioRJVFYm8IOCpUkDqr9nd8i+Y8Xh3Z7Zp3KbQImbHlzkXz5xvzjlz1t7+tm3H3ba9aLVtzkreKpO4y1qwbV8RFJawfZbyUvKlJD/KmZIte6F8lUITddLZ3RrkipawiEsqkAOe5fIdgWrUj7u8J8eUuHLcY/FerxLGLnKoJB3GrP9JNqhmrbTEbUcy8lCptu01C4jf5+ISPPGUd3ndVvNHcZIowQ/obrDbpRPygHW3Qh5nkhmFSckkOcvDTsyPqgU7nqQUGQ95ZSq4e8VqsjzL7qwW0astN+3GCgfNbgTeh9VREuc3JYUXB6zBaM4G3LQ57qbe2sC0GVOqWe1SB1Fzx31qWg4pcXAAXCWXxClbnfEcJImdLOXCBdWkS/nyUsmLLN0TzzxMrZIfJeyjhUgItcr4G7ZoWRCifLCwPPr94ej7ZxsbN5auSsll8agVr+bLatmavXLYZVF4kPBr4lvr4X5t+FrcKbIyi7j1VSjWrRRryZUsyYoab4xx225GzSv5/s2Ni1BDFDfCRt3zkXkFIohIQIaPT8dnz0d/Ho9PzkY/PBifPh+eHY+PT6f4vDNY5D6bsFxL89slmYPFhTos2JejkodFxd0Wa1PRwdLqI9uUBBNSnsWTpNW21Vfb9o7CbLY2PUQq1Or4zhK5LGMH0N1Kezfs3NkrsgM1o5kVZlr6HFHVBAQKg3MyLWrKtC87Uc7X0y8/M9GCRHciSHxj/R6Epgd5nkMD7L122E3cSi6mFSbxXrpodQSfFR8uNIYk8Wv/G/1yMjy5P3r2x/DRk9GTB389/fE/FZz7W6uHm+smrggIpIDWsO6UJHB8gmhQd5dcIm4boD0f0mlI65AOH/46h+p7DGlvZfPTfmcupBF2QKDh5ZkR7mC9kYaAx+Lw8IWnT/u/Fv7kNWoAEPS/vtU37W0hz3G1BUKVxGqDCUaOhzUDPGNSCKjroMCddjx3dopqSeOK/gZFBALWikWA1RKXW3UIaiqsyVDRVYlR1xrQn0igWkK+wymnZtR0RVXVyuVKFL0iuXwGvij94ksUuofXe2xlPv/62KHQn3U9G3tU5JCZ32Njn11AHV1xLlMLisl+k22e7JteK06qx7fekOaYWMv7h95cjYggNLwa6SGBAHR8QGfN+19A9fJ/jObD6NbmFzc+nvs3hQFxAuCRadedLPAdCDTzkZnCoGdmiznoCPhHTv0q8hatuu654ADzQVWk3//pxW9PX/x8b/z4u1kp8K4qggqgrOheF1tT6dO3TDI79t81cRe4UA8AAA==",
-            "is_curr": 1
-          }
-        }
+        const data1 = await http.get('/hz_ppt', { method_: "get_hz_ppt_by_dimension_and_year", ...dimension_obj, year: year, gridKey: gridKey.value })
+        // const data1 = {
+        //   "status": 200,
+        //   "msg": "新的维度数据已创建",
+        //   "data": {
+        //     "id": 46,
+        //     "hiwin_deleted_time": null,
+        //     "hiwin_creator": 2,
+        //     "hiwin_updator": null,
+        //     "hiwin_is_deleted": 0,
+        //     "grid_key": "ppt",
+        //     "year": "2022",
+        //     "dimension": "bupl_id_0_spfd_id_1_d_id_0",
+        //     "version": "",
+        //     "doc": "H4sIAAAAAAAAA9VWW2sbRxT+K8v0wS+rzVz3VtfQugRTatd20oTG+GEtjawl693t7tiSG/xSAiENeTOlD4GGYKhfStungFvIr5GU/ouekfbmRKpsggsdzWh2z5yZPd+5zs4jFHaQj5TMVSuPwo5sEWQiGckDGasc+TuPkDpOJbDkvQBmc8rP23vbgxTeItlVyMcmUkmKfIrhqR92VA/5gtsm6slwvwcMzKaWMNFRKPufJQM4VnPC2DVRGmhutG5g+H0JA8gw6389HsBHumEUActHYs/b64gJYSA724EKE+R3gyiXJkrSoB2qY5DFckyUJSpQIDU+MWcDSJKHa1n3PQC1+ExDqcSn+EaF70Zheg/5KjuUs2VXcqBK0cNO7KwPKtGZEIXwtrCoqPXvihoAEdxiHrb1ehTGcq2kW9RE7SRWYG04ejldWc5VlsT7MKdBbOTqOJKfLHWBo5WH30nfMAih6WBpZfTH09Hz15ubd5dvac4VmIqNt9IV1EBhoo7sBoeRug2HbAQHGs562M6SPOkq45sAREQVz2oSJZnWFmMMzcHv5Org3uYM/FSwuQoQ9ns45+CjXMMbvjgfX7wZ/XU6PrsY/fhkfP5meHE6Pj2v0N4ASG2YEuTtOH2Q8xqkTUqQzDVRroIMqDvY1E4oY9ixI7g3eUuTcBq5CHajXQ27+FzlgRPUOiISiHhUKYyeAPde0H64nyWH+sw6dArG6qjupKETLf27CYTOSSBNG6ZqI/76iwoe4aUNCXcreRxCagM6jiU85izy39Ki+mOtIAr3Y99ow6LMPl5a6NvcLUw/+vVsePZ49PrP4Q8vRy+f/P3qp//cyw+21462NioNUQz4caOx0h+4Z7mcCq/oNr9aACxQ1GwFVbHRVNDw6W/v6OiGY8NZ3fq8365jgzILew0NOHWoWKzZ+OzIYZAcXXC8qn9gHPF5RQd7/W/v9yvBW9Sx7MZniQ7tieScUcthDZGc6nCChW1Rz646a2R5qLKNFegLqxbFxqrBsdGCYU86wQWVFGQypU9rWlHciFty0IJDP5NqpVgo6FPqtDxeuSbWZfA6WWl2SmJXudMc3enJ1UZOcpkliFv3MkM5AiKx9jdWmcbGwmpuaGQveLu8tNgypaqb94nyhnF9Hc7xyPW0f+TUdwlKyCXfom51sSOWi0XdnP8D6su3wjmJ9v7WV3c/ra+yDHPLww6veml2z7UIbqChdbwT53LYNTTA8YfWp4l3+0ZRcv8lObt4ci97/PPb31+9/eX78YtnddG6odoFKkiyzh1QMuwR1w3U3X8AWckOV34MAAA=",
+        //     "doc2": "H4sIAAAAAAAAA91XW2/cRBT+K5Z5yEvXnasvIUSCoCpCJCRpaUWzeXB2x1mrjm3sSXYD6ktVqWoRbxHioRJVFYm8IOCpUkDqr9nd8i+Y8Xh3Z7Zp3KbQImbHlzkXz5xvzjlz1t7+tm3H3ba9aLVtzkreKpO4y1qwbV8RFJawfZbyUvKlJD/KmZIte6F8lUITddLZ3RrkipawiEsqkAOe5fIdgWrUj7u8J8eUuHLcY/FerxLGLnKoJB3GrP9JNqhmrbTEbUcy8lCptu01C4jf5+ISPPGUd3ndVvNHcZIowQ/obrDbpRPygHW3Qh5nkhmFSckkOcvDTsyPqgU7nqQUGQ95ZSq4e8VqsjzL7qwW0astN+3GCgfNbgTeh9VREuc3JYUXB6zBaM4G3LQ57qbe2sC0GVOqWe1SB1Fzx31qWg4pcXAAXCWXxClbnfEcJImdLOXCBdWkS/nyUsmLLN0TzzxMrZIfJeyjhUgItcr4G7ZoWRCifLCwPPr94ej7ZxsbN5auSsll8agVr+bLatmavXLYZVF4kPBr4lvr4X5t+FrcKbIyi7j1VSjWrRRryZUsyYoab4xx225GzSv5/s2Ni1BDFDfCRt3zkXkFIohIQIaPT8dnz0d/Ho9PzkY/PBifPh+eHY+PT6f4vDNY5D6bsFxL89slmYPFhTos2JejkodFxd0Wa1PRwdLqI9uUBBNSnsWTpNW21Vfb9o7CbLY2PUQq1Or4zhK5LGMH0N1Kezfs3NkrsgM1o5kVZlr6HFHVBAQKg3MyLWrKtC87Uc7X0y8/M9GCRHciSHxj/R6Epgd5nkMD7L122E3cSi6mFSbxXrpodQSfFR8uNIYk8Wv/G/1yMjy5P3r2x/DRk9GTB389/fE/FZz7W6uHm+smrggIpIDWsO6UJHB8gmhQd5dcIm4boD0f0mlI65AOH/46h+p7DGlvZfPTfmcupBF2QKDh5ZkR7mC9kYaAx+Lw8IWnT/u/Fv7kNWoAEPS/vtU37W0hz3G1BUKVxGqDCUaOhzUDPGNSCKjroMCddjx3dopqSeOK/gZFBALWikWA1RKXW3UIaiqsyVDRVYlR1xrQn0igWkK+wymnZtR0RVXVyuVKFL0iuXwGvij94ksUuofXe2xlPv/62KHQn3U9G3tU5JCZ32Njn11AHV1xLlMLisl+k22e7JteK06qx7fekOaYWMv7h95cjYggNLwa6SGBAHR8QGfN+19A9fJ/jObD6NbmFzc+nvs3hQFxAuCRadedLPAdCDTzkZnCoGdmiznoCPhHTv0q8hatuu654ADzQVWk3//pxW9PX/x8b/z4u1kp8K4qggqgrOheF1tT6dO3TDI79t81cRe4UA8AAA==",
+        //     "is_curr": 1
+        //   }
+        // }
         // const data1  = {"status":200,"msg":"ok","dimension_obj":{"pl_list":[{"name":"DSTE咨询及软件","id":2,"pk":2,"superior_id":0,"children_pk_list":[5,6],"is_valid_now":0},{"name":"内训","id":3,"pk":3,"superior_id":0,"children_pk_list":[7,8],"is_valid_now":0},{"name":"公开课","id":4,"pk":4,"superior_id":0,"children_pk_list":[9,10],"is_valid_now":0},{"name":"IPD咨询","id":11,"pk":11,"superior_id":0,"children_pk_list":[1],"is_valid_now":0},{"name":"布艺事业部","id":13,"pk":13,"superior_id":0,"children_pk_list":[14,15,16,17,18],"is_valid_now":0},{"name":"11","id":21,"pk":21,"superior_id":0,"children_pk_list":[22],"is_valid_now":0},{"name":"12","id":23,"pk":23,"superior_id":0,"children_pk_list":[24],"is_valid_now":1},{"name":"测试权限","id":25,"pk":25,"superior_id":0,"children_pk_list":[26],"is_valid_now":0},{"name":"布艺事业部 / 中高端品类","id":18,"pk":18,"superior_id":13,"is_valid_now":1}],"pl_id":null,"pl_name":null,"spfd_list":[{"id":7,"pk":7,"name":"供应链"},{"id":1,"pk":1,"name":"研发领域"},{"id":2,"pk":2,"name":"营销领域"},{"id":3,"pk":3,"name":"组织及人力资源"},{"id":4,"pk":4,"name":"财务"},{"id":5,"pk":5,"name":"品牌"},{"id":6,"pk":6,"name":"服务领域"},{"id":8,"pk":8,"name":"流程IT"},{"id":9,"pk":9,"name":"市场营销"},{"id":10,"pk":10,"name":"F-权限测试"}],"spfd_id":null,"spfd_name":null,"d_list":[{"id":"00000000","pk":"00000000","name":"汉捷公司","text":"汉捷公司","tree_name":"汉捷公司","level":0,"sales_position":1},{"pk":"01000000","name":"咨询一部","tree_name":"咨询一部","level":1,"sales_position":2,"superior_department__pk":"00000000","id":"01000000","text":"咨询一部"},{"pk":"06000000","name":"咨询二部","tree_name":"咨询二部","level":1,"sales_position":"","superior_department__pk":"00000000","id":"06000000","text":"咨询二部"},{"pk":"02000000","name":"销售一部","tree_name":"销售一部","level":1,"sales_position":1,"superior_department__pk":"00000000","id":"02000000","text":"销售一部"},{"pk":"03000000","name":"销售二部","tree_name":"销售二部","level":1,"sales_position":1,"superior_department__pk":"00000000","id":"03000000","text":"销售二部"},{"pk":"04000000","name":"市场部","tree_name":"市场部","level":1,"sales_position":"","superior_department__pk":"00000000","id":"04000000","text":"市场部"},{"pk":"05000000","name":"运作管理部","tree_name":"运作管理部","level":1,"sales_position":"","superior_department__pk":"00000000","id":"05000000","text":"运作管理部"},{"pk":"07000000","name":"总经理助理","tree_name":"总经理助理","level":1,"sales_position":"","superior_department__pk":"00000000","id":"07000000","text":"总经理助理"},{"pk":"08000000","name":"外部合作","tree_name":"外部合作","level":1,"sales_position":"","superior_department__pk":"00000000","id":"08000000","text":"外部合作"},{"pk":"09000000","name":"香港办事处","tree_name":"香港办事处","level":1,"sales_position":"","superior_department__pk":"00000000","id":"09000000","text":"香港办事处"},{"pk":"04010000","name":"软件中心","tree_name":"软件中心","level":1,"sales_position":"","superior_department__pk":"00000000","id":"04010000","text":"软件中心"},{"pk":"11000000","name":"测试权限","tree_name":"测试权限","level":1,"sales_position":"","superior_department__pk":"00000000","id":"11000000","text":"测试权限"},{"pk":"06010000","name":"IT实施组","tree_name":"咨询二部 / IT实施组","level":2,"sales_position":"","superior_department__pk":"06000000","id":"06010000","text":"IT实施组"},{"pk":"08010000","name":"外部合作销售","tree_name":"外部合作 / 外部合作销售","level":2,"sales_position":"","superior_department__pk":"08000000","id":"08010000","text":"外部合作销售"},{"pk":"11020000","name":"测试权限（二级部门）","tree_name":"测试权限 / 测试权限（二级部门）","level":2,"sales_position":"","superior_department__pk":"11000000","id":"11020000","text":"测试权限（二级部门）"},{"id":"07000000","pk":"07000000","text":"总经理助理","tree_name":"总经理助理","level":1},{"id":"04010000","pk":"04010000","text":"软件中心","tree_name":"软件中心","level":1},{"id":"06000000","pk":"06000000","text":"咨询二部","tree_name":"咨询二部","level":1}],"d_id":"00000000","d_name":"汉捷管理咨询有限公司","year_list":[{"id":2019,"name":2019},{"id":2020,"name":2020},{"id":2021,"name":2021},{"id":2022,"name":2022},{"id":2023,"name":2023},{"id":2024,"name":2024},{"id":2025,"name":2025},{"id":2026,"name":2026},{"id":2027,"name":2027},{"id":2028,"name":2028}],"cur_year":"2022"}}
         if (data1 && data1.status === 200) {
           // // 解析维度信息 
@@ -745,6 +781,7 @@ export default defineComponent({
       if (resp && resp.status === 200) {
         // 返回响应
         message.success('保存成功')
+        slidesStore.setChanged_init()
         close_loading()
       }
       else {
@@ -786,39 +823,121 @@ export default defineComponent({
     //     parentElement.addEventListener('keydown', keydownListener)
     //   }
     // }
-    debugger
-    const remindSave = () => {
-      debugger
-      return new Promise<void>((resolve, reject) => {
-        debugger
-        const { isChanged } = storeToRefs(slidesStore)
-        if (isChanged.value) {
-          ElMessageBox.confirm(
-            '保存当前所做更改吗？',
-            '信息',
-            {
-              confirmButtonText: '保存',
-              cancelButtonText: '取消',
-              type: 'warning'
-            }
-          ).then(() => {
-            // 调用保存数据的方法
-            saveData().then(() => {
-              slidesStore.setChanged_init()
-              resolve() // 解决 Promise，表示点击了确定
-            }).catch(error => {
-              slidesStore.setChanged_init()
-              reject() // 拒绝 Promise，表示出错或取消
-            })
-          }).catch(() => {
-            slidesStore.setChanged_init()
-            reject() // 拒绝 Promise，表示点击了取消
-          })
-        } else {
-          resolve() // 解决 Promise，不需要保存直接通过
+    // const remindSave = () => {
+    //   return new Promise<void>((resolve, reject) => {
+    //     const { isChanged } = storeToRefs(slidesStore)
+    //     if (isChanged.value) {
+    //       ElMessageBox.confirm(
+    //         '保存当前所做更改吗？',
+    //         '信息',
+    //         {
+    //           confirmButtonText: '保存',
+    //           cancelButtonText: '取消',
+    //           type: 'warning'
+    //         }
+    //       ).then(() => {
+    //         // 调用保存数据的方法
+    //         saveData().then(() => {
+    //           slidesStore.setChanged_init()
+    //           resolve() // 解决 Promise，表示点击了确定
+    //         }).catch(error => {
+    //           slidesStore.setChanged_init()
+    //           reject() // 拒绝 Promise，表示出错或取消
+    //         })
+    //       }).catch(() => {
+    //         slidesStore.setChanged_init()
+    //         reject() // 拒绝 Promise，表示点击了取消
+    //       })
+    //     } else {
+    //       resolve() // 解决 Promise，不需要保存直接通过
+    //     }
+    //   })
+    // }
+
+
+    const dialogVisible = ref(false)
+    // const openRemindDialog = () => {
+    //   debugger
+    //   dialogVisible.value = true
+    // }
+
+
+    let confirmButton = null
+    let discardButton = null
+    let cancelButton = null
+    const openRemindDialog = async () => {
+      dialogVisible.value = true
+      return await new Promise<string>((resolve) => {
+        const handleConfirmClick = () => {
+          resolve('save')
+          dialogVisible.value = false
         }
+
+        const handleDiscardClick = () => {
+          resolve('discard')
+          dialogVisible.value = false
+        }
+
+        const handleCancelClick = () => {
+          resolve('cancel')
+          dialogVisible.value = false
+        }
+        // 添加 nextTick 来确保在下一次 DOM 更新之后获取到正确的元素对象
+        nextTick(() => {
+          confirmButton = document.getElementById('confirm-button-ppt')
+          discardButton = document.getElementById('discard-button-ppt')
+          cancelButton = document.getElementById('cancel-button-ppt')
+          addClickEventIfNotExists(confirmButton, handleConfirmClick)
+          addClickEventIfNotExists(discardButton, handleDiscardClick)
+          addClickEventIfNotExists(cancelButton, handleCancelClick)
+          // confirmButton.addEventListener('click', handleConfirmClick)
+          // discardButton.addEventListener('click', handleDiscardClick)
+          // cancelButton.addEventListener('click', handleCancelClick)
+        })
       })
     }
+    const addClickEventIfNotExists = (button, eventListener) => {
+      if (!button.hasEventListener) {
+        button.hasEventListener = true
+        button.addEventListener('click', eventListener)
+      }
+    }
+    // const remindSave = () => {
+    //   return new Promise<void>((resolve, reject) => {
+    //     const { isChanged } = storeToRefs(slidesStore);
+    //     if (isChanged.value) {
+    //       ElMessageBox.confirm(
+    //         '保存当前所做更改吗？',
+    //         '信息',
+    //         {
+    //           confirmButtonText: '保存',
+    //           cancelButtonText: '取消',
+    //           cancelButtonClass: 'no-save-button', // 添加自定义类名
+    //           showCancelButton: true, // 添加显示取消按钮
+    //           type: 'warning'
+    //         }
+    //       ).then(() => {
+    //         // 调用保存数据的方法
+    //         saveData().then(() => {
+    //           slidesStore.setChanged_init();
+    //           resolve(); // 解决 Promise，表示点击了确定
+    //         }).catch(error => {
+    //           slidesStore.setChanged_init();
+    //           reject(); // 拒绝 Promise，表示出错或取消
+    //         });
+    //       }).catch(action => {
+    //         if (action === 'cancel') { // 判断是否点击了取消按钮
+    //           resolve(); // 解决 Promise，表示点击了不保存
+    //         } else {
+    //           slidesStore.setChanged_init();
+    //           reject(); // 拒绝 Promise，表示出错或取消
+    //         }
+    //       });
+    //     } else {
+    //       resolve(); // 解决 Promise，不需要保存直接通过
+    //     }
+    //   });
+    // }
 
     provide('get_hz_ppt_by_dimension_and_year', get_hz_ppt_by_dimension_and_year)
     const pptistEditor = ref(null)
@@ -829,7 +948,6 @@ export default defineComponent({
         // 是hj_slider 触发   并且 hj_slider 没变小 
         return
       }
-      alert(hjSlider_data + " hjSlider_data")
       const computedWidth = window.getComputedStyle(hjSlider_data).width
       if (computedWidth === '0px' || computedWidth === '10px') {
         hjSlider_data.classList.remove('shrink')
@@ -863,35 +981,34 @@ export default defineComponent({
       hanldeDefaultSelect()
       hj_slider_dom.value = document.querySelector('.hj_slider')
       pptistEditor.value = document.querySelector('.pptist-editor')
-      window.addEventListener('beforeunload', handleBeforeUnload)
     })
+
     // 阻止离开当前页面代码
-
     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-      const { isChanged } = storeToRefs(slidesStore);
+      hanldleLeaveHandleDataIndex()
+      // hanldleLeaveHandleDataTemplate()
+      // ElMessage.success('离开')
+    }
+    // const hanldleLeaveHandleDataTemplate = () => {
+    //   // 给重孙发消息，通知它保存模版数据
+    //   provide('saveTemplateData', 'saveTemplateData')
+    // }
+    // 首页保存方法
+    const hanldleLeaveHandleDataIndex = () => {
+      const { isChanged } = storeToRefs(slidesStore)
       if (isChanged.value) {
-        event.preventDefault();
-        event.returnValue = '确认离开该页面吗'; // Chrome需要设置此属性
-
-
-        // 监听用户点击取消事件
-        const handleUserCancel = () => {
-          // 隐藏全局加载动画
-          hideGlobalLoading();
-
-          // 移除用户点击取消事件监听器
-          window.removeEventListener('unload', handleUserCancel);
-        };
-
-        // 添加用户点击取消事件监听器
-        window.addEventListener('unload', handleUserCancel);
+        // 保存模版数据和首页数据
+        try {
+          saveData()
+          slidesStore.setChanged_init()
+        } catch (error) {
+        }
       }
     }
-    const hideGlobalLoading = () => {
-      const loading_dom = document.querySelector('.higet_processing ') as HTMLElement
-      if (loading_dom) {
-        loading_dom.style.display = 'none'
-      }
+    window.onbeforeunload = (event) => {
+      // 自定义确认消息
+      handleBeforeUnload(event)
+      // return '你确定要离开当前页面吗？'
     }
     return {
       remarkHeight,
@@ -932,6 +1049,11 @@ export default defineComponent({
       dimension_obj_for_index,
       adjustWidth,
       hj_slider_dom,
+      dialogVisible,
+      openRemindDialog,
+      confirmButton,
+      discardButton,
+      cancelButton,
     }
   },
   created() {
@@ -1014,4 +1136,8 @@ export default defineComponent({
   width: 120px !important;
   max-width: 120px !important;
 } */
+.dialog-footer_ppt_remind {
+  text-align: right;
+  margin-top: 15px;
+}
 </style>

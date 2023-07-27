@@ -49,7 +49,6 @@ export default defineComponent({
     const mainStore = useMainStore()
     const { dialogForExport } = storeToRefs(mainStore)
     const closeExportDialog = () => mainStore.setDialogForExport('')
-
     const remarkHeight = ref(40)
     useGlobalHotkey()
     usePasteEvent()
