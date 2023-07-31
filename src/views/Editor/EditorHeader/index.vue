@@ -1105,6 +1105,7 @@ export default defineComponent({
   justify-content: space-between;
   padding: 0 10px;
   position: relative;
+  height: 40px;
 }
 
 .left,
